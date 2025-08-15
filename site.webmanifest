@@ -1,0 +1,67 @@
+{
+    "name": "TownRanker - Premium Web Development",
+    "short_name": "TownRanker",
+    "description": "Transform your business with custom websites, web applications, and CRM systems",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4285F4",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png"
+        },
+        {
+            "src": "/favicon-32x32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        },
+        {
+            "src": "/favicon-16x16.png",
+            "sizes": "16x16",
+            "type": "image/png"
+        }
+    ],
+    "categories": ["business", "developer", "productivity"],
+    "lang": "en-US",
+    "dir": "ltr",
+    "scope": "/",
+    "prefer_related_applications": false,
+    "shortcuts": [
+        {
+            "name": "Contact Us",
+            "short_name": "Contact",
+            "description": "Get in touch with our team",
+            "url": "/#contact",
+            "icons": [{ "src": "/favicon-32x32.png", "sizes": "32x32" }]
+        },
+        {
+            "name": "Our Services",
+            "short_name": "Services",
+            "description": "View our web development services",
+            "url": "/#services",
+            "icons": [{ "src": "/favicon-32x32.png", "sizes": "32x32" }]
+        },
+        {
+            "name": "Portfolio",
+            "short_name": "Portfolio",
+            "description": "See our recent work",
+            "url": "/#portfolio",
+            "icons": [{ "src": "/favicon-32x32.png", "sizes": "32x32" }]
+        }
+    ]
+}
