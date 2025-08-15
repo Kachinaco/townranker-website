@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /backend/
+Disallow: *.json$
+
+Sitemap: https://townranker.com/sitemap.xml

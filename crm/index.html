@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TownRanker CRM - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --sidebar-width: 250px;
+        }
+        
+        body {
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: var(--primary-gradient);
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .sidebar .logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .sidebar-nav li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-nav a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .sidebar-nav i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            margin: 0;
+            color: #1f2937;
+            font-size: 28px;
+        }
+        
+        /* Stats Cards */
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .stat-card .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-card.primary .stat-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .stat-card.success .stat-icon {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .stat-card.warning .stat-icon {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        
+        .stat-card.danger .stat-icon {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        
+        .stat-card h3 {
+            font-size: 32px;
+            margin: 0;
+            color: #1f2937;
+        }
+        
+        .stat-card p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        /* Tables */
+        .data-table {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .data-table h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+        
+        .table-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        
+        /* Status Badges */
+        .badge-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-lead { background: #e0e7ff; color: #4338ca; }
+        .badge-prospect { background: #fef3c7; color: #92400e; }
+        .badge-client { background: #d1fae5; color: #065f46; }
+        .badge-planning { background: #e0e7ff; color: #4338ca; }
+        .badge-in-progress { background: #fed7aa; color: #9a3412; }
+        .badge-completed { background: #d1fae5; color: #065f46; }
+        
+        /* Priority Badges */
+        .badge-priority {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-low { background: #f3f4f6; color: #4b5563; }
+        .badge-medium { background: #dbeafe; color: #1e40af; }
+        .badge-high { background: #fed7aa; color: #9a3412; }
+        .badge-urgent { background: #fee2e2; color: #991b1b; }
+        
+        /* Charts */
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .quick-action-btn {
+            flex: 1;
+            padding: 15px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            color: #4b5563;
+            transition: all 0.3s;
+        }
+        
+        .quick-action-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .quick-action-btn i {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="/crm" class="logo">
+            <i class="bi bi-graph-up"></i> TownRanker CRM
+        </a>
+        
+        <ul class="sidebar-nav">
+            <li>
+                <a href="#dashboard" class="active" onclick="showSection('dashboard')">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="#customers" onclick="showSection('customers')">
+                    <i class="bi bi-people"></i> Customers
+                </a>
+            </li>
+            <li>
+                <a href="#projects" onclick="showSection('projects')">
+                    <i class="bi bi-kanban"></i> Projects
+                </a>
+            </li>
+            <li>
+                <a href="#payments" onclick="showSection('payments')">
+                    <i class="bi bi-credit-card"></i> Payments
+                </a>
+            </li>
+            <li>
+                <a href="#proposals" onclick="showSection('proposals')">
+                    <i class="bi bi-file-text"></i> Proposals
+                </a>
+            </li>
+            <li>
+                <a href="#analytics" onclick="showSection('analytics')">
+                    <i class="bi bi-bar-chart"></i> Analytics
+                </a>
+            </li>
+            <li class="mt-4">
+                <a href="/" target="_blank">
+                    <i class="bi bi-globe"></i> View Website
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="logout()" style="color: #fca5a5;">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="section">
+            <div class="header">
+                <h1>Dashboard</h1>
+                <p class="text-muted mb-0">Welcome back! Here's what's happening with your business.</p>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <a href="#" class="quick-action-btn" onclick="showModal('newCustomer')">
+                    <i class="bi bi-person-plus"></i>
+                    <span>New Customer</span>
+                </a>
+                <a href="#" class="quick-action-btn" onclick="showModal('newProject')">
+                    <i class="bi bi-folder-plus"></i>
+                    <span>New Project</span>
+                </a>
+                <a href="#" class="quick-action-btn" onclick="showModal('newInvoice')">
+                    <i class="bi bi-receipt"></i>
+                    <span>New Invoice</span>
+                </a>
+                <a href="#" class="quick-action-btn" onclick="showModal('newProposal')">
+                    <i class="bi bi-file-earmark-plus"></i>
+                    <span>New Proposal</span>
+                </a>
+            </div>
+            
+            <!-- Stats Grid -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stat-card primary">
+                        <div class="stat-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h3 id="stat-customers">0</h3>
+                        <p>Total Customers</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card success">
+                        <div class="stat-icon">
+                            <i class="bi bi-folder"></i>
+                        </div>
+                        <h3 id="stat-projects">0</h3>
+                        <p>Active Projects</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card warning">
+                        <div class="stat-icon">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                        <h3 id="stat-revenue">$0</h3>
+                        <p>Total Revenue</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card danger">
+                        <div class="stat-icon">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <h3 id="stat-overdue">0</h3>
+                        <p>Overdue Payments</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="data-table">
+                        <h2>Recent Customers</h2>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-customers">
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="data-table">
+                        <h2>Recent Projects</h2>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Progress</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-projects">
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Customers Section -->
+        <div id="customers-section" class="section" style="display: none;">
+            <div class="header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1>Customers</h1>
+                    <button class="btn btn-primary" onclick="showModal('newCustomer')">
+                        <i class="bi bi-plus-circle"></i> Add Customer
+                    </button>
+                </div>
+            </div>
+            
+            <div class="data-table">
+                <div class="table-actions">
+                    <input type="text" class="form-control w-25" placeholder="Search customers..." id="customer-search">
+                    <div>
+                        <select class="form-select" id="customer-filter">
+                            <option value="">All Status</option>
+                            <option value="lead">Leads</option>
+                            <option value="prospect">Prospects</option>
+                            <option value="client">Clients</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Lead Score</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customers-list">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">Loading customers...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Projects Section -->
+        <div id="projects-section" class="section" style="display: none;">
+            <div class="header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1>Projects</h1>
+                    <button class="btn btn-primary" onclick="showModal('newProject')">
+                        <i class="bi bi-plus-circle"></i> New Project
+                    </button>
+                </div>
+            </div>
+            
+            <div class="data-table">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Project Name</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projects-list">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">Loading projects...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Payments Section -->
+        <div id="payments-section" class="section" style="display: none;">
+            <div class="header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1>Payments</h1>
+                    <button class="btn btn-primary" onclick="showModal('newInvoice')">
+                        <i class="bi bi-plus-circle"></i> Create Invoice
+                    </button>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="stat-card success">
+                        <div class="stat-icon">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <h3 id="total-paid">$0</h3>
+                        <p>Total Paid</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card warning">
+                        <div class="stat-icon">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <h3 id="total-pending">$0</h3>
+                        <p>Pending</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card danger">
+                        <div class="stat-icon">
+                            <i class="bi bi-exclamation-circle"></i>
+                        </div>
+                        <h3 id="total-overdue">$0</h3>
+                        <p>Overdue</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="data-table">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Due Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payments-list">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">Loading payments...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Proposals Section -->
+        <div id="proposals-section" class="section" style="display: none;">
+            <div class="header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1>Proposals</h1>
+                    <button class="btn btn-primary" onclick="showModal('newProposal')">
+                        <i class="bi bi-plus-circle"></i> Create Proposal
+                    </button>
+                </div>
+            </div>
+            
+            <div class="data-table">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Proposal #</th>
+                                <th>Customer</th>
+                                <th>Title</th>
+                                <th>Value</th>
+                                <th>Status</th>
+                                <th>Valid Until</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="proposals-list">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">Loading proposals...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    
+    <!-- New Customer Modal -->
+    <div class="modal fade" id="newCustomerModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-person-plus"></i> Add New Customer</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newCustomerForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="customerName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="customerEmail" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone *</label>
+                                <input type="tel" class="form-control" id="customerPhone" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Company</label>
+                                <input type="text" class="form-control" id="customerCompany">
+                            </div>
+                        </div>
+                        <hr>
+                        <h6>Project Information</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Project Type</label>
+                                <select class="form-select" id="customerProjectType">
+                                    <option value="">Select type...</option>
+                                    <option value="business">Business Website</option>
+                                    <option value="ecommerce">E-Commerce</option>
+                                    <option value="webapp">Web Application</option>
+                                    <option value="landing">Landing Page</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Budget Range</label>
+                                <input type="number" class="form-control" id="customerBudget" placeholder="5000">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Timeline</label>
+                                <select class="form-select" id="customerTimeline">
+                                    <option value="">Select timeline...</option>
+                                    <option value="asap">ASAP</option>
+                                    <option value="1-2months">1-2 Months</option>
+                                    <option value="3-4months">3-4 Months</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" id="customerStatus">
+                                    <option value="lead">Lead</option>
+                                    <option value="prospect">Prospect</option>
+                                    <option value="client">Client</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" id="customerNotes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveNewCustomer()">
+                        <i class="bi bi-save"></i> Save Customer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- New Project Modal -->
+    <div class="modal fade" id="newProjectModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-folder-plus"></i> Create New Project</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newProjectForm">
+                        <div class="mb-3">
+                            <label class="form-label">Project Name *</label>
+                            <input type="text" class="form-control" id="projectName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Customer *</label>
+                            <select class="form-select" id="projectCustomer" required>
+                                <option value="">Select customer...</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Project Type</label>
+                                <select class="form-select" id="projectType">
+                                    <option value="business">Business Website</option>
+                                    <option value="ecommerce">E-Commerce</option>
+                                    <option value="webapp">Web Application</option>
+                                    <option value="landing">Landing Page</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Budget</label>
+                                <input type="number" class="form-control" id="projectBudget" placeholder="10000">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="projectStartDate">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="projectEndDate">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="projectDescription" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="saveNewProject()">
+                        <i class="bi bi-save"></i> Create Project
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- New Invoice Modal -->
+    <div class="modal fade" id="newInvoiceModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title"><i class="bi bi-receipt"></i> Create New Invoice</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newInvoiceForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Customer *</label>
+                                <select class="form-select" id="invoiceCustomer" required>
+                                    <option value="">Select customer...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Due Date *</label>
+                                <input type="date" class="form-control" id="invoiceDueDate" required>
+                            </div>
+                        </div>
+                        
+                        <h6>Line Items</h6>
+                        <div id="invoiceItems">
+                            <div class="invoice-item mb-2">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" placeholder="Description">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" class="form-control" placeholder="Qty" value="1">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="number" class="form-control" placeholder="Rate" step="0.01">
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeInvoiceItem(this)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="addInvoiceItem()">
+                            <i class="bi bi-plus"></i> Add Item
+                        </button>
+                        
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Tax Rate (%)</label>
+                                <input type="number" class="form-control" id="invoiceTaxRate" value="0" step="0.01">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Total</label>
+                                <input type="text" class="form-control" id="invoiceTotal" readonly>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" onclick="saveNewInvoice()">
+                        <i class="bi bi-save"></i> Create Invoice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- New Proposal Modal -->
+    <div class="modal fade" id="newProposalModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title"><i class="bi bi-file-earmark-text"></i> Create New Proposal</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newProposalForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Customer *</label>
+                                <select class="form-select" id="proposalCustomer" required>
+                                    <option value="">Select customer...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Proposal Title *</label>
+                                <input type="text" class="form-control" id="proposalTitle" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Executive Summary</label>
+                            <textarea class="form-control" id="proposalSummary" rows="4"></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Total Amount</label>
+                                <input type="number" class="form-control" id="proposalAmount" placeholder="10000">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Valid Until</label>
+                                <input type="date" class="form-control" id="proposalValidUntil">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Template</label>
+                                <select class="form-select" id="proposalTemplate">
+                                    <option value="standard">Standard</option>
+                                    <option value="detailed">Detailed</option>
+                                    <option value="simple">Simple</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-info text-white" onclick="saveNewProposal()">
+                        <i class="bi bi-save"></i> Create Proposal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="assets/crm.js"></script>
+    <script src="assets/modals.js"></script>
+</body>
+</html>

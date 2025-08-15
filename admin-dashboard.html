@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TownRanker Admin - Lead Management Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --gray: #6b7280;
+            --light: #f9fafb;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        /* Login Screen */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: var(--shadow);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--gray);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card h3 {
+            color: var(--gray);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .stat-change {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-change.positive {
+            color: var(--success);
+        }
+
+        .stat-change.negative {
+            color: var(--danger);
+        }
+
+        /* Filters */
+        .filters-container {
+            padding: 0 30px 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-box .material-icons {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        /* Leads Table */
+        .table-container {
+            padding: 0 30px 30px;
+        }
+
+        .leads-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--light);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: var(--light);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .status-badge.new {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-badge.contacted {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.qualified {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.proposal {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .status-badge.closed-won {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-badge.closed-lost {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .project-type {
+            background: var(--light);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .budget {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            background: transparent;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-action:hover {
+            background: var(--light);
+            color: var(--primary);
+        }
+
+        /* Template Buttons */
+        .template-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 12px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+            text-align: left;
+        }
+
+        .template-btn:hover {
+            background: var(--light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .template-btn.active {
+            background: #eef2ff;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Lead Details Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            color: var(--dark);
+        }
+
+        .close-modal {
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .detail-group {
+            margin-bottom: 20px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            color: var(--dark);
+            font-size: 16px;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features-list li {
+            padding: 5px 0;
+            color: var(--dark);
+        }
+
+        .features-list li::before {
+            content: '✓ ';
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state .material-icons {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        .spinner {
+            border: 3px solid var(--light);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-container {
+                flex-direction: column;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 700px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <h1>Admin Login</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="password">Access Token</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter admin token" required>
+                </div>
+                <button type="submit" class="btn-login">Login to Dashboard</button>
+            </form>
+            <p style="text-align: center; margin-top: 20px; color: var(--gray); font-size: 14px;">
+                Use token: dev-token
+            </p>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
+        <!-- Header -->
+        <div class="header">
+            <h1>Lead Management Dashboard</h1>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="refreshData()">
+                    <span class="material-icons" style="font-size: 18px; vertical-align: middle;">refresh</span>
+                    Refresh
+                </button>
+                <button class="btn btn-secondary" onclick="exportLeads()">
+                    <span class="material-icons" style="font-size: 18px; vertical-align: middle;">download</span>
+                    Export CSV
+                </button>
+                <button class="btn btn-secondary" onclick="logout()">
+                    <span class="material-icons" style="font-size: 18px; vertical-align: middle;">logout</span>
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <h3>Total Leads</h3>
+                <div class="stat-value" id="totalLeads">0</div>
+                <div class="stat-change positive">
+                    <span class="material-icons" style="font-size: 16px;">trending_up</span>
+                    <span id="leadGrowth">+0% this month</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>New Leads</h3>
+                <div class="stat-value" id="newLeads">0</div>
+                <div class="stat-change positive">
+                    <span class="material-icons" style="font-size: 16px;">fiber_new</span>
+                    <span>Awaiting contact</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>Qualified Leads</h3>
+                <div class="stat-value" id="qualifiedLeads">0</div>
+                <div class="stat-change positive">
+                    <span class="material-icons" style="font-size: 16px;">verified</span>
+                    <span>Ready for proposal</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>Conversion Rate</h3>
+                <div class="stat-value" id="conversionRate">0%</div>
+                <div class="stat-change positive">
+                    <span class="material-icons" style="font-size: 16px;">insights</span>
+                    <span>Win rate</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-container">
+            <select class="filter-select" id="statusFilter" onchange="filterLeads()">
+                <option value="">All Status</option>
+                <option value="new">New</option>
+                <option value="contacted">Contacted</option>
+                <option value="qualified">Qualified</option>
+                <option value="proposal">Proposal Sent</option>
+                <option value="closed-won">Closed Won</option>
+                <option value="closed-lost">Closed Lost</option>
+            </select>
+            <select class="filter-select" id="projectFilter" onchange="filterLeads()">
+                <option value="">All Projects</option>
+                <option value="business">Business Website</option>
+                <option value="ecommerce">E-Commerce</option>
+                <option value="webapp">Web Application</option>
+                <option value="crm">CRM System</option>
+                <option value="mobile">Mobile App</option>
+                <option value="other">Other</option>
+            </select>
+            <select class="filter-select" id="budgetFilter" onchange="filterLeads()">
+                <option value="">All Budgets</option>
+                <option value="0-1000">$500 - $1k</option>
+                <option value="1000-5000">$1k - $5k</option>
+                <option value="5000-10000">$5k - $10k</option>
+                <option value="10000-25000">$10k - $25k</option>
+                <option value="25000+">$25k+</option>
+            </select>
+            <div class="search-box">
+                <span class="material-icons">search</span>
+                <input type="text" id="searchInput" placeholder="Search by name, email, or company..." onkeyup="filterLeads()">
+            </div>
+        </div>
+
+        <!-- Leads Table -->
+        <div class="table-container">
+            <div class="leads-table">
+                <div id="loadingState" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 20px;">Loading leads...</p>
+                </div>
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <span class="material-icons">inbox</span>
+                    <h3>No leads found</h3>
+                    <p>New leads will appear here when they submit the form</p>
+                </div>
+                <table id="leadsTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Name</th>
+                            <th>Contact</th>
+                            <th>Project</th>
+                            <th>Budget</th>
+                            <th>Timeline</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leadsTableBody">
+                        <!-- Leads will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lead Details Modal -->
+    <div id="leadModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Lead Details</h2>
+                <button class="close-modal" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Lead details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Modal -->
+    <div id="emailModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>Send Email</h2>
+                <button class="close-modal" onclick="closeEmailModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; gap: 20px;">
+                    <!-- Templates Sidebar -->
+                    <div style="flex: 0 0 250px; border-right: 1px solid #e5e7eb; padding-right: 20px;">
+                        <h4 style="margin-bottom: 15px; color: var(--dark);">Email Templates</h4>
+                        <div id="templatesList" style="display: flex; flex-direction: column; gap: 10px;">
+                            <button class="template-btn" onclick="loadTemplate('welcome')">
+                                <span class="material-icons" style="font-size: 18px;">waving_hand</span>
+                                Welcome Email
+                            </button>
+                            <button class="template-btn" onclick="loadTemplate('follow-up')">
+                                <span class="material-icons" style="font-size: 18px;">replay</span>
+                                Follow-Up
+                            </button>
+                            <button class="template-btn" onclick="loadTemplate('proposal')">
+                                <span class="material-icons" style="font-size: 18px;">description</span>
+                                Send Proposal
+                            </button>
+                            <button class="template-btn" onclick="loadTemplate('quote')">
+                                <span class="material-icons" style="font-size: 18px;">request_quote</span>
+                                Price Quote
+                            </button>
+                            <button class="template-btn" onclick="loadTemplate('thank-you')">
+                                <span class="material-icons" style="font-size: 18px;">favorite</span>
+                                Thank You
+                            </button>
+                            <button class="template-btn" onclick="loadTemplate('custom')">
+                                <span class="material-icons" style="font-size: 18px;">edit</span>
+                                Custom Email
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Email Composer -->
+                    <div style="flex: 1;">
+                        <div class="form-group">
+                            <label>To:</label>
+                            <input type="email" id="emailTo" class="form-control" readonly style="background: #f3f4f6;">
+                        </div>
+                        <div class="form-group">
+                            <label>Subject:</label>
+                            <input type="text" id="emailSubject" class="form-control" placeholder="Enter email subject...">
+                        </div>
+                        <div class="form-group">
+                            <label>Message:</label>
+                            <textarea id="emailBody" class="form-control" rows="12" placeholder="Compose your email..."></textarea>
+                        </div>
+                        <div style="background: #f0f9ff; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                            <small style="color: #0369a1;">
+                                <strong>Available variables:</strong> {name}, {company}, {projectType}, {budget}, {timeline}
+                            </small>
+                        </div>
+                        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button class="btn btn-secondary" onclick="closeEmailModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="sendEmail()">
+                                <span class="material-icons" style="font-size: 18px; margin-right: 5px;">send</span>
+                                Send Email
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = '';
+        let allLeads = [];
+        let filteredLeads = [];
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const token = document.getElementById('password').value;
+            authToken = token;
+            
+            // Store in sessionStorage
+            sessionStorage.setItem('adminToken', token);
+            
+            // Show dashboard
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').classList.add('active');
+            
+            // Load leads
+            loadLeads();
+        });
+
+        // Check if already logged in
+        window.onload = function() {
+            const savedToken = sessionStorage.getItem('adminToken');
+            if (savedToken) {
+                authToken = savedToken;
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').classList.add('active');
+                loadLeads();
+            }
+        };
+
+        // Logout
+        function logout() {
+            sessionStorage.removeItem('adminToken');
+            authToken = '';
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('loginScreen').style.display = 'flex';
+        }
+
+        // Load leads
+        async function loadLeads() {
+            const loadingState = document.getElementById('loadingState');
+            const emptyState = document.getElementById('emptyState');
+            const table = document.getElementById('leadsTable');
+            
+            loadingState.style.display = 'block';
+            emptyState.style.display = 'none';
+            table.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/leads', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.status === 401) {
+                    alert('Invalid token. Please login again.');
+                    logout();
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    allLeads = data.leads;
+                    filteredLeads = allLeads;
+                    updateStats();
+                    renderLeads();
+                } else {
+                    throw new Error('Failed to load leads');
+                }
+            } catch (error) {
+                console.error('Error loading leads:', error);
+                emptyState.style.display = 'block';
+            } finally {
+                loadingState.style.display = 'none';
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            const totalLeads = allLeads.length;
+            const newLeads = allLeads.filter(l => l.status === 'new').length;
+            const qualifiedLeads = allLeads.filter(l => l.status === 'qualified').length;
+            const closedWon = allLeads.filter(l => l.status === 'closed-won').length;
+            const closedTotal = allLeads.filter(l => l.status.startsWith('closed')).length;
+            const conversionRate = closedTotal > 0 ? Math.round((closedWon / closedTotal) * 100) : 0;
+            
+            document.getElementById('totalLeads').textContent = totalLeads;
+            document.getElementById('newLeads').textContent = newLeads;
+            document.getElementById('qualifiedLeads').textContent = qualifiedLeads;
+            document.getElementById('conversionRate').textContent = conversionRate + '%';
+            
+            // Calculate growth (mock data for demo)
+            const growth = Math.round(Math.random() * 30) + 10;
+            document.getElementById('leadGrowth').textContent = `+${growth}% this month`;
+        }
+
+        // Render leads
+        function renderLeads() {
+            const tbody = document.getElementById('leadsTableBody');
+            const table = document.getElementById('leadsTable');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (filteredLeads.length === 0) {
+                table.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            table.style.display = 'table';
+            emptyState.style.display = 'none';
+            
+            tbody.innerHTML = filteredLeads.map(lead => `
+                <tr>
+                    <td>${new Date(lead.createdAt).toLocaleDateString()}</td>
+                    <td><strong>${lead.name}</strong></td>
+                    <td>
+                        <div>${lead.email}</div>
+                        <div style="color: var(--gray); font-size: 12px;">${lead.phone}</div>
+                    </td>
+                    <td><span class="project-type">${lead.projectType}</span></td>
+                    <td class="budget">$${lead.budget.toLocaleString()}</td>
+                    <td>${formatTimeline(lead.timeline)}</td>
+                    <td>
+                        <span class="status-badge ${lead.status}">${lead.status.replace('-', ' ')}</span>
+                    </td>
+                    <td class="actions">
+                        <button class="btn-action" onclick="viewLead('${lead._id}')" title="View Details">
+                            <span class="material-icons">visibility</span>
+                        </button>
+                        <button class="btn-action" onclick="updateStatus('${lead._id}')" title="Update Status">
+                            <span class="material-icons">edit</span>
+                        </button>
+                        <button class="btn-action" onclick="contactLead('${lead._id}')" title="Contact">
+                            <span class="material-icons">mail</span>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Format timeline
+        function formatTimeline(timeline) {
+            switch(timeline) {
+                case 'asap': return 'ASAP';
+                case '1-2months': return '1-2 Months';
+                case '3-4months': return '3-4 Months';
+                case 'flexible': return 'Flexible';
+                default: return timeline;
+            }
+        }
+
+        // Filter leads
+        function filterLeads() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const projectFilter = document.getElementById('projectFilter').value;
+            const budgetFilter = document.getElementById('budgetFilter').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            filteredLeads = allLeads.filter(lead => {
+                // Status filter
+                if (statusFilter && lead.status !== statusFilter) return false;
+                
+                // Project filter
+                if (projectFilter && lead.projectType !== projectFilter) return false;
+                
+                // Budget filter
+                if (budgetFilter) {
+                    const budget = lead.budget;
+                    switch(budgetFilter) {
+                        case '0-1000':
+                            if (budget < 500 || budget >= 1000) return false;
+                            break;
+                        case '1000-5000':
+                            if (budget < 1000 || budget >= 5000) return false;
+                            break;
+                        case '5000-10000':
+                            if (budget < 5000 || budget >= 10000) return false;
+                            break;
+                        case '10000-25000':
+                            if (budget < 10000 || budget >= 25000) return false;
+                            break;
+                        case '25000+':
+                            if (budget < 25000) return false;
+                            break;
+                    }
+                }
+                
+                // Search filter
+                if (searchTerm) {
+                    const searchIn = `${lead.name} ${lead.email} ${lead.company || ''}`.toLowerCase();
+                    if (!searchIn.includes(searchTerm)) return false;
+                }
+                
+                return true;
+            });
+            
+            renderLeads();
+        }
+
+        // View lead details
+        function viewLead(leadId) {
+            const lead = allLeads.find(l => l._id === leadId);
+            if (!lead) return;
+            
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="detail-group">
+                    <div class="detail-label">Contact Information</div>
+                    <div class="detail-value">${lead.name}</div>
+                    <div class="detail-value">${lead.email}</div>
+                    <div class="detail-value">${lead.phone}</div>
+                    ${lead.company ? `<div class="detail-value">${lead.company}</div>` : ''}
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Project Details</div>
+                    <div class="detail-value">Type: ${lead.projectType}</div>
+                    <div class="detail-value">Budget: $${lead.budget.toLocaleString()}</div>
+                    <div class="detail-value">Timeline: ${formatTimeline(lead.timeline)}</div>
+                </div>
+                
+                ${lead.features && lead.features.length > 0 ? `
+                    <div class="detail-group">
+                        <div class="detail-label">Requested Features</div>
+                        <ul class="features-list">
+                            ${lead.features.map(f => `<li>${f}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+                
+                ${lead.message ? `
+                    <div class="detail-group">
+                        <div class="detail-label">Additional Message</div>
+                        <div class="detail-value">${lead.message}</div>
+                    </div>
+                ` : ''}
+                
+                <div class="detail-group">
+                    <div class="detail-label">Lead Information</div>
+                    <div class="detail-value">Status: <span class="status-badge ${lead.status}">${lead.status.replace('-', ' ')}</span></div>
+                    <div class="detail-value">Created: ${new Date(lead.createdAt).toLocaleString()}</div>
+                    <div class="detail-value">Lead ID: ${lead._id}</div>
+                </div>
+            `;
+            
+            document.getElementById('leadModal').classList.add('active');
+        }
+
+        // Update lead status
+        async function updateStatus(leadId) {
+            const lead = allLeads.find(l => l._id === leadId);
+            if (!lead) return;
+            
+            const newStatus = prompt('Update status to:\n\nnew, contacted, qualified, proposal, closed-won, closed-lost', lead.status);
+            if (!newStatus || newStatus === lead.status) return;
+            
+            const validStatuses = ['new', 'contacted', 'qualified', 'proposal', 'closed-won', 'closed-lost'];
+            if (!validStatuses.includes(newStatus)) {
+                alert('Invalid status');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/leads/${leadId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    // Update local data
+                    lead.status = newStatus;
+                    renderLeads();
+                    updateStats();
+                    alert('Status updated successfully');
+                } else {
+                    throw new Error('Failed to update status');
+                }
+            } catch (error) {
+                console.error('Error updating status:', error);
+                alert('Failed to update status');
+            }
+        }
+
+        // Contact lead
+        // Email Templates
+        const emailTemplates = {
+            'welcome': {
+                subject: 'Welcome to TownRanker - Let\'s Get Started!',
+                body: `Hi {name},
+
+Thank you for reaching out to us about your {projectType} project. We're excited to learn more about your needs and how we can help {company} achieve its goals.
+
+I've reviewed your project requirements, and with your budget of ${'{budget}'} and timeline of {timeline}, we can definitely create something amazing together.
+
+I'd love to schedule a brief call to discuss:
+• Your specific requirements and goals
+• Our recommended approach
+• Timeline and milestones
+• Any questions you might have
+
+Are you available for a 30-minute call this week? I have availability on:
+- Tuesday 2-4 PM EST
+- Wednesday 10 AM - 12 PM EST
+- Thursday 3-5 PM EST
+
+Looking forward to speaking with you!
+
+Best regards,
+The TownRanker Team`
+            },
+            'follow-up': {
+                subject: 'Following up on your {projectType} project',
+                body: `Hi {name},
+
+I wanted to follow up on your recent inquiry about {projectType} for {company}.
+
+I understand you're looking to get started within {timeline} with a budget of ${'{budget}'}. Based on these requirements, I've put together some initial thoughts on how we can help you achieve your goals.
+
+Would you be interested in a quick 15-minute call to discuss the next steps? I'm confident we can deliver exactly what you're looking for.
+
+Please let me know what works best for your schedule.
+
+Best regards,
+The TownRanker Team`
+            },
+            'proposal': {
+                subject: 'Proposal for {company} - {projectType}',
+                body: `Dear {name},
+
+Thank you for taking the time to discuss your {projectType} project with us. Based on our conversation, I'm pleased to present our proposal for {company}.
+
+Project Overview:
+• Project Type: {projectType}
+• Timeline: {timeline}
+• Investment: ${'{budget}'}
+
+Our Approach:
+1. Discovery & Planning Phase (Week 1)
+2. Design & Development (Weeks 2-4)
+3. Testing & Refinement (Week 5)
+4. Launch & Training (Week 6)
+
+Key Deliverables:
+• Fully responsive, modern design
+• SEO optimization
+• Performance optimization
+• 30-day post-launch support
+
+I've attached a detailed proposal document for your review. Please feel free to reach out if you have any questions or would like to discuss any adjustments.
+
+Looking forward to partnering with you!
+
+Best regards,
+The TownRanker Team`
+            },
+            'quote': {
+                subject: 'Price Quote for {projectType}',
+                body: `Hi {name},
+
+Thank you for your interest in our {projectType} services. Based on your requirements, here's our quote for {company}:
+
+Project: {projectType}
+Timeline: {timeline}
+Total Investment: ${'{budget}'}
+
+This includes:
+• Complete project development
+• Quality assurance and testing
+• Project management
+• 30-day post-launch support
+• Training documentation
+
+Payment Terms:
+• 30% upfront
+• 40% at midpoint
+• 30% upon completion
+
+This quote is valid for 30 days. Please let me know if you'd like to proceed or if you have any questions.
+
+Best regards,
+The TownRanker Team`
+            },
+            'thank-you': {
+                subject: 'Thank you for choosing TownRanker!',
+                body: `Dear {name},
+
+Thank you for choosing TownRanker for your {projectType} project! We're thrilled to have the opportunity to work with {company}.
+
+Here's what happens next:
+1. You'll receive a project kickoff email within 24 hours
+2. We'll schedule an initial planning meeting
+3. You'll be assigned a dedicated project manager
+4. We'll begin work according to the agreed timeline
+
+If you have any immediate questions, please don't hesitate to reach out. We're here to ensure your project is a complete success.
+
+Welcome aboard!
+
+Best regards,
+The TownRanker Team`
+            },
+            'custom': {
+                subject: '',
+                body: ''
+            }
+        };
+
+        let currentLead = null;
+
+        function contactLead(leadId) {
+            const lead = allLeads.find(l => l._id === leadId);
+            if (!lead) return;
+            
+            currentLead = lead;
+            document.getElementById('emailTo').value = lead.email;
+            document.getElementById('emailModal').classList.add('active');
+            
+            // Load default template
+            loadTemplate('welcome');
+        }
+
+        function loadTemplate(templateName) {
+            const template = emailTemplates[templateName];
+            if (!template || !currentLead) return;
+            
+            // Update button states
+            document.querySelectorAll('.template-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.template-btn').classList.add('active');
+            
+            // Replace variables in template
+            const subject = replaceVariables(template.subject, currentLead);
+            const body = replaceVariables(template.body, currentLead);
+            
+            document.getElementById('emailSubject').value = subject;
+            document.getElementById('emailBody').value = body;
+        }
+
+        function replaceVariables(text, lead) {
+            return text
+                .replace(/{name}/g, lead.name)
+                .replace(/{company}/g, lead.company || 'your company')
+                .replace(/{projectType}/g, lead.projectType)
+                .replace(/{budget}/g, lead.budget.toLocaleString())
+                .replace(/{timeline}/g, formatTimeline(lead.timeline));
+        }
+
+        function closeEmailModal() {
+            document.getElementById('emailModal').classList.remove('active');
+            currentLead = null;
+        }
+
+        function sendEmail() {
+            const to = document.getElementById('emailTo').value;
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').value;
+            
+            if (!subject || !body) {
+                alert('Please enter both subject and message');
+                return;
+            }
+            
+            // In a real application, this would send via backend
+            // For now, we'll use mailto as fallback
+            const mailtoLink = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoLink;
+            
+            // Update lead status
+            if (currentLead) {
+                updateLeadStatus(currentLead._id, 'contacted');
+            }
+            
+            closeEmailModal();
+            
+            // Show success message
+            alert('Email client opened. After sending, the lead status will be updated to "Contacted".');
+        }
+
+        function updateLeadStatus(leadId, status) {
+            // Update local data
+            const lead = allLeads.find(l => l._id === leadId);
+            if (lead) {
+                lead.status = status;
+                renderLeads();
+                updateStats();
+            }
+            
+            // In a real app, this would update the backend
+            fetch(`/api/leads/${leadId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status })
+            }).catch(err => console.error('Error updating status:', err));
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('leadModal').classList.remove('active');
+        }
+
+        // Refresh data
+        function refreshData() {
+            loadLeads();
+        }
+
+        // Export to CSV
+        function exportLeads() {
+            if (filteredLeads.length === 0) {
+                alert('No leads to export');
+                return;
+            }
+            
+            const headers = ['Date', 'Name', 'Email', 'Phone', 'Company', 'Project Type', 'Budget', 'Timeline', 'Features', 'Status', 'Message'];
+            const csvContent = [
+                headers.join(','),
+                ...filteredLeads.map(lead => [
+                    new Date(lead.createdAt).toLocaleDateString(),
+                    lead.name,
+                    lead.email,
+                    lead.phone,
+                    lead.company || '',
+                    lead.projectType,
+                    lead.budget,
+                    lead.timeline,
+                    (lead.features || []).join('; '),
+                    lead.status,
+                    lead.message || ''
+                ].map(v => `"${v}"`).join(','))
+            ].join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `leads-${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('leadModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
