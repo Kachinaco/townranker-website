@@ -1,6 +1,33 @@
 // CRM JavaScript
 const API_BASE = '/api/crm';
 
+// Mobile Menu Functions
+function toggleMobileMenu() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
+
+function closeMobileMenu() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    
+    // Only close if on mobile
+    if (window.innerWidth <= 768) {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+    }
+}
+
+// Close mobile menu on window resize
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+        closeMobileMenu();
+    }
+});
+
 // Get auth token
 const getAuthToken = () => {
     return localStorage.getItem('crm_token') || sessionStorage.getItem('crm_token');

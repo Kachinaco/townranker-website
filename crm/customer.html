@@ -114,6 +114,82 @@
             gap: 20px;
         }
         
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .profile-header {
+                padding: 20px;
+            }
+            
+            .profile-header h1 {
+                font-size: 24px;
+            }
+            
+            .profile-header .company {
+                font-size: 16px;
+            }
+            
+            .profile-header .contact-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+            }
+            
+            .financial-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .nav-tabs .nav-link {
+                white-space: nowrap;
+                padding: 10px 15px;
+            }
+            
+            .table-responsive {
+                margin: 0 -15px;
+            }
+            
+            .content-card {
+                padding: 15px;
+            }
+            
+            /* Back button positioning */
+            .container {
+                padding: 15px;
+            }
+            
+            /* Modal adjustments */
+            .modal-dialog {
+                margin: 10px;
+            }
+            
+            .form-control, .form-select {
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .financial-card .value {
+                font-size: 20px;
+            }
+            
+            /* Stack form columns on small screens */
+            .row .col-md-6 {
+                margin-bottom: 15px;
+            }
+        }
+        
         .financial-card {
             padding: 15px;
             border-radius: 8px;
@@ -141,6 +217,7 @@
         .nav-tabs {
             border-bottom: 2px solid #e5e7eb;
             margin-bottom: 30px;
+            display: flex;
         }
         
         .nav-tabs .nav-link {

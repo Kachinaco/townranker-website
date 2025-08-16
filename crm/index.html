@@ -248,53 +248,208 @@
             margin-bottom: 5px;
         }
         
-        /* Responsive */
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 20px;
+        }
+        
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        
+        /* Responsive Styles */
         @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
             .sidebar {
                 transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .sidebar-overlay.active {
+                display: block;
             }
             
             .main-content {
                 margin-left: 0;
+                padding: 70px 15px 20px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+            
+            .quick-action-btn {
+                width: 100%;
+            }
+            
+            /* Stats Cards Mobile */
+            .stat-card {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .stat-card h3 {
+                font-size: 24px;
+            }
+            
+            .stat-card .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+                margin-bottom: 10px;
+            }
+            
+            /* Tables Mobile */
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .table {
+                min-width: 600px;
+            }
+            
+            .data-table {
+                padding: 15px;
+            }
+            
+            .table-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .table-actions input,
+            .table-actions select {
+                width: 100% !important;
+            }
+            
+            /* Modal Mobile */
+            .modal-dialog {
+                margin: 10px;
+            }
+            
+            .modal-content {
+                border-radius: 8px;
+            }
+            
+            .modal-header {
+                padding: 15px;
+            }
+            
+            .modal-title {
+                font-size: 18px;
+            }
+            
+            /* Form Elements Mobile */
+            .form-control, .form-select {
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+            
+            /* Header Actions Mobile */
+            .header .d-flex {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .header .btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .col-md-3, .col-md-4, .col-md-6 {
+                margin-bottom: 15px;
+            }
+            
+            /* Stack invoice items vertically on small screens */
+            .invoice-item .row > div {
+                margin-bottom: 10px;
+            }
+        }
+        
+        /* Touch-friendly buttons */
+        @media (hover: none) {
+            .btn, .quick-action-btn {
+                min-height: 44px;
+            }
+            
+            .table td button {
+                padding: 8px 12px;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+        <i class="bi bi-list"></i>
+    </button>
+    
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" onclick="toggleMobileMenu()"></div>
+    
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <a href="/crm" class="logo">
             <i class="bi bi-graph-up"></i> TownRanker CRM
         </a>
         
         <ul class="sidebar-nav">
             <li>
-                <a href="#dashboard" class="active" onclick="showSection('dashboard')">
+                <a href="#dashboard" class="active" onclick="showSection('dashboard'); closeMobileMenu()">
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
             </li>
             <li>
-                <a href="#customers" onclick="showSection('customers')">
+                <a href="#customers" onclick="showSection('customers'); closeMobileMenu()">
                     <i class="bi bi-people"></i> Customers
                 </a>
             </li>
             <li>
-                <a href="#projects" onclick="showSection('projects')">
+                <a href="#projects" onclick="showSection('projects'); closeMobileMenu()">
                     <i class="bi bi-kanban"></i> Projects
                 </a>
             </li>
             <li>
-                <a href="#payments" onclick="showSection('payments')">
+                <a href="#payments" onclick="showSection('payments'); closeMobileMenu()">
                     <i class="bi bi-credit-card"></i> Payments
                 </a>
             </li>
             <li>
-                <a href="#proposals" onclick="showSection('proposals')">
+                <a href="#proposals" onclick="showSection('proposals'); closeMobileMenu()">
                     <i class="bi bi-file-text"></i> Proposals
                 </a>
             </li>
             <li>
-                <a href="#analytics" onclick="showSection('analytics')">
+                <a href="#analytics" onclick="showSection('analytics'); closeMobileMenu()">
                     <i class="bi bi-bar-chart"></i> Analytics
                 </a>
             </li>
@@ -341,8 +496,8 @@
             </div>
             
             <!-- Stats Grid -->
-            <div class="row">
-                <div class="col-md-3">
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
                     <div class="stat-card primary">
                         <div class="stat-icon">
                             <i class="bi bi-people"></i>
@@ -351,7 +506,7 @@
                         <p>Total Customers</p>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-6 col-md-3">
                     <div class="stat-card success">
                         <div class="stat-icon">
                             <i class="bi bi-folder"></i>
@@ -360,7 +515,7 @@
                         <p>Active Projects</p>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-6 col-md-3">
                     <div class="stat-card warning">
                         <div class="stat-icon">
                             <i class="bi bi-cash-stack"></i>
@@ -369,7 +524,7 @@
                         <p>Total Revenue</p>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-6 col-md-3">
                     <div class="stat-card danger">
                         <div class="stat-icon">
                             <i class="bi bi-exclamation-triangle"></i>
@@ -381,8 +536,8 @@
             </div>
             
             <!-- Recent Activity -->
-            <div class="row mt-4">
-                <div class="col-md-6">
+            <div class="row mt-4 g-3">
+                <div class="col-12 col-md-6">
                     <div class="data-table">
                         <h2>Recent Customers</h2>
                         <div class="table-responsive">
@@ -404,7 +559,7 @@
                     </div>
                 </div>
                 
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <div class="data-table">
                         <h2>Recent Projects</h2>
                         <div class="table-responsive">
@@ -441,7 +596,7 @@
             
             <div class="data-table">
                 <div class="table-actions">
-                    <input type="text" class="form-control w-25" placeholder="Search customers..." id="customer-search">
+                    <input type="text" class="form-control" placeholder="Search customers..." id="customer-search" style="max-width: 300px;">
                     <div>
                         <select class="form-select" id="customer-filter">
                             <option value="">All Status</option>
@@ -783,13 +938,13 @@
                         <div id="invoiceItems">
                             <div class="invoice-item mb-2">
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-12 col-md-6">
                                         <input type="text" class="form-control" placeholder="Description">
                                     </div>
                                     <div class="col-md-2">
                                         <input type="number" class="form-control" placeholder="Qty" value="1">
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-6 col-md-3">
                                         <input type="number" class="form-control" placeholder="Rate" step="0.01">
                                     </div>
                                     <div class="col-md-1">
@@ -806,11 +961,11 @@
                         
                         <hr>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-12 col-md-6">
                                 <label class="form-label">Tax Rate (%)</label>
                                 <input type="number" class="form-control" id="invoiceTaxRate" value="0" step="0.01">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-12 col-md-6">
                                 <label class="form-label">Total</label>
                                 <input type="text" class="form-control" id="invoiceTotal" readonly>
                             </div>
