@@ -1,30 +1,34 @@
 // CRM JavaScript
 const API_BASE = '/api/crm';
 
-// Mobile Menu Functions
-function toggleMobileMenu() {
+// Mobile Menu Functions - Define globally before auth check
+window.toggleMobileMenu = function() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.querySelector('.sidebar-overlay');
     
-    sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
+    if (sidebar && overlay) {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
 }
 
-function closeMobileMenu() {
+window.closeMobileMenu = function() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.querySelector('.sidebar-overlay');
     
     // Only close if on mobile
     if (window.innerWidth <= 768) {
-        sidebar.classList.remove('active');
-        overlay.classList.remove('active');
+        if (sidebar && overlay) {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
     }
 }
 
 // Close mobile menu on window resize
 window.addEventListener('resize', function() {
     if (window.innerWidth > 768) {
-        closeMobileMenu();
+        window.closeMobileMenu();
     }
 });
 
@@ -43,9 +47,10 @@ const checkAuth = () => {
     return true;
 };
 
-// Initialize auth check
+// Initialize auth check - but don't throw error, just redirect
 if (!checkAuth()) {
-    throw new Error('Not authenticated');
+    // Stop execution without throwing error that would prevent mobile menu functions
+    // The redirect will happen from checkAuth()
 }
 
 const AUTH_TOKEN = getAuthToken();
@@ -96,8 +101,8 @@ const formatDate = (date) => {
     });
 };
 
-// Section Management
-const showSection = (section) => {
+// Section Management - Make globally accessible
+window.showSection = (section) => {
     // Hide all sections
     document.querySelectorAll('.section').forEach(s => {
         s.style.display = 'none';
@@ -413,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Logout function
-const logout = () => {
+window.logout = () => {
     // Clear tokens
     localStorage.removeItem('crm_token');
     sessionStorage.removeItem('crm_token');

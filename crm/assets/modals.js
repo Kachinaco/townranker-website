@@ -1,7 +1,7 @@
 // Modal Functions for CRM
 
-// Update showModal to open the correct modal
-const showModal = (type) => {
+// Update showModal to open the correct modal - Make globally accessible
+window.showModal = (type) => {
     switch(type) {
         case 'newCustomer':
             loadCustomerModal();
@@ -31,7 +31,7 @@ function loadCustomerModal() {
     modal.show();
 }
 
-async function saveNewCustomer() {
+window.saveNewCustomer = async function() {
     const customerData = {
         name: document.getElementById('customerName').value,
         email: document.getElementById('customerEmail').value,
@@ -110,7 +110,7 @@ async function loadProjectModal() {
     modal.show();
 }
 
-async function saveNewProject() {
+window.saveNewProject = async function() {
     const projectData = {
         name: document.getElementById('projectName').value,
         customer: document.getElementById('projectCustomer').value,
@@ -204,7 +204,7 @@ async function loadInvoiceModal() {
     modal.show();
 }
 
-function addInvoiceItem() {
+window.addInvoiceItem = function() {
     const itemsContainer = document.getElementById('invoiceItems');
     const newItem = document.createElement('div');
     newItem.className = 'invoice-item mb-2';
@@ -229,7 +229,7 @@ function addInvoiceItem() {
     itemsContainer.appendChild(newItem);
 }
 
-function removeInvoiceItem(button) {
+window.removeInvoiceItem = function(button) {
     const items = document.querySelectorAll('.invoice-item');
     if (items.length > 1) {
         button.closest('.invoice-item').remove();
@@ -255,7 +255,7 @@ function calculateInvoiceTotal() {
     document.getElementById('invoiceTotal').value = `$${total.toFixed(2)}`;
 }
 
-async function saveNewInvoice() {
+window.saveNewInvoice = async function() {
     const items = [];
     document.querySelectorAll('.invoice-item').forEach(item => {
         const description = item.querySelector('.item-description').value;
@@ -353,7 +353,7 @@ async function loadProposalModal() {
     modal.show();
 }
 
-async function saveNewProposal() {
+window.saveNewProposal = async function() {
     const proposalData = {
         customer: document.getElementById('proposalCustomer').value,
         title: document.getElementById('proposalTitle').value,
