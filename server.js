@@ -84,7 +84,23 @@ const leadSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    // Email tracking fields
+    emailCount: {
+        type: Number,
+        default: 0
+    },
+    lastContacted: {
+        type: Date
+    },
+    lastEmailOpened: {
+        type: Date
+    },
+    emailOpens: [{
+        timestamp: { type: Date, default: Date.now },
+        userAgent: String,
+        ip: String
+    }]
 });
 
 // Create Lead model
@@ -551,6 +567,85 @@ app.post('/api/send-follow-up-24hr', async (req, res) => {
     }
 });
 
+// Email open tracking endpoint
+app.get('/api/track-email-open/:trackingId', async (req, res) => {
+    try {
+        const { trackingId } = req.params;
+        
+        // Log the email open
+        console.log(`📧 Email opened: ${trackingId} at ${new Date().toISOString()}`);
+        
+        // Find and update the lead with email open data
+        const lead = await Lead.findById(trackingId);
+        if (lead) {
+            await Lead.findByIdAndUpdate(trackingId, {
+                $push: {
+                    emailOpens: {
+                        timestamp: new Date(),
+                        userAgent: req.get('User-Agent'),
+                        ip: req.ip || req.connection.remoteAddress
+                    }
+                },
+                lastEmailOpened: new Date()
+            });
+            console.log(`✅ Email open tracked for lead: ${lead.name}`);
+        }
+        
+        // Return a 1x1 transparent pixel
+        const pixel = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==', 'base64');
+        
+        res.set({
+            'Content-Type': 'image/png',
+            'Content-Length': pixel.length,
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        });
+        
+        res.send(pixel);
+    } catch (error) {
+        console.error('Email tracking error:', error);
+        // Still return the pixel even if tracking fails
+        const pixel = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==', 'base64');
+        res.set('Content-Type', 'image/png');
+        res.send(pixel);
+    }
+});
+
+// Get email tracking data for a customer
+app.get('/api/leads/:id/email-tracking', async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const lead = await Lead.findById(id);
+        if (!lead) {
+            return res.status(404).json({
+                success: false,
+                message: 'Customer not found'
+            });
+        }
+        
+        res.json({
+            success: true,
+            data: {
+                emailCount: lead.emailCount || 0,
+                lastContacted: lead.lastContacted,
+                lastEmailOpened: lead.lastEmailOpened,
+                emailOpens: lead.emailOpens || [],
+                openRate: lead.emailOpens && lead.emailCount ? 
+                    ((lead.emailOpens.length / lead.emailCount) * 100).toFixed(1) : '0'
+            }
+        });
+    } catch (error) {
+        console.error('Email tracking fetch error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch email tracking data',
+            error: error.message
+        });
+    }
+});
+
 // Send custom email from Communication tab
 app.post('/api/send-customer-email', async (req, res) => {
     try {
@@ -580,7 +675,8 @@ app.post('/api/send-customer-email', async (req, res) => {
             });
         }
 
-        // Create professional HTML email format
+        // Create professional HTML email format with tracking pixel
+        const trackingPixelUrl = `${req.protocol}://${req.get('host')}/api/track-email-open/${lead._id}`;
         const emailHtml = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; text-align: center;">
@@ -596,6 +692,8 @@ app.post('/api/send-customer-email', async (req, res) => {
                         Customer ID: ${lead._id}
                     </p>
                 </div>
+                <!-- Email tracking pixel -->
+                <img src="${trackingPixelUrl}" width="1" height="1" style="display:none;" alt="" />
             </div>
         `;
 
