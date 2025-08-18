@@ -110,6 +110,29 @@ const leadSchema = new mongoose.Schema({
         status: { type: String, enum: ['sent', 'draft', 'failed'], default: 'sent' },
         openCount: { type: Number, default: 0 },
         lastOpened: Date
+    }],
+    // Customer notes field
+    notes: [{
+        content: { type: String, required: true },
+        author: { type: String, default: 'Admin' },
+        priority: { type: String, enum: ['low', 'medium', 'high'], default: 'low' },
+        createdAt: { type: Date, default: Date.now }
+    }],
+    // Additional customer tracking fields
+    tags: [String],
+    priority: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
+    assignedTo: String,
+    // Interaction timeline
+    interactions: [{
+        type: { type: String, enum: ['email', 'call', 'meeting', 'status', 'note'], required: true },
+        title: { type: String, required: true },
+        description: String,
+        timestamp: { type: Date, default: Date.now },
+        metadata: {
+            emailSubject: String,
+            duration: Number,
+            outcome: String
+        }
     }]
 });
 
@@ -756,6 +779,161 @@ app.get('/api/leads/:id/email-history', async (req, res) => {
     }
 });
 
+// Add note to customer
+app.post('/api/leads/:id/notes', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { content, priority = 'low' } = req.body;
+        
+        if (!content) {
+            return res.status(400).json({
+                success: false,
+                message: 'Note content is required'
+            });
+        }
+        
+        const lead = await Lead.findByIdAndUpdate(id, {
+            $push: {
+                notes: {
+                    content: content,
+                    author: 'Admin',
+                    priority: priority,
+                    createdAt: new Date()
+                }
+            }
+        }, { new: true });
+        
+        if (!lead) {
+            return res.status(404).json({
+                success: false,
+                message: 'Customer not found'
+            });
+        }
+        
+        res.json({
+            success: true,
+            message: 'Note added successfully',
+            note: lead.notes[lead.notes.length - 1]
+        });
+    } catch (error) {
+        console.error('Add note error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to add note',
+            error: error.message
+        });
+    }
+});
+
+// Get customer notes
+app.get('/api/leads/:id/notes', async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const lead = await Lead.findById(id);
+        if (!lead) {
+            return res.status(404).json({
+                success: false,
+                message: 'Customer not found'
+            });
+        }
+        
+        // Return notes sorted by most recent first
+        const notes = (lead.notes || [])
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        res.json({
+            success: true,
+            data: notes
+        });
+    } catch (error) {
+        console.error('Get notes error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch notes',
+            error: error.message
+        });
+    }
+});
+
+// Get customer interactions (timeline)
+app.get('/api/leads/:id/interactions', async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const lead = await Lead.findById(id);
+        if (!lead) {
+            return res.status(404).json({
+                success: false,
+                message: 'Customer not found'
+            });
+        }
+        
+        // Return interactions sorted by most recent first
+        const interactions = (lead.interactions || [])
+            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        res.json({
+            success: true,
+            data: interactions
+        });
+    } catch (error) {
+        console.error('Get interactions error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch interactions',
+            error: error.message
+        });
+    }
+});
+
+// Add interaction to customer
+app.post('/api/leads/:id/interactions', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { type, title, description, metadata = {} } = req.body;
+        
+        if (!type || !title) {
+            return res.status(400).json({
+                success: false,
+                message: 'Type and title are required'
+            });
+        }
+        
+        const lead = await Lead.findByIdAndUpdate(id, {
+            $push: {
+                interactions: {
+                    type: type,
+                    title: title,
+                    description: description,
+                    timestamp: new Date(),
+                    metadata: metadata
+                }
+            }
+        }, { new: true });
+        
+        if (!lead) {
+            return res.status(404).json({
+                success: false,
+                message: 'Customer not found'
+            });
+        }
+        
+        res.json({
+            success: true,
+            message: 'Interaction added successfully',
+            interaction: lead.interactions[lead.interactions.length - 1]
+        });
+    } catch (error) {
+        console.error('Add interaction error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to add interaction',
+            error: error.message
+        });
+    }
+});
+
 // Get email tracking data for a customer
 app.get('/api/leads/:id/email-tracking', async (req, res) => {
     try {
@@ -849,7 +1027,7 @@ app.post('/api/send-customer-email', async (req, res) => {
             html: emailHtml
         });
 
-        // Save email to history and update lead's last contacted time
+        // Save email to history, add interaction, and update lead's last contacted time
         await Lead.findByIdAndUpdate(leadId, {
             lastContacted: new Date(),
             $inc: { emailCount: 1 },
@@ -861,6 +1039,15 @@ app.post('/api/send-customer-email', async (req, res) => {
                     sentAt: new Date(),
                     messageId: result.messageId,
                     status: 'sent'
+                },
+                interactions: {
+                    type: 'email',
+                    title: 'Email Sent',
+                    description: subject,
+                    timestamp: new Date(),
+                    metadata: {
+                        emailSubject: subject
+                    }
                 }
             }
         });

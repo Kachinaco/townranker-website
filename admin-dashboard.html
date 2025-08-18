@@ -1850,7 +1850,7 @@
         let currentLead = null;
 
         // View lead details with enhanced profile
-        function viewLead(leadId) {
+        async function viewLead(leadId) {
             const lead = allLeads.find(l => l._id === leadId);
             if (!lead) return;
             
@@ -1869,14 +1869,14 @@
                 `<span class="tag ${tag.type}">${tag.text}</span>`
             ).join('');
             
-            // Populate stats
-            populateProfileStats(lead);
+            // Populate stats (now async)
+            await populateProfileStats(lead);
             
             // Populate overview tab
             populateOverviewTab(lead);
             
-            // Populate timeline
-            populateTimelineTab(lead);
+            // Populate timeline (now async)
+            await populateTimelineTab(lead);
             
             // Populate pipeline
             populatePipelineTab(lead);
@@ -1884,8 +1884,8 @@
             // Populate communication
             populateCommunicationTab(lead);
             
-            // Populate notes
-            populateNotesTab(lead);
+            // Populate notes (now async)
+            await populateNotesTab(lead);
             
             // Reset to overview tab
             switchTab('overview');
@@ -1921,16 +1921,53 @@
             return tags;
         }
 
-        // Populate profile stats
-        function populateProfileStats(lead) {
+        // Populate profile stats with real data
+        async function populateProfileStats(lead) {
             const createdDate = new Date(lead.createdAt);
             const now = new Date();
             const daysAsCustomer = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
             
             document.getElementById('daysAsCustomer').textContent = daysAsCustomer;
-            document.getElementById('totalInteractions').textContent = getInteractionCount(lead);
             document.getElementById('projectValue').textContent = `$${(lead.budget || 0).toLocaleString()}`;
-            document.getElementById('responseTime').textContent = getAverageResponseTime(lead);
+            
+            // Get real interaction count
+            try {
+                const response = await fetch(`/api/leads/${lead._id}/interactions`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        document.getElementById('totalInteractions').textContent = result.data.length;
+                    } else {
+                        document.getElementById('totalInteractions').textContent = getInteractionCount(lead);
+                    }
+                } else {
+                    document.getElementById('totalInteractions').textContent = getInteractionCount(lead);
+                }
+            } catch (error) {
+                console.error('Error fetching interaction count:', error);
+                document.getElementById('totalInteractions').textContent = getInteractionCount(lead);
+            }
+            
+            // Set response time based on email opens
+            if (lead.lastEmailOpened) {
+                const lastOpenTime = new Date(lead.lastEmailOpened);
+                const hoursSinceOpen = Math.floor((now - lastOpenTime) / (1000 * 60 * 60));
+                
+                if (hoursSinceOpen < 1) {
+                    document.getElementById('responseTime').textContent = 'Recently active';
+                } else if (hoursSinceOpen < 24) {
+                    document.getElementById('responseTime').textContent = `${hoursSinceOpen}h ago`;
+                } else {
+                    document.getElementById('responseTime').textContent = getAverageResponseTime(lead);
+                }
+            } else {
+                document.getElementById('responseTime').textContent = getAverageResponseTime(lead);
+            }
         }
 
         // Get interaction count (mock data for now)
@@ -1988,10 +2025,83 @@
             document.getElementById('leadId').textContent = `Lead ID: ${lead._id}`;
         }
 
-        // Populate timeline tab with interactions
-        function populateTimelineTab(lead) {
+        // Populate timeline tab with real interactions
+        async function populateTimelineTab(lead) {
             const timeline = document.getElementById('interactionTimeline');
-            const interactions = generateTimelineData(lead);
+            
+            try {
+                // Fetch real interactions from server
+                const response = await fetch(`/api/leads/${lead._id}/interactions`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        displayTimeline(result.data, lead);
+                        return;
+                    }
+                }
+                
+                // Fallback to mock data if API fails
+                const interactions = generateTimelineData(lead);
+                displayTimelineMock(interactions);
+                
+            } catch (error) {
+                console.error('Error fetching interactions:', error);
+                // Fallback to mock data
+                const interactions = generateTimelineData(lead);
+                displayTimelineMock(interactions);
+            }
+        }
+
+        // Display real timeline data
+        function displayTimeline(interactions, lead) {
+            const timeline = document.getElementById('interactionTimeline');
+            
+            // Always include lead creation as first interaction if not present
+            const hasLeadCreation = interactions.some(i => i.type === 'status' && i.title === 'Lead Created');
+            if (!hasLeadCreation) {
+                interactions.unshift({
+                    type: 'status',
+                    title: 'Lead Created',
+                    description: `New lead from ${formatProjectType(lead.projectType)} inquiry`,
+                    timestamp: lead.createdAt
+                });
+            }
+            
+            if (interactions.length === 0) {
+                timeline.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                        <span class="material-icons" style="font-size: 48px; opacity: 0.5;">timeline</span>
+                        <p>No interactions found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            timeline.innerHTML = interactions.map(interaction => {
+                const interactionTime = new Date(interaction.timestamp);
+                return `
+                    <div class="timeline-item">
+                        <div class="timeline-icon ${interaction.type}">
+                            <span class="material-icons">${getTimelineIcon(interaction.type)}</span>
+                        </div>
+                        <div class="timeline-content">
+                            <h4>${interaction.title}</h4>
+                            <p>${interaction.description || ''}</p>
+                            <div class="timeline-time">${interactionTime.toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Display mock timeline data (fallback)
+        function displayTimelineMock(interactions) {
+            const timeline = document.getElementById('interactionTimeline');
             
             timeline.innerHTML = interactions.map(interaction => `
                 <div class="timeline-item">
@@ -2114,21 +2224,65 @@
             }));
         }
 
-        // Populate notes tab
-        function populateNotesTab(lead) {
+        // Populate notes tab with real data
+        async function populateNotesTab(lead) {
             const notesList = document.getElementById('notesList');
-            const notes = getCustomerNotes(lead);
             
-            notesList.innerHTML = notes.map(note => `
-                <div class="note-item">
-                    <div class="note-header">
-                        <span class="note-author">${note.author}</span>
-                        <span class="note-date">${note.date}</span>
+            try {
+                // Fetch real notes from server
+                const response = await fetch(`/api/leads/${lead._id}/notes`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        displayNotes(result.data);
+                        return;
+                    }
+                }
+                
+                // Fallback to mock data if API fails
+                const notes = getCustomerNotes(lead);
+                displayNotes(notes);
+                
+            } catch (error) {
+                console.error('Error fetching notes:', error);
+                // Fallback to mock data
+                const notes = getCustomerNotes(lead);
+                displayNotes(notes);
+            }
+        }
+
+        // Display notes in the UI
+        function displayNotes(notes) {
+            const notesList = document.getElementById('notesList');
+            
+            if (notes.length === 0) {
+                notesList.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                        <span class="material-icons" style="font-size: 48px; opacity: 0.5;">note</span>
+                        <p>No notes found</p>
                     </div>
-                    <div class="note-content">${note.content}</div>
-                    ${note.priority !== 'low' ? `<span class="tag priority-${note.priority}" style="margin-top: 10px; display: inline-block;">${note.priority} priority</span>` : ''}
-                </div>
-            `).join('');
+                `;
+                return;
+            }
+            
+            notesList.innerHTML = notes.map(note => {
+                const noteDate = note.createdAt ? new Date(note.createdAt) : new Date(note.date);
+                return `
+                    <div class="note-item">
+                        <div class="note-header">
+                            <span class="note-author">${note.author || 'Admin'}</span>
+                            <span class="note-date">${noteDate.toLocaleDateString()}</span>
+                        </div>
+                        <div class="note-content">${note.content}</div>
+                        ${note.priority && note.priority !== 'low' ? `<span class="tag priority-${note.priority}" style="margin-top: 10px; display: inline-block;">${note.priority} priority</span>` : ''}
+                    </div>
+                `;
+            }).join('');
         }
 
         // Populate communication tab
@@ -2835,7 +2989,7 @@ TownRanker Team`
         }
 
         // Add new interaction
-        function addInteraction() {
+        async function addInteraction() {
             const type = document.getElementById('interactionType').value;
             const note = document.getElementById('interactionNote').value.trim();
             
@@ -2844,36 +2998,51 @@ TownRanker Team`
                 return;
             }
             
-            // For now, just add to the timeline visually
-            const timeline = document.getElementById('interactionTimeline');
-            const newInteraction = document.createElement('div');
-            newInteraction.className = 'timeline-item';
-            newInteraction.innerHTML = `
-                <div class="timeline-icon ${type}">
-                    <span class="material-icons">${getTimelineIcon(type)}</span>
-                </div>
-                <div class="timeline-content">
-                    <h4>${type.charAt(0).toUpperCase() + type.slice(1)} Interaction</h4>
-                    <p>${note}</p>
-                    <div class="timeline-time">Just now</div>
-                </div>
-            `;
+            if (!currentLead) {
+                alert('No customer selected');
+                return;
+            }
             
-            timeline.insertBefore(newInteraction, timeline.firstChild);
-            
-            // Clear form
-            document.getElementById('interactionNote').value = '';
-            
-            // Update interaction count
-            const currentCount = parseInt(document.getElementById('totalInteractions').textContent) || 0;
-            document.getElementById('totalInteractions').textContent = currentCount + 1;
-            
-            // In a real app, this would save to the database
-            alert('Interaction logged successfully');
+            try {
+                // Send interaction to server
+                const response = await fetch(`/api/leads/${currentLead._id}/interactions`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        type: type,
+                        title: `${type.charAt(0).toUpperCase() + type.slice(1)} Interaction`,
+                        description: note
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Clear form
+                    document.getElementById('interactionNote').value = '';
+                    
+                    // Refresh timeline to show the new interaction
+                    await populateTimelineTab(currentLead);
+                    
+                    // Update interaction count
+                    const currentCount = parseInt(document.getElementById('totalInteractions').textContent) || 0;
+                    document.getElementById('totalInteractions').textContent = currentCount + 1;
+                    
+                    alert('Interaction logged successfully');
+                } else {
+                    throw new Error(result.message || 'Failed to log interaction');
+                }
+            } catch (error) {
+                console.error('Error adding interaction:', error);
+                alert('Failed to log interaction: ' + error.message);
+            }
         }
 
         // Add new note
-        function addNote() {
+        async function addNote() {
             const noteText = document.getElementById('newNoteText').value.trim();
             const priority = document.getElementById('notePriority').value;
             
@@ -2882,27 +3051,43 @@ TownRanker Team`
                 return;
             }
             
-            // Add note to the top of the list
-            const notesList = document.getElementById('notesList');
-            const newNote = document.createElement('div');
-            newNote.className = 'note-item';
-            newNote.innerHTML = `
-                <div class="note-header">
-                    <span class="note-author">Admin</span>
-                    <span class="note-date">Just now</span>
-                </div>
-                <div class="note-content">${noteText}</div>
-                ${priority !== 'low' ? `<span class="tag priority-${priority}" style="margin-top: 10px; display: inline-block;">${priority} priority</span>` : ''}
-            `;
+            if (!currentLead) {
+                alert('No customer selected');
+                return;
+            }
             
-            notesList.insertBefore(newNote, notesList.firstChild);
-            
-            // Clear form
-            document.getElementById('newNoteText').value = '';
-            document.getElementById('notePriority').value = 'low';
-            
-            // In a real app, this would save to the database
-            alert('Note added successfully');
+            try {
+                // Send note to server
+                const response = await fetch(`/api/leads/${currentLead._id}/notes`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: noteText,
+                        priority: priority
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Clear form
+                    document.getElementById('newNoteText').value = '';
+                    document.getElementById('notePriority').value = 'low';
+                    
+                    // Refresh notes list to show the new note
+                    await populateNotesTab(currentLead);
+                    
+                    alert('Note added successfully');
+                } else {
+                    throw new Error(result.message || 'Failed to add note');
+                }
+            } catch (error) {
+                console.error('Error adding note:', error);
+                alert('Failed to add note: ' + error.message);
+            }
         }
 
         // Close modal when clicking outside

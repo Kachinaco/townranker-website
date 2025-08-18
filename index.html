@@ -4366,48 +4366,147 @@
 
             #projectModal .modal-content {
                 border-radius: 15px;
-                max-height: 90vh;
+                max-height: 75vh;
                 height: auto;
                 max-width: 95%;
             }
 
             #projectModal .modal-header {
-                padding: 15px;
+                padding: 10px 12px;
             }
 
             #projectModal .modal-header h2 {
-                font-size: 18px;
+                font-size: 16px;
+            }
+
+            #projectModal .modal-header p {
+                font-size: 11px;
             }
 
             #projectModal .modal-body {
-                padding: 15px;
+                padding: 10px;
+                max-height: calc(75vh - 180px);
+                overflow-y: auto;
+            }
+
+            #projectModal .form-step h3 {
+                font-size: 12px;
+                margin-bottom: 8px;
             }
 
             #projectModal .project-cards {
-                grid-template-columns: 1fr;
-                gap: 10px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+
+            #projectModal .project-card {
+                padding: 6px 4px;
+            }
+
+            #projectModal .project-icon {
+                font-size: 16px;
+                margin-bottom: 2px;
+            }
+
+            #projectModal .project-name {
+                font-size: 10px;
+            }
+
+            #projectModal .project-desc {
+                font-size: 8px;
             }
 
             #projectModal .timeline-options {
-                grid-template-columns: 1fr;
-                gap: 10px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+
+            #projectModal .timeline-option {
+                padding: 8px 6px;
+            }
+
+            #projectModal .timeline-icon {
+                font-size: 18px;
+                margin-bottom: 2px;
+            }
+
+            #projectModal .timeline-name {
+                font-size: 10px;
+            }
+
+            #projectModal .timeline-desc {
+                font-size: 8px;
             }
 
             #projectModal .features-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
+                gap: 6px;
+            }
+
+            #projectModal .feature-chip {
+                padding: 6px 8px;
+                font-size: 10px;
             }
 
             #projectModal .form-grid {
                 grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            #projectModal .form-group label {
+                font-size: 10px;
+            }
+
+            #projectModal .form-group input,
+            #projectModal .form-group textarea {
+                padding: 5px 8px;
+                font-size: 11px;
+            }
+
+            #projectModal .form-group textarea {
+                min-height: 40px;
             }
 
             #projectModal .budget-value {
-                font-size: 24px;
+                font-size: 22px;
+                margin: 6px 0;
+            }
+
+            #projectModal .budget-slider {
+                height: 5px;
+                margin: 8px 0;
+            }
+
+            #projectModal .budget-slider::-webkit-slider-thumb {
+                width: 18px;
+                height: 18px;
+            }
+
+            #projectModal .budget-labels {
+                font-size: 10px;
+                margin-top: 6px;
             }
 
             #projectModal .modal-footer {
-                padding: 12px 15px;
+                padding: 8px 10px;
+            }
+
+            #projectModal .btn-prev,
+            #projectModal .btn-next,
+            #projectModal .btn-submit {
+                padding: 8px 20px;
+                font-size: 12px;
+            }
+
+            #projectModal .modal-steps {
+                padding: 10px 8px;
+            }
+
+            #projectModal .step-number {
+                width: 20px;
+                height: 20px;
+                font-size: 10px;
+                margin-right: 3px;
             }
         }
     </style>
