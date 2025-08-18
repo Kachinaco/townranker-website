@@ -3224,9 +3224,14 @@ TownRanker Team`
 
         // Delete customer function
         async function deleteCustomer() {
+            console.log('🗑️ Delete button clicked');
+            console.log('🔍 Current lead ID:', window.currentLeadId);
+            console.log('🔍 Auth token available:', !!authToken);
+            
             const currentLeadId = window.currentLeadId;
             if (!currentLeadId) {
-                alert('No customer selected');
+                console.error('❌ No current lead ID found');
+                alert('No customer selected. Please open a customer profile first.');
                 return;
             }
 
@@ -3245,15 +3250,22 @@ TownRanker Team`
             deleteBtn.disabled = true;
 
             try {
+                console.log('🌐 Making DELETE request to:', `/api/leads/${currentLeadId}`);
+                console.log('🔑 Using auth token:', authToken ? 'YES' : 'NO');
+                
                 const response = await fetch(`/api/leads/${currentLeadId}`, {
                     method: 'DELETE',
                     headers: {
-                        'Authorization': `Bearer ${getAuthToken()}`,
+                        'Authorization': `Bearer ${authToken}`,
                         'Content-Type': 'application/json'
                     }
                 });
 
+                console.log('📡 Response status:', response.status);
+                console.log('📡 Response ok:', response.ok);
+                
                 const result = await response.json();
+                console.log('📊 Response data:', result);
 
                 if (result.success) {
                     // Show success message
