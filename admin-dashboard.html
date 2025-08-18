@@ -623,6 +623,16 @@
             color: #1e40af;
         }
 
+        .timeline-icon.email.incoming {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .timeline-icon.email.outgoing {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
         .timeline-icon.call {
             background: #d1fae5;
             color: #065f46;
@@ -979,6 +989,228 @@
             justify-content: center;
             font-size: 11px;
             font-weight: bold;
+        }
+
+        /* iPhone-style Conversation UI */
+        .conversation-container {
+            background: #f5f5f7;
+            border-radius: 12px;
+            border: 1px solid #d1d1d6;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .messages-area {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: linear-gradient(180deg, #f5f5f7 0%, #e5e5ea 100%);
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            margin-bottom: 12px;
+            word-wrap: break-word;
+            animation: messageSlideIn 0.3s ease-out;
+        }
+
+        .message-sent {
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message-received {
+            margin-right: auto;
+            text-align: left;
+        }
+
+        .message-content {
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        .message-sent .message-content {
+            background: #007aff;
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .message-received .message-content {
+            background: white;
+            color: #1d1d1f;
+            border-bottom-left-radius: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .message-subject {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+            opacity: 0.9;
+        }
+
+        .message-text {
+            font-size: 16px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .message-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+
+        .message-sent .message-meta {
+            justify-content: flex-end;
+        }
+
+        .message-received .message-meta {
+            justify-content: flex-start;
+        }
+
+        .message-time {
+            font-size: 11px;
+        }
+
+        .message-status {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .read-receipt {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #34c759;
+            font-size: 8px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-reply-section {
+            padding: 16px;
+            background: white;
+            border-top: 1px solid #e5e5ea;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .quick-reply-btn {
+            background: #f2f2f7;
+            border: 1px solid #d1d1d6;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            color: #007aff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-reply-btn:hover {
+            background: #e5e5ea;
+            transform: translateY(-1px);
+        }
+
+        .conversation-status {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .conversation-status.online {
+            background: #34c759;
+            color: white;
+        }
+
+        .conversation-status.offline {
+            background: #8e8e93;
+            color: white;
+        }
+
+        .btn-icon {
+            background: transparent;
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
+            padding: 6px;
+            cursor: pointer;
+            color: #007aff;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            background: #f2f2f7;
+        }
+
+        .btn-icon .material-icons {
+            font-size: 18px;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 18px;
+            border-bottom-left-radius: 6px;
+            max-width: 70%;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #8e8e93;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
         }
 
         .modal-header {
@@ -1392,7 +1624,12 @@
                         <!-- Tags will be populated here -->
                     </div>
                 </div>
-                <button class="close-modal" onclick="closeModal()" style="margin-left: auto; background: rgba(255,255,255,0.2); color: white; border: none; font-size: 24px; cursor: pointer; padding: 10px; border-radius: 50%; width: 40px; height: 40px;">×</button>
+                <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
+                    <button id="deleteCustomerBtn" onclick="deleteCustomer()" title="Delete Customer" style="background: rgba(239,68,68,0.9); color: white; border: none; font-size: 18px; cursor: pointer; padding: 10px; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-icons" style="font-size: 18px;">delete</span>
+                    </button>
+                    <button class="close-modal" onclick="closeModal()" style="background: rgba(255,255,255,0.2); color: white; border: none; font-size: 24px; cursor: pointer; padding: 10px; border-radius: 50%; width: 40px; height: 40px;">×</button>
+                </div>
             </div>
 
             <!-- Profile Stats -->
@@ -1569,14 +1806,35 @@
                             </div>
                         </div>
                         
-                        <!-- Email History -->
-                        <div class="email-history" style="margin-top: 30px;">
+                        <!-- Email Conversation -->
+                        <div class="email-conversation" style="margin-top: 30px;">
                             <h4 style="margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
-                                <span class="material-icons">history</span>
-                                Email History
+                                <span class="material-icons">chat</span>
+                                Email Conversation
+                                <div style="margin-left: auto; display: flex; gap: 10px;">
+                                    <span class="conversation-status online">Online</span>
+                                    <button onclick="refreshConversation()" class="btn-icon" title="Refresh">
+                                        <span class="material-icons">refresh</span>
+                                    </button>
+                                </div>
                             </h4>
-                            <div id="emailHistoryList">
-                                <!-- Email history will be populated here -->
+                            <div class="conversation-container" id="conversationContainer">
+                                <div class="messages-area" id="messagesArea">
+                                    <!-- Messages will be populated here -->
+                                </div>
+                                <div class="conversation-input">
+                                    <div class="quick-reply-section" id="quickReplies">
+                                        <button class="quick-reply-btn" onclick="insertQuickReply('Thanks for your interest! Let me get back to you shortly.')">
+                                            Thanks for your interest
+                                        </button>
+                                        <button class="quick-reply-btn" onclick="insertQuickReply('I\'ve sent you a detailed proposal. Please review and let me know your thoughts.')">
+                                            Proposal sent
+                                        </button>
+                                        <button class="quick-reply-btn" onclick="insertQuickReply('When would be a good time for a quick call to discuss your project?')">
+                                            Schedule call
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1617,6 +1875,7 @@
             e.preventDefault();
             const token = document.getElementById('password').value;
             authToken = token;
+            console.log('🔑 Login with token:', token);
             
             // Store in sessionStorage
             sessionStorage.setItem('adminToken', token);
@@ -1851,46 +2110,81 @@
 
         // View lead details with enhanced profile
         async function viewLead(leadId) {
-            const lead = allLeads.find(l => l._id === leadId);
-            if (!lead) return;
-            
-            currentLead = lead;
-            
-            // Populate profile header
-            const initials = lead.name ? lead.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'NA';
-            document.getElementById('profileAvatar').textContent = initials;
-            document.getElementById('profileName').textContent = lead.name || 'Unknown';
-            document.getElementById('profileSubtitle').textContent = `${lead.email || 'No email'} • ${lead.phone || 'No phone'}`;
-            
-            // Populate tags
-            const tagsContainer = document.getElementById('profileTags');
-            const tags = getCustomerTags(lead);
-            tagsContainer.innerHTML = tags.map(tag => 
-                `<span class="tag ${tag.type}">${tag.text}</span>`
-            ).join('');
-            
-            // Populate stats (now async)
-            await populateProfileStats(lead);
-            
-            // Populate overview tab
-            populateOverviewTab(lead);
-            
-            // Populate timeline (now async)
-            await populateTimelineTab(lead);
-            
-            // Populate pipeline
-            populatePipelineTab(lead);
-            
-            // Populate communication
-            populateCommunicationTab(lead);
-            
-            // Populate notes (now async)
-            await populateNotesTab(lead);
-            
-            // Reset to overview tab
-            switchTab('overview');
-            
-            document.getElementById('leadModal').classList.add('active');
+            try {
+                console.log('Opening customer profile for ID:', leadId);
+                const lead = allLeads.find(l => l._id === leadId);
+                if (!lead) {
+                    console.error('Lead not found:', leadId);
+                    return;
+                }
+                
+                currentLead = lead;
+                window.currentLeadId = leadId;
+                
+                // Show modal first to provide immediate feedback
+                const modal = document.getElementById('leadModal');
+                if (!modal) {
+                    console.error('Modal element not found');
+                    return;
+                }
+                modal.classList.add('active');
+                
+                // Populate profile header
+                const initials = lead.name ? lead.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'NA';
+                const avatarEl = document.getElementById('profileAvatar');
+                const nameEl = document.getElementById('profileName');
+                const subtitleEl = document.getElementById('profileSubtitle');
+                
+                if (avatarEl) avatarEl.textContent = initials;
+                if (nameEl) nameEl.textContent = lead.name || 'Unknown';
+                if (subtitleEl) subtitleEl.textContent = `${lead.email || 'No email'} • ${lead.phone || 'No phone'}`;
+                
+                // Populate tags
+                const tagsContainer = document.getElementById('profileTags');
+                if (tagsContainer) {
+                    const tags = getCustomerTags(lead);
+                    tagsContainer.innerHTML = tags.map(tag => 
+                        `<span class="tag ${tag.type}">${tag.text}</span>`
+                    ).join('');
+                }
+                
+                // Reset to overview tab first
+                switchTab('overview');
+                
+                // Populate overview tab
+                populateOverviewTab(lead);
+                
+                // Populate pipeline
+                populatePipelineTab(lead);
+                
+                // Populate communication
+                populateCommunicationTab(lead);
+                
+                // Load async data in background
+                try {
+                    await populateProfileStats(lead);
+                } catch (error) {
+                    console.error('Error loading profile stats:', error);
+                }
+                
+                try {
+                    await populateTimelineTab(lead);
+                } catch (error) {
+                    console.error('Error loading timeline:', error);
+                }
+                
+                try {
+                    await populateNotesTab(lead);
+                } catch (error) {
+                    console.error('Error loading notes:', error);
+                }
+                
+                console.log('Customer profile opened successfully');
+                
+            } catch (error) {
+                console.error('Error opening customer profile:', error);
+                alert('Error opening customer profile. Please try again.');
+            }
         }
 
         // Get customer tags based on lead data
@@ -2084,14 +2378,23 @@
             
             timeline.innerHTML = interactions.map(interaction => {
                 const interactionTime = new Date(interaction.timestamp);
+                const isIncoming = interaction.metadata?.isIncoming;
+                const emailDirection = isIncoming ? 'incoming' : 'outgoing';
+                const iconClass = interaction.type === 'email' ? `${interaction.type} ${emailDirection}` : interaction.type;
+                
                 return `
                     <div class="timeline-item">
-                        <div class="timeline-icon ${interaction.type}">
-                            <span class="material-icons">${getTimelineIcon(interaction.type)}</span>
+                        <div class="timeline-icon ${iconClass}">
+                            <span class="material-icons">${getTimelineIcon(interaction.type, isIncoming)}</span>
                         </div>
                         <div class="timeline-content">
-                            <h4>${interaction.title}</h4>
+                            <h4>${interaction.title}${isIncoming ? ' (Reply)' : ''}</h4>
                             <p>${interaction.description || ''}</p>
+                            ${interaction.metadata?.textContent ? `
+                                <div style="background: var(--light); padding: 10px; border-radius: 6px; margin-top: 8px; font-style: italic; font-size: 14px;">
+                                    "${interaction.metadata.textContent}${interaction.metadata.textContent.length >= 500 ? '...' : ''}"
+                                </div>
+                            ` : ''}
                             <div class="timeline-time">${interactionTime.toLocaleString()}</div>
                         </div>
                     </div>
@@ -2162,9 +2465,10 @@
         }
 
         // Get timeline icon
-        function getTimelineIcon(type) {
+        function getTimelineIcon(type, isIncoming = false) {
             switch(type) {
-                case 'email': return 'email';
+                case 'email': 
+                    return isIncoming ? 'mail_outline' : 'send';
                 case 'call': return 'phone';
                 case 'meeting': return 'event';
                 case 'status': return 'update';
@@ -2464,7 +2768,7 @@
 
         // Populate email history with real data
         async function populateEmailHistory(lead) {
-            const emailHistoryList = document.getElementById('emailHistoryList');
+            const messagesArea = document.getElementById('messagesArea');
             
             try {
                 // Fetch real email history from server
@@ -2476,70 +2780,107 @@
                 
                 if (response.ok) {
                     const result = await response.json();
+                    console.log('Email history API response:', result);
                     if (result.success) {
-                        displayEmailHistory(result.data);
+                        console.log('Email data received:', result.data);
+                        displayEmailConversation(result.data);
                         return;
                     }
+                } else {
+                    console.error('API request failed:', response.status, response.statusText);
                 }
                 
                 // Fallback to mock data if API fails
                 const emails = getEmailHistory(lead);
-                displayEmailHistory(emails);
+                displayEmailConversation(emails);
                 
             } catch (error) {
                 console.error('Error fetching email history:', error);
                 // Fallback to mock data
                 const emails = getEmailHistory(lead);
-                displayEmailHistory(emails);
+                displayEmailConversation(emails);
             }
         }
 
-        // Display email history in the UI
-        function displayEmailHistory(emails) {
-            const emailHistoryList = document.getElementById('emailHistoryList');
+        // Display email conversation in iPhone-style UI
+        function displayEmailConversation(emails) {
+            const messagesArea = document.getElementById('messagesArea');
+            console.log('Displaying email conversation with emails:', emails);
             
             if (emails.length === 0) {
-                emailHistoryList.innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
-                        <span class="material-icons" style="font-size: 48px; opacity: 0.5;">email</span>
-                        <p>No email history found</p>
+                messagesArea.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #8e8e93;">
+                        <span class="material-icons" style="font-size: 48px; opacity: 0.5; margin-bottom: 10px; display: block;">chat_bubble_outline</span>
+                        <p style="margin: 0; font-size: 16px;">No conversation yet</p>
+                        <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.7;">Send your first email to start the conversation</p>
                     </div>
                 `;
                 return;
             }
             
-            emailHistoryList.innerHTML = emails.map(email => {
+            // Sort emails by date to show conversation chronologically
+            const sortedEmails = [...emails].sort((a, b) => {
+                const dateA = new Date(a.sentAt || a.date);
+                const dateB = new Date(b.sentAt || b.date);
+                return dateA - dateB;
+            });
+            
+            messagesArea.innerHTML = sortedEmails.map(email => {
                 const sentDate = email.sentAt ? new Date(email.sentAt) : new Date(email.date);
-                const openStatus = email.openCount > 0 ? 'opened' : 'unopened';
-                const openText = email.openCount > 0 ? 
-                    (email.openCount === 1 ? 'opened once' : `opened ${email.openCount} times`) : 
-                    'not opened';
+                const isReceived = email.type === 'received' || email.direction === 'incoming' || email.status === 'received';
+                const messageType = isReceived ? 'received' : 'sent';
+                console.log('Email processing:', {
+                    subject: email.subject,
+                    type: email.type,
+                    direction: email.direction,
+                    status: email.status,
+                    isReceived: isReceived,
+                    messageType: messageType
+                });
+                
+                const timeStr = sentDate.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                const dateStr = sentDate.toLocaleDateString([], { 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                
+                let statusIndicator = '';
+                if (!isReceived) {
+                    if (email.openCount > 0) {
+                        statusIndicator = `
+                            <div class="message-status">
+                                <div class="read-receipt" title="Read ${email.openCount} time${email.openCount !== 1 ? 's' : ''}">✓</div>
+                            </div>
+                        `;
+                    } else {
+                        statusIndicator = `
+                            <div class="message-status">
+                                <span style="color: #8e8e93;">✓</span>
+                            </div>
+                        `;
+                    }
+                }
                 
                 return `
-                    <div class="email-item">
-                        <div class="email-header">
-                            <div class="email-subject">${email.subject}</div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="email-status ${email.status || 'sent'}">${email.status || 'sent'}</span>
-                                <span class="email-status ${openStatus}">${openText}</span>
-                                <span class="email-date">${sentDate.toLocaleDateString()}</span>
-                            </div>
+                    <div class="message-bubble message-${messageType}">
+                        <div class="message-content">
+                            ${email.subject ? `<div class="message-subject">${email.subject}</div>` : ''}
+                            <div class="message-text">${email.body || email.preview || 'No content'}</div>
                         </div>
-                        <div class="email-preview">${email.preview || email.body?.substring(0, 100) + (email.body?.length > 100 ? '...' : '')}</div>
-                        ${email.openCount > 0 && email.lastOpened ? `
-                            <div class="email-open-info">
-                                <span class="email-open-indicator opened"></span>
-                                Last opened: ${new Date(email.lastOpened).toLocaleString()}
-                            </div>
-                        ` : email.openCount === 0 ? `
-                            <div class="email-open-info">
-                                <span class="email-open-indicator unopened"></span>
-                                Not yet opened
-                            </div>
-                        ` : ''}
+                        <div class="message-meta">
+                            <span class="message-time">${timeStr} • ${dateStr}</span>
+                            ${statusIndicator}
+                        </div>
                     </div>
                 `;
             }).join('');
+            
+            // Auto-scroll to bottom
+            messagesArea.scrollTop = messagesArea.scrollHeight;
         }
 
         // Get email history (mock data for now)
@@ -2879,6 +3220,81 @@ TownRanker Team`
         function closeModal() {
             document.getElementById('leadModal').classList.remove('active');
             stopNotificationPolling(); // Stop polling when modal is closed
+        }
+
+        // Delete customer function
+        async function deleteCustomer() {
+            const currentLeadId = window.currentLeadId;
+            if (!currentLeadId) {
+                alert('No customer selected');
+                return;
+            }
+
+            // Get customer name for confirmation
+            const customerName = document.getElementById('profileName').textContent || 'this customer';
+            
+            // Confirm deletion
+            if (!confirm(`Are you sure you want to permanently delete ${customerName}?\n\nThis action cannot be undone and will remove:\n• Customer profile\n• Email history\n• Notes and interactions\n• All associated data`)) {
+                return;
+            }
+
+            // Show loading state
+            const deleteBtn = document.getElementById('deleteCustomerBtn');
+            const originalContent = deleteBtn.innerHTML;
+            deleteBtn.innerHTML = '<span style="font-size: 12px;">⏳</span>';
+            deleteBtn.disabled = true;
+
+            try {
+                const response = await fetch(`/api/leads/${currentLeadId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${getAuthToken()}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Show success message
+                    alert(`✅ ${customerName} has been permanently deleted`);
+                    
+                    // Close modal
+                    closeModal();
+                    
+                    // Refresh the leads table
+                    await loadLeads();
+                    
+                    console.log('✅ Customer deleted successfully:', result.deletedCustomer);
+                } else {
+                    throw new Error(result.message || 'Failed to delete customer');
+                }
+            } catch (error) {
+                console.error('❌ Delete customer error:', error);
+                alert(`❌ Failed to delete customer: ${error.message}`);
+                
+                // Restore button
+                deleteBtn.innerHTML = originalContent;
+                deleteBtn.disabled = false;
+            }
+        }
+
+        // Quick reply functions for conversation
+        function insertQuickReply(text) {
+            const emailBody = document.getElementById('emailBody');
+            if (emailBody) {
+                emailBody.value = text;
+                emailBody.focus();
+                // Scroll to email composer
+                emailBody.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Refresh conversation
+        async function refreshConversation() {
+            if (currentLead) {
+                await populateEmailHistory(currentLead);
+            }
         }
 
         // Refresh data

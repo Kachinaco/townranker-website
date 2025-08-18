@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const nodemailer = require('nodemailer');
+const Imap = require('imap');
+const { simpleParser } = require('mailparser');
 require('dotenv').config();
 
 const app = express();
@@ -53,6 +55,7 @@ const leadSchema = new mongoose.Schema({
         required: true,
         lowercase: true,
         trim: true,
+        unique: true,
         match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email']
     },
     phone: {
@@ -139,10 +142,386 @@ const leadSchema = new mongoose.Schema({
 // Create Lead model
 const Lead = mongoose.model('Lead', leadSchema);
 
-const { router: authRoutes } = require('./routes/auth');
+const { router: authRoutes, verifyToken: authenticateToken } = require('./routes/auth');
 
 // Email transporter setup
 const fs = require('fs').promises;
+
+// IMAP configuration for receiving emails
+const imapConfig = {
+    user: process.env.EMAIL_USER || 'rank@townranker.com',
+    password: process.env.EMAIL_PASS,
+    host: 'imap.gmail.com',
+    port: 993,
+    tls: true,
+    tlsOptions: {
+        rejectUnauthorized: false
+    }
+};
+
+// Email receiving system
+let emailReceiver = null;
+let isMonitoringEmails = false;
+
+// Function to start monitoring emails
+function startEmailMonitoring() {
+    if (isMonitoringEmails || !process.env.EMAIL_PASS) {
+        console.log('📧 Email monitoring already running or credentials missing');
+        return;
+    }
+
+    emailReceiver = new Imap(imapConfig);
+    
+    emailReceiver.once('ready', () => {
+        console.log('📧 IMAP connection ready - monitoring for new emails');
+        isMonitoringEmails = true;
+        
+        // Open inbox
+        emailReceiver.openBox('INBOX', false, (err, box) => {
+            if (err) {
+                console.error('Failed to open inbox:', err);
+                return;
+            }
+            
+            console.log('📬 Inbox opened, monitoring for new emails...');
+            
+            // Listen for new emails
+            emailReceiver.on('mail', (numNewMsgs) => {
+                console.log(`📨 ${numNewMsgs} new email(s) received`);
+                fetchNewEmails();
+            });
+        });
+    });
+
+    emailReceiver.once('error', (err) => {
+        console.error('📧 IMAP Error:', err);
+        isMonitoringEmails = false;
+        
+        // Retry connection after 30 seconds
+        setTimeout(() => {
+            console.log('🔄 Retrying email connection...');
+            startEmailMonitoring();
+        }, 30000);
+    });
+
+    emailReceiver.once('end', () => {
+        console.log('📧 IMAP connection ended');
+        isMonitoringEmails = false;
+    });
+
+    emailReceiver.connect();
+}
+
+// Function to fetch and process new emails
+function fetchNewEmails() {
+    if (!emailReceiver) return;
+
+    // Search for unseen emails (and recent emails for debugging)
+    emailReceiver.search(['UNSEEN'], (err, results) => {
+        if (err) {
+            console.error('Email search error:', err);
+            return;
+        }
+
+        // If no unseen emails, also check for ALL emails for debugging
+        if (!results || results.length === 0) {
+            console.log('📭 No unseen emails found, checking ALL emails in inbox...');
+            
+            emailReceiver.search(['ALL'], (err2, allResults) => {
+                if (err2) {
+                    console.error('All emails search error:', err2);
+                    return;
+                }
+                
+                if (allResults && allResults.length > 0) {
+                    console.log(`📧 Found ${allResults.length} total emails in inbox`);
+                    
+                    // Fetch last 3 emails to see what we have
+                    const lastEmails = allResults.slice(-3);
+                    console.log(`🔍 Checking last 3 emails: ${lastEmails}`);
+                    
+                    const debugFetch = emailReceiver.fetch(lastEmails, {
+                        bodies: 'HEADER',
+                        struct: true
+                    });
+                    
+                    debugFetch.on('message', (msg, seqno) => {
+                        msg.on('body', (stream, info) => {
+                            let buffer = '';
+                            stream.on('data', (chunk) => {
+                                buffer += chunk.toString('utf8');
+                            });
+                            stream.on('end', () => {
+                                try {
+                                    const parsed = simpleParser(buffer);
+                                    parsed.then(mail => {
+                                        const from = mail.from?.value?.[0]?.address?.toLowerCase();
+                                        const subject = mail.subject || '';
+                                        const date = mail.date || '';
+                                        console.log(`📬 Email ${seqno}: From "${from}", Subject: "${subject}", Date: ${date}`);
+                                    });
+                                } catch (e) {
+                                    console.error('Error parsing email header:', e);
+                                }
+                            });
+                        });
+                    });
+                    
+                    debugFetch.on('end', () => {
+                        console.log('🔍 Email header check complete');
+                        
+                        // Also search specifically for emails from coryanalla@gmail.com
+                        console.log('🔍 Searching specifically for emails from coryanalla@gmail.com...');
+                        emailReceiver.search([['FROM', 'coryanalla@gmail.com']], (err3, coryResults) => {
+                            if (err3) {
+                                console.error('Cory email search error:', err3);
+                                return;
+                            }
+                            
+                            if (coryResults && coryResults.length > 0) {
+                                console.log(`✅ Found ${coryResults.length} email(s) from coryanalla@gmail.com: ${coryResults}`);
+                                
+                                // Fetch the most recent one
+                                const latestCory = coryResults.slice(-1);
+                                const coryFetch = emailReceiver.fetch(latestCory, {
+                                    bodies: '',
+                                    markSeen: false // Don't mark as seen for debugging
+                                });
+                                
+                                coryFetch.on('message', (msg, seqno) => {
+                                    let emailBody = '';
+                                    
+                                    msg.on('body', (stream, info) => {
+                                        let buffer = '';
+                                        stream.on('data', (chunk) => {
+                                            buffer += chunk.toString('utf8');
+                                        });
+                                        stream.on('end', () => {
+                                            emailBody = buffer;
+                                        });
+                                    });
+                                    
+                                    msg.once('end', () => {
+                                        console.log(`🎯 Found Cory's email! Processing...`);
+                                        processIncomingEmail(emailBody);
+                                    });
+                                });
+                            } else {
+                                console.log('❌ No emails found from coryanalla@gmail.com');
+                                console.log('💡 This means the reply either:');
+                                console.log('   1. Hasn\'t reached the inbox yet');
+                                console.log('   2. Went to spam/promotions folder');
+                                console.log('   3. Was sent from a different email address');
+                            }
+                        });
+                    });
+                } else {
+                    console.log('📭 No emails found in inbox at all');
+                }
+            });
+            return;
+        }
+
+        console.log(`📧 Processing ${results.length} new email(s)`);
+
+        const fetch = emailReceiver.fetch(results, {
+            bodies: '',
+            markSeen: true
+        });
+
+        fetch.on('message', (msg, seqno) => {
+            let emailBody = '';
+            
+            msg.on('body', (stream, info) => {
+                let buffer = '';
+                stream.on('data', (chunk) => {
+                    buffer += chunk.toString('utf8');
+                });
+                stream.once('end', () => {
+                    emailBody = buffer;
+                });
+            });
+
+            msg.once('attributes', (attrs) => {
+                // Parse the email
+                simpleParser(emailBody, async (err, parsed) => {
+                    if (err) {
+                        console.error('Email parsing error:', err);
+                        return;
+                    }
+
+                    await processIncomingEmail(parsed, attrs);
+                });
+            });
+        });
+
+        fetch.once('error', (err) => {
+            console.error('Email fetch error:', err);
+        });
+
+        fetch.once('end', () => {
+            console.log('✅ Finished processing new emails');
+        });
+    });
+}
+
+// Function to process incoming emails and match to customers
+async function processIncomingEmail(parsed, attrs) {
+    try {
+        const fromEmail = parsed.from?.value?.[0]?.address?.toLowerCase();
+        const subject = parsed.subject || '';
+        const textContent = parsed.text || '';
+        const htmlContent = parsed.html || '';
+        const receivedDate = parsed.date || new Date();
+
+        console.log(`📨 Processing email from: ${fromEmail}`);
+        console.log(`📝 Subject: ${subject}`);
+        console.log(`📄 Content preview: ${textContent.substring(0, 100)}...`);
+        console.log(`📅 Date: ${receivedDate}`);
+
+        if (!fromEmail) {
+            console.log('❌ No sender email found, skipping');
+            return;
+        }
+
+        // Find matching customer by email
+        const customer = await Lead.findOne({ 
+            email: fromEmail 
+        });
+
+        if (!customer) {
+            console.log(`❓ No customer found for email: ${fromEmail}`);
+            console.log(`🔍 Searching for customers with email containing: ${fromEmail}`);
+            
+            // Try partial match in case of email variations
+            const partialCustomer = await Lead.findOne({
+                email: { $regex: fromEmail.split('@')[0], $options: 'i' }
+            });
+            
+            if (partialCustomer) {
+                console.log(`🎯 Found partial match: ${partialCustomer.name} (${partialCustomer.email})`);
+            } else {
+                console.log(`📋 Available customer emails:`);
+                const allCustomers = await Lead.find({}, 'name email').limit(10);
+                allCustomers.forEach(c => console.log(`   ${c.name}: ${c.email}`));
+            }
+            return;
+        }
+
+        console.log(`✅ Found customer: ${customer.name} (${customer._id})`);
+
+        // Add email to customer's interaction history and email history
+        await Lead.findByIdAndUpdate(customer._id, {
+            $push: {
+                interactions: {
+                    type: 'email',
+                    title: 'Email Received',
+                    description: subject,
+                    timestamp: receivedDate,
+                    metadata: {
+                        emailSubject: subject,
+                        isIncoming: true,
+                        textContent: textContent.substring(0, 500), // Store first 500 chars
+                        fromEmail: fromEmail
+                    }
+                },
+                emailHistory: {
+                    subject: subject,
+                    body: textContent,
+                    sentAt: receivedDate,
+                    messageId: parsed.messageId || `incoming-${Date.now()}`,
+                    status: 'received',
+                    direction: 'incoming',
+                    type: 'received',
+                    openCount: 0
+                }
+            },
+            lastContacted: receivedDate,
+            $inc: { emailCount: 1 }
+        });
+
+        // Send notification about the reply
+        await sendReplyNotification(customer, subject, textContent, fromEmail);
+
+        console.log(`💾 Email reply saved for customer: ${customer.name}`);
+
+    } catch (error) {
+        console.error('Error processing incoming email:', error);
+    }
+}
+
+// Function to send notification about customer reply
+async function sendReplyNotification(customer, subject, content, fromEmail) {
+    try {
+        const notificationHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); padding: 20px; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 24px;">📨 Customer Reply Received!</h1>
+                </div>
+                <div style="padding: 30px; background: #f0f9ff; line-height: 1.6;">
+                    <h2 style="color: #1e40af; margin-top: 0;">${customer.name} replied to your email!</h2>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3b82f6;">
+                        <h3 style="color: #1e40af; margin-top: 0;">📋 Customer Details</h3>
+                        <p><strong>Name:</strong> ${customer.name}</p>
+                        <p><strong>Email:</strong> ${customer.email}</p>
+                        <p><strong>Company:</strong> ${customer.company || 'Not provided'}</p>
+                        <p><strong>Project:</strong> ${customer.projectType}</p>
+                        <p><strong>Budget:</strong> $${(customer.budget || 0).toLocaleString()}</p>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
+                        <h3 style="color: #065f46; margin-top: 0;">📧 Email Reply</h3>
+                        <p><strong>Subject:</strong> ${subject}</p>
+                        <p><strong>From:</strong> ${fromEmail}</p>
+                        <p><strong>Received:</strong> ${new Date().toLocaleString()}</p>
+                        <div style="background: #f9fafb; padding: 15px; border-radius: 6px; margin-top: 15px;">
+                            <p style="margin: 0; font-style: italic;">${content.substring(0, 300)}${content.length > 300 ? '...' : ''}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                        <h3 style="color: #92400e; margin-top: 0;">⚡ Quick Actions</h3>
+                        <p>Your customer is actively engaged! Consider:</p>
+                        <ul>
+                            <li>Sending a quick response</li>
+                            <li>Scheduling a follow-up call</li>
+                            <li>Moving them to the next stage in your pipeline</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="https://townranker.com/admin-dashboard.html" 
+                           style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                  color: white; 
+                                  padding: 15px 30px; 
+                                  border-radius: 8px; 
+                                  text-decoration: none; 
+                                  display: inline-block; 
+                                  font-weight: bold;">
+                            View Customer & Reply →
+                        </a>
+                    </div>
+                </div>
+                <div style="background: #1f2937; padding: 20px; text-align: center;">
+                    <p style="color: white; margin: 0; font-weight: bold;">TownRanker Email System</p>
+                    <p style="color: #9ca3af; margin: 5px 0; font-size: 14px;">Never miss a customer reply</p>
+                </div>
+            </div>
+        `;
+        
+        await transporter.sendMail({
+            from: process.env.EMAIL_FROM || '"TownRanker Notifications" <notifications@townranker.com>',
+            to: 'rank@townranker.com',
+            subject: `📨 ${customer.name} replied to your email - ${customer.projectType} project`,
+            html: notificationHtml
+        });
+        
+        console.log(`📬 Reply notification sent to rank@townranker.com for ${customer.name}`);
+    } catch (emailError) {
+        console.error('Failed to send reply notification:', emailError);
+    }
+}
 const createEmailTransporter = () => {
     // Use environment variables for production only if properly configured
     if (process.env.EMAIL_SERVICE && 
@@ -238,6 +617,17 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Force email check endpoint
+app.get('/api/check-emails', (req, res) => {
+    console.log('🔄 Manual email check requested');
+    if (emailReceiver) {
+        fetchNewEmails();
+        res.json({ success: true, message: 'Email check triggered' });
+    } else {
+        res.json({ success: false, message: 'Email receiver not connected' });
+    }
+});
+
 // Submit contact form
 app.post('/api/contact', async (req, res) => {
     try {
@@ -248,6 +638,21 @@ app.post('/api/contact', async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: 'Please provide all required fields'
+            });
+        }
+        
+        // Check if customer already exists with this email
+        const existingLead = await Lead.findOne({ email: leadData.email.toLowerCase() });
+        if (existingLead) {
+            return res.status(409).json({
+                success: false,
+                message: 'A customer with this email already exists',
+                existingCustomer: {
+                    id: existingLead._id,
+                    name: existingLead.name,
+                    email: existingLead.email,
+                    status: existingLead.status
+                }
             });
         }
         
@@ -437,6 +842,45 @@ app.patch('/api/leads/:id', async (req, res) => {
     }
 });
 
+// Delete customer
+app.delete('/api/leads/:id', async (req, res) => {
+    try {
+        // Basic authentication check
+        const authHeader = req.headers.authorization;
+        if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_TOKEN || 'dev-token'}`) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+        
+        const { id } = req.params;
+        const lead = await Lead.findByIdAndDelete(id);
+        
+        if (!lead) {
+            return res.status(404).json({
+                success: false,
+                message: 'Customer not found'
+            });
+        }
+        
+        console.log(`🗑️ Customer deleted: ${lead.name} (${lead.email})`);
+        
+        res.json({
+            success: true,
+            message: `Customer ${lead.name} has been deleted successfully`,
+            deletedCustomer: {
+                id: lead._id,
+                name: lead.name,
+                email: lead.email
+            }
+        });
+    } catch (error) {
+        console.error('Error deleting customer:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting customer'
+        });
+    }
+});
+
 // Import email templates
 const emailTemplates = require('./email-templates');
 
@@ -600,6 +1044,9 @@ app.post('/api/send-follow-up-24hr', async (req, res) => {
     }
 });
 
+// Cache to prevent duplicate notifications
+const recentEmailOpens = new Map();
+
 // Email open tracking endpoint
 app.get('/api/track-email-open/:trackingId', async (req, res) => {
     try {
@@ -607,6 +1054,36 @@ app.get('/api/track-email-open/:trackingId', async (req, res) => {
         
         // Log the email open
         console.log(`📧 Email opened: ${trackingId} at ${new Date().toISOString()}`);
+        
+        // Check if this email was opened recently (within 30 seconds)
+        const now = Date.now();
+        const recentOpenKey = trackingId;
+        const lastOpenTime = recentEmailOpens.get(recentOpenKey);
+        
+        if (lastOpenTime && (now - lastOpenTime) < 30000) {
+            // Skip notification if opened within last 30 seconds
+            console.log(`⏭️ Skipping duplicate notification for ${trackingId} (opened ${Math.round((now - lastOpenTime)/1000)}s ago)`);
+            // Still serve the tracking pixel
+            const pixel = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
+            res.set({
+                'Content-Type': 'image/png',
+                'Content-Length': pixel.length,
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            });
+            return res.send(pixel);
+        }
+        
+        // Update the cache with current time
+        recentEmailOpens.set(recentOpenKey, now);
+        
+        // Clean up old entries (older than 1 minute)
+        for (const [key, time] of recentEmailOpens.entries()) {
+            if (now - time > 60000) {
+                recentEmailOpens.delete(key);
+            }
+        }
         
         // Find and update the lead with email open data
         const lead = await Lead.findById(trackingId);
@@ -740,6 +1217,7 @@ app.get('/api/track-email-open/:trackingId', async (req, res) => {
 app.get('/api/leads/:id/email-history', async (req, res) => {
     try {
         const { id } = req.params;
+        console.log(`📧 Email history requested for lead ID: ${id}`);
         
         const lead = await Lead.findById(id);
         if (!lead) {
@@ -764,6 +1242,9 @@ app.get('/api/leads/:id/email-history', async (req, res) => {
                 lastOpened: email.lastOpened,
                 preview: email.body.substring(0, 100) + (email.body.length > 100 ? '...' : '')
             }));
+        
+        console.log(`📧 Returning ${emailHistory.length} emails for lead ${lead.name}`);
+        console.log('📧 Email statuses:', emailHistory.map(e => `${e.subject} (${e.status})`));
         
         res.json({
             success: true,
@@ -1078,11 +1559,24 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
     console.log(`🚀 TownRanker server running on port ${PORT}`);
     console.log(`📍 Visit http://localhost:${PORT} to view the website`);
+    
+    // Start email monitoring
+    setTimeout(() => {
+        console.log('🚀 Starting email monitoring...');
+        startEmailMonitoring();
+    }, 5000); // Wait 5 seconds for server to fully start
 });
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
     console.log('\n👋 Shutting down gracefully...');
+    
+    // Close email connection
+    if (emailReceiver) {
+        console.log('📧 Closing email connection...');
+        emailReceiver.end();
+    }
+    
     await mongoose.connection.close();
     process.exit(0);
 });
