@@ -2292,9 +2292,11 @@
         function startNotificationPolling() {
             if (notificationInterval) clearInterval(notificationInterval);
             
-            notificationInterval = setInterval(() => {
+            notificationInterval = setInterval(async () => {
                 if (currentLead && document.getElementById('tab-communication').classList.contains('active')) {
-                    fetchEmailTrackingData(currentLead._id);
+                    await fetchEmailTrackingData(currentLead._id);
+                    // Also refresh email history to show updated open counts
+                    await populateEmailHistory(currentLead);
                 }
             }, 30000); // Check every 30 seconds when communication tab is active
         }
@@ -2306,10 +2308,41 @@
             }
         }
 
-        // Populate email history
-        function populateEmailHistory(lead) {
+        // Populate email history with real data
+        async function populateEmailHistory(lead) {
             const emailHistoryList = document.getElementById('emailHistoryList');
-            const emails = getEmailHistory(lead);
+            
+            try {
+                // Fetch real email history from server
+                const response = await fetch(`/api/leads/${lead._id}/email-history`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        displayEmailHistory(result.data);
+                        return;
+                    }
+                }
+                
+                // Fallback to mock data if API fails
+                const emails = getEmailHistory(lead);
+                displayEmailHistory(emails);
+                
+            } catch (error) {
+                console.error('Error fetching email history:', error);
+                // Fallback to mock data
+                const emails = getEmailHistory(lead);
+                displayEmailHistory(emails);
+            }
+        }
+
+        // Display email history in the UI
+        function displayEmailHistory(emails) {
+            const emailHistoryList = document.getElementById('emailHistoryList');
             
             if (emails.length === 0) {
                 emailHistoryList.innerHTML = `
@@ -2321,18 +2354,38 @@
                 return;
             }
             
-            emailHistoryList.innerHTML = emails.map(email => `
-                <div class="email-item">
-                    <div class="email-header">
-                        <div class="email-subject">${email.subject}</div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span class="email-status ${email.status}">${email.status}</span>
-                            <span class="email-date">${email.date}</span>
+            emailHistoryList.innerHTML = emails.map(email => {
+                const sentDate = email.sentAt ? new Date(email.sentAt) : new Date(email.date);
+                const openStatus = email.openCount > 0 ? 'opened' : 'unopened';
+                const openText = email.openCount > 0 ? 
+                    (email.openCount === 1 ? 'opened once' : `opened ${email.openCount} times`) : 
+                    'not opened';
+                
+                return `
+                    <div class="email-item">
+                        <div class="email-header">
+                            <div class="email-subject">${email.subject}</div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="email-status ${email.status || 'sent'}">${email.status || 'sent'}</span>
+                                <span class="email-status ${openStatus}">${openText}</span>
+                                <span class="email-date">${sentDate.toLocaleDateString()}</span>
+                            </div>
                         </div>
+                        <div class="email-preview">${email.preview || email.body?.substring(0, 100) + (email.body?.length > 100 ? '...' : '')}</div>
+                        ${email.openCount > 0 && email.lastOpened ? `
+                            <div class="email-open-info">
+                                <span class="email-open-indicator opened"></span>
+                                Last opened: ${new Date(email.lastOpened).toLocaleString()}
+                            </div>
+                        ` : email.openCount === 0 ? `
+                            <div class="email-open-info">
+                                <span class="email-open-indicator unopened"></span>
+                                Not yet opened
+                            </div>
+                        ` : ''}
                     </div>
-                    <div class="email-preview">${email.preview}</div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // Get email history (mock data for now)
@@ -2515,34 +2568,20 @@ TownRanker Team`
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Add to email history
-                    const emailHistoryList = document.getElementById('emailHistoryList');
-                    const newEmail = document.createElement('div');
-                    newEmail.className = 'email-item';
-                    newEmail.innerHTML = `
-                        <div class="email-header">
-                            <div class="email-subject">${subject}</div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="email-status sent">sent</span>
-                                <span class="email-date">Just now</span>
-                            </div>
-                        </div>
-                        <div class="email-preview">${body.substring(0, 100)}${body.length > 100 ? '...' : ''}</div>
-                    `;
-                    
-                    if (emailHistoryList.querySelector('[style*="text-align: center"]')) {
-                        // Replace empty state
-                        emailHistoryList.innerHTML = '';
-                    }
-                    emailHistoryList.insertBefore(newEmail, emailHistoryList.firstChild);
-                    
                     // Clear form
                     document.getElementById('emailSubject').value = '';
                     document.getElementById('emailBody').value = '';
                     document.getElementById('emailTemplate').value = '';
                     
+                    // Refresh email history to show the new email
+                    await populateEmailHistory(currentLead);
+                    
                     // Add to timeline
                     addEmailToTimeline(subject);
+                    
+                    // Update email count stat
+                    const currentCount = parseInt(document.getElementById('totalInteractions').textContent) || 0;
+                    document.getElementById('totalInteractions').textContent = currentCount + 1;
                     
                     alert(`Email sent successfully to ${result.recipient}!`);
                 } else {

@@ -100,6 +100,16 @@ const leadSchema = new mongoose.Schema({
         timestamp: { type: Date, default: Date.now },
         userAgent: String,
         ip: String
+    }],
+    emailHistory: [{
+        subject: { type: String, required: true },
+        body: { type: String, required: true },
+        template: String,
+        sentAt: { type: Date, default: Date.now },
+        messageId: String,
+        status: { type: String, enum: ['sent', 'draft', 'failed'], default: 'sent' },
+        openCount: { type: Number, default: 0 },
+        lastOpened: Date
     }]
 });
 
@@ -584,12 +594,22 @@ app.get('/api/track-email-open/:trackingId', async (req, res) => {
                 ip: req.ip || req.connection.remoteAddress
             };
             
-            await Lead.findByIdAndUpdate(trackingId, {
+            // Update the most recent email in history with open data
+            const updatedLead = await Lead.findByIdAndUpdate(trackingId, {
                 $push: {
                     emailOpens: openData
                 },
                 lastEmailOpened: new Date()
-            });
+            }, { new: true });
+            
+            // Update the most recent email's open count
+            if (updatedLead.emailHistory && updatedLead.emailHistory.length > 0) {
+                const mostRecentEmail = updatedLead.emailHistory[updatedLead.emailHistory.length - 1];
+                mostRecentEmail.openCount = (mostRecentEmail.openCount || 0) + 1;
+                mostRecentEmail.lastOpened = new Date();
+                await updatedLead.save();
+            }
+            
             console.log(`✅ Email open tracked for lead: ${lead.name}`);
             
             // Send notification email about the email open
@@ -693,6 +713,49 @@ app.get('/api/track-email-open/:trackingId', async (req, res) => {
     }
 });
 
+// Get email history for a customer
+app.get('/api/leads/:id/email-history', async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const lead = await Lead.findById(id);
+        if (!lead) {
+            return res.status(404).json({
+                success: false,
+                message: 'Customer not found'
+            });
+        }
+        
+        // Return email history sorted by most recent first
+        const emailHistory = (lead.emailHistory || [])
+            .sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt))
+            .map(email => ({
+                _id: email._id,
+                subject: email.subject,
+                body: email.body,
+                template: email.template,
+                sentAt: email.sentAt,
+                messageId: email.messageId,
+                status: email.status,
+                openCount: email.openCount || 0,
+                lastOpened: email.lastOpened,
+                preview: email.body.substring(0, 100) + (email.body.length > 100 ? '...' : '')
+            }));
+        
+        res.json({
+            success: true,
+            data: emailHistory
+        });
+    } catch (error) {
+        console.error('Email history fetch error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch email history',
+            error: error.message
+        });
+    }
+});
+
 // Get email tracking data for a customer
 app.get('/api/leads/:id/email-tracking', async (req, res) => {
     try {
@@ -786,10 +849,20 @@ app.post('/api/send-customer-email', async (req, res) => {
             html: emailHtml
         });
 
-        // Update lead's last contacted time
+        // Save email to history and update lead's last contacted time
         await Lead.findByIdAndUpdate(leadId, {
             lastContacted: new Date(),
-            $inc: { emailCount: 1 }
+            $inc: { emailCount: 1 },
+            $push: {
+                emailHistory: {
+                    subject: subject,
+                    body: body,
+                    template: template || '',
+                    sentAt: new Date(),
+                    messageId: result.messageId,
+                    status: 'sent'
+                }
+            }
         });
 
         res.json({
