@@ -802,6 +802,74 @@
             transition: width 0.3s ease;
         }
 
+        /* Communication Tab Styles */
+        .communication-section {
+            padding: 0;
+        }
+
+        .email-composer {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .email-history {
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .email-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .email-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .email-subject {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .email-date {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .email-preview {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .email-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .email-status.sent {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .email-status.draft {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
         .modal-header {
             padding: 20px;
             border-bottom: 1px solid #e5e7eb;
@@ -1250,6 +1318,10 @@
                     <span class="material-icons" style="font-size: 16px; margin-right: 5px;">trending_up</span>
                     Pipeline
                 </button>
+                <button class="profile-tab" onclick="switchTab('communication')">
+                    <span class="material-icons" style="font-size: 16px; margin-right: 5px;">email</span>
+                    Communication
+                </button>
                 <button class="profile-tab" onclick="switchTab('notes')">
                     <span class="material-icons" style="font-size: 16px; margin-right: 5px;">note</span>
                     Notes
@@ -1327,6 +1399,68 @@
                 <div id="tab-pipeline" class="tab-content">
                     <div class="project-pipeline" id="projectPipeline">
                         <!-- Pipeline stages will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Communication Tab -->
+                <div id="tab-communication" class="tab-content">
+                    <div class="communication-section">
+                        <h4 style="margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px;">
+                            <span class="material-icons">email</span>
+                            Send Email to Customer
+                        </h4>
+                        
+                        <!-- Email Composer -->
+                        <div class="email-composer">
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label for="emailTo" style="display: block; margin-bottom: 5px; font-weight: 500;">To:</label>
+                                <input type="email" id="emailTo" class="form-control" readonly style="background: var(--light); color: var(--text-secondary);">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label for="emailSubject" style="display: block; margin-bottom: 5px; font-weight: 500;">Subject:</label>
+                                <input type="text" id="emailSubject" class="form-control" placeholder="Enter email subject...">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label for="emailTemplate" style="display: block; margin-bottom: 5px; font-weight: 500;">Template:</label>
+                                <select id="emailTemplate" class="form-control" onchange="loadEmailTemplate()">
+                                    <option value="">Custom Email</option>
+                                    <option value="welcome">Welcome Email</option>
+                                    <option value="followup">Follow-up Email</option>
+                                    <option value="proposal">Proposal Email</option>
+                                    <option value="project-update">Project Update</option>
+                                    <option value="completion">Project Completion</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label for="emailBody" style="display: block; margin-bottom: 5px; font-weight: 500;">Message:</label>
+                                <textarea id="emailBody" rows="8" class="form-control" placeholder="Type your email message here..."></textarea>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                                <button onclick="sendEmail()" class="btn btn-primary">
+                                    <span class="material-icons" style="font-size: 16px; margin-right: 5px;">send</span>
+                                    Send Email
+                                </button>
+                                <button onclick="saveEmailDraft()" class="btn btn-secondary">
+                                    <span class="material-icons" style="font-size: 16px; margin-right: 5px;">save</span>
+                                    Save Draft
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Email History -->
+                        <div class="email-history" style="margin-top: 30px;">
+                            <h4 style="margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
+                                <span class="material-icons">history</span>
+                                Email History
+                            </h4>
+                            <div id="emailHistoryList">
+                                <!-- Email history will be populated here -->
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1629,6 +1763,9 @@
             // Populate pipeline
             populatePipelineTab(lead);
             
+            // Populate communication
+            populateCommunicationTab(lead);
+            
             // Populate notes
             populateNotesTab(lead);
             
@@ -1874,6 +2011,296 @@
                     ${note.priority !== 'low' ? `<span class="tag priority-${note.priority}" style="margin-top: 10px; display: inline-block;">${note.priority} priority</span>` : ''}
                 </div>
             `).join('');
+        }
+
+        // Populate communication tab
+        function populateCommunicationTab(lead) {
+            // Set the email recipient
+            document.getElementById('emailTo').value = lead.email || '';
+            
+            // Clear form
+            document.getElementById('emailSubject').value = '';
+            document.getElementById('emailBody').value = '';
+            document.getElementById('emailTemplate').value = '';
+            
+            // Populate email history
+            populateEmailHistory(lead);
+        }
+
+        // Populate email history
+        function populateEmailHistory(lead) {
+            const emailHistoryList = document.getElementById('emailHistoryList');
+            const emails = getEmailHistory(lead);
+            
+            if (emails.length === 0) {
+                emailHistoryList.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                        <span class="material-icons" style="font-size: 48px; opacity: 0.5;">email</span>
+                        <p>No email history found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            emailHistoryList.innerHTML = emails.map(email => `
+                <div class="email-item">
+                    <div class="email-header">
+                        <div class="email-subject">${email.subject}</div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="email-status ${email.status}">${email.status}</span>
+                            <span class="email-date">${email.date}</span>
+                        </div>
+                    </div>
+                    <div class="email-preview">${email.preview}</div>
+                </div>
+            `).join('');
+        }
+
+        // Get email history (mock data for now)
+        function getEmailHistory(lead) {
+            const baseEmails = [];
+            
+            // Add emails based on lead status
+            if (lead.status !== 'new') {
+                baseEmails.push({
+                    subject: `Welcome to TownRanker - ${lead.name}`,
+                    preview: 'Thank you for your interest in our services. We\'re excited to work with you on your project...',
+                    date: new Date(new Date(lead.createdAt).getTime() + 2 * 60 * 60 * 1000).toLocaleDateString(),
+                    status: 'sent'
+                });
+            }
+            
+            if (['qualified', 'proposal', 'closed-won', 'closed-lost'].includes(lead.status)) {
+                baseEmails.push({
+                    subject: `Project Brief for ${formatProjectType(lead.projectType)}`,
+                    preview: 'Following our discussion, here\'s a detailed brief for your project requirements...',
+                    date: new Date(new Date(lead.createdAt).getTime() + 24 * 60 * 60 * 1000).toLocaleDateString(),
+                    status: 'sent'
+                });
+            }
+            
+            if (['proposal', 'closed-won', 'closed-lost'].includes(lead.status)) {
+                baseEmails.push({
+                    subject: `Proposal: ${formatProjectType(lead.projectType)} - $${lead.budget?.toLocaleString()}`,
+                    preview: 'Please find attached our detailed proposal for your project. We\'ve included timeline, pricing...',
+                    date: new Date(new Date(lead.createdAt).getTime() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                    status: 'sent'
+                });
+            }
+            
+            return baseEmails.reverse(); // Show newest first
+        }
+
+        // Load email template
+        function loadEmailTemplate() {
+            const template = document.getElementById('emailTemplate').value;
+            const lead = currentLead;
+            
+            if (!template || !lead) return;
+            
+            const templates = {
+                welcome: {
+                    subject: `Welcome to TownRanker - ${lead.name}`,
+                    body: `Hi ${lead.name?.split(' ')[0] || 'there'},
+
+Thank you for reaching out to TownRanker about your ${formatProjectType(lead.projectType)} project.
+
+We're excited to learn more about your vision and help bring it to life. Based on your initial inquiry, I understand you're looking for:
+
+• Project Type: ${formatProjectType(lead.projectType)}
+• Budget Range: $${(lead.budget || 0).toLocaleString()}
+• Timeline: ${formatTimeline(lead.timeline)}
+
+I'll be your dedicated project manager throughout this process. Let's schedule a quick 15-minute discovery call to discuss your specific requirements and answer any questions you might have.
+
+You can book a time that works for you here: [Calendar Link]
+
+Looking forward to working with you!
+
+Best regards,
+TownRanker Team`
+                },
+                followup: {
+                    subject: `Following up on your ${formatProjectType(lead.projectType)} project`,
+                    body: `Hi ${lead.name?.split(' ')[0] || 'there'},
+
+I wanted to follow up on your ${formatProjectType(lead.projectType)} project inquiry.
+
+We've been working on some initial concepts based on your requirements and would love to share them with you. 
+
+Are you available for a brief call this week to discuss next steps?
+
+Best regards,
+TownRanker Team`
+                },
+                proposal: {
+                    subject: `Proposal: ${formatProjectType(lead.projectType)} - $${(lead.budget || 0).toLocaleString()}`,
+                    body: `Hi ${lead.name?.split(' ')[0] || 'there'},
+
+Thank you for the detailed discussion about your ${formatProjectType(lead.projectType)} project.
+
+Please find attached our comprehensive proposal including:
+• Detailed project scope and deliverables
+• Timeline and milestones
+• Investment: $${(lead.budget || 0).toLocaleString()}
+• Next steps
+
+This proposal is valid for 14 days. I'm happy to schedule a call to discuss any questions or adjustments.
+
+Looking forward to your feedback!
+
+Best regards,
+TownRanker Team`
+                },
+                'project-update': {
+                    subject: `Project Update - ${formatProjectType(lead.projectType)}`,
+                    body: `Hi ${lead.name?.split(' ')[0] || 'there'},
+
+Here's your weekly project update:
+
+Progress This Week:
+• [Update on completed tasks]
+• [Milestones achieved]
+
+Coming Up Next Week:
+• [Upcoming deliverables]
+• [Any input needed from you]
+
+Please let me know if you have any questions or feedback.
+
+Best regards,
+TownRanker Team`
+                },
+                completion: {
+                    subject: `Project Complete - ${formatProjectType(lead.projectType)}`,
+                    body: `Hi ${lead.name?.split(' ')[0] || 'there'},
+
+Congratulations! Your ${formatProjectType(lead.projectType)} project is now complete and ready for launch.
+
+Final deliverables include:
+• [List of deliverables]
+• Training materials
+• Support documentation
+
+We'll continue to provide 30 days of post-launch support. Thank you for choosing TownRanker!
+
+Best regards,
+TownRanker Team`
+                }
+            };
+            
+            if (templates[template]) {
+                document.getElementById('emailSubject').value = templates[template].subject;
+                document.getElementById('emailBody').value = templates[template].body;
+            }
+        }
+
+        // Send email
+        async function sendEmail() {
+            const to = document.getElementById('emailTo').value;
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').value;
+            
+            if (!to || !subject || !body) {
+                alert('Please fill in all email fields');
+                return;
+            }
+            
+            try {
+                // In a real implementation, this would send via your email API
+                // For now, we'll just simulate the action
+                
+                // Add to email history
+                const emailHistoryList = document.getElementById('emailHistoryList');
+                const newEmail = document.createElement('div');
+                newEmail.className = 'email-item';
+                newEmail.innerHTML = `
+                    <div class="email-header">
+                        <div class="email-subject">${subject}</div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="email-status sent">sent</span>
+                            <span class="email-date">Just now</span>
+                        </div>
+                    </div>
+                    <div class="email-preview">${body.substring(0, 100)}${body.length > 100 ? '...' : ''}</div>
+                `;
+                
+                if (emailHistoryList.querySelector('[style*="text-align: center"]')) {
+                    // Replace empty state
+                    emailHistoryList.innerHTML = '';
+                }
+                emailHistoryList.insertBefore(newEmail, emailHistoryList.firstChild);
+                
+                // Clear form
+                document.getElementById('emailSubject').value = '';
+                document.getElementById('emailBody').value = '';
+                document.getElementById('emailTemplate').value = '';
+                
+                // Add to timeline
+                addEmailToTimeline(subject);
+                
+                alert('Email sent successfully!');
+            } catch (error) {
+                console.error('Error sending email:', error);
+                alert('Failed to send email');
+            }
+        }
+
+        // Save email draft
+        function saveEmailDraft() {
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').value;
+            
+            if (!subject && !body) {
+                alert('Please enter some content to save as draft');
+                return;
+            }
+            
+            // Add to email history as draft
+            const emailHistoryList = document.getElementById('emailHistoryList');
+            const newEmail = document.createElement('div');
+            newEmail.className = 'email-item';
+            newEmail.innerHTML = `
+                <div class="email-header">
+                    <div class="email-subject">${subject || 'Untitled Draft'}</div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="email-status draft">draft</span>
+                        <span class="email-date">Just now</span>
+                    </div>
+                </div>
+                <div class="email-preview">${body.substring(0, 100)}${body.length > 100 ? '...' : ''}</div>
+            `;
+            
+            if (emailHistoryList.querySelector('[style*="text-align: center"]')) {
+                // Replace empty state
+                emailHistoryList.innerHTML = '';
+            }
+            emailHistoryList.insertBefore(newEmail, emailHistoryList.firstChild);
+            
+            alert('Draft saved successfully!');
+        }
+
+        // Add email to timeline
+        function addEmailToTimeline(subject) {
+            const timeline = document.getElementById('interactionTimeline');
+            const newInteraction = document.createElement('div');
+            newInteraction.className = 'timeline-item';
+            newInteraction.innerHTML = `
+                <div class="timeline-icon email">
+                    <span class="material-icons">email</span>
+                </div>
+                <div class="timeline-content">
+                    <h4>Email Sent</h4>
+                    <p>${subject}</p>
+                    <div class="timeline-time">Just now</div>
+                </div>
+            `;
+            
+            timeline.insertBefore(newInteraction, timeline.firstChild);
+            
+            // Update interaction count
+            const currentCount = parseInt(document.getElementById('totalInteractions').textContent) || 0;
+            document.getElementById('totalInteractions').textContent = currentCount + 1;
         }
 
         // Get customer notes (mock for now)
