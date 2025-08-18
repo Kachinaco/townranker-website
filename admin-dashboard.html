@@ -1413,11 +1413,6 @@
                         <!-- Email Composer -->
                         <div class="email-composer">
                             <div class="form-group" style="margin-bottom: 15px;">
-                                <label for="emailTo" style="display: block; margin-bottom: 5px; font-weight: 500;">To:</label>
-                                <input type="email" id="emailTo" class="form-control" readonly style="background: var(--light); color: var(--text-secondary);">
-                            </div>
-                            
-                            <div class="form-group" style="margin-bottom: 15px;">
                                 <label for="emailSubject" style="display: block; margin-bottom: 5px; font-weight: 500;">Subject:</label>
                                 <input type="text" id="emailSubject" class="form-control" placeholder="Enter email subject...">
                             </div>
@@ -2015,9 +2010,6 @@
 
         // Populate communication tab
         function populateCommunicationTab(lead) {
-            // Set the email recipient
-            document.getElementById('emailTo').value = lead.email || '';
-            
             // Clear form
             document.getElementById('emailSubject').value = '';
             document.getElementById('emailBody').value = '';
@@ -2197,12 +2189,16 @@ TownRanker Team`
 
         // Send email
         async function sendEmail() {
-            const to = document.getElementById('emailTo').value;
             const subject = document.getElementById('emailSubject').value;
             const body = document.getElementById('emailBody').value;
             
-            if (!to || !subject || !body) {
-                alert('Please fill in all email fields');
+            if (!subject || !body) {
+                alert('Please fill in subject and message fields');
+                return;
+            }
+            
+            if (!currentLead || !currentLead.email) {
+                alert('Customer email not available');
                 return;
             }
             
