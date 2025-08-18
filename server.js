@@ -105,12 +105,12 @@ const leadSchema = new mongoose.Schema({
         ip: String
     }],
     emailHistory: [{
-        subject: { type: String, required: true },
+        subject: { type: String, default: '(No Subject)' },
         body: { type: String, required: true },
         template: String,
         sentAt: { type: Date, default: Date.now },
         messageId: String,
-        status: { type: String, enum: ['sent', 'draft', 'failed'], default: 'sent' },
+        status: { type: String, enum: ['sent', 'draft', 'failed', 'received'], default: 'sent' },
         openCount: { type: Number, default: 0 },
         lastOpened: Date
     }],
@@ -136,11 +136,92 @@ const leadSchema = new mongoose.Schema({
             duration: Number,
             outcome: String
         }
-    }]
+    }],
+    // Workflow data - using Mixed type for flexibility
+    workflowItems: [mongoose.Schema.Types.Mixed],
+    workflowColumns: [mongoose.Schema.Types.Mixed]
 });
 
 // Create Lead model
 const Lead = mongoose.model('Lead', leadSchema);
+
+// Email Notification Schema for recent activity
+const notificationSchema = new mongoose.Schema({
+    type: {
+        type: String,
+        enum: ['email_open', 'customer_reply', 'new_lead'],
+        required: true
+    },
+    title: {
+        type: String,
+        required: true
+    },
+    message: {
+        type: String,
+        required: true
+    },
+    customerName: {
+        type: String,
+        required: true
+    },
+    customerEmail: {
+        type: String,
+        required: true
+    },
+    leadId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Lead'
+    },
+    metadata: {
+        emailSubject: String,
+        openCount: Number,
+        replyContent: String
+    },
+    read: {
+        type: Boolean,
+        default: false
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+// Create Notification model
+const Notification = mongoose.model('Notification', notificationSchema);
+
+// Helper function to create notifications
+async function createNotification(type, title, message, customerName, customerEmail, leadId, metadata = {}) {
+    try {
+        // Create the notification
+        const notification = new Notification({
+            type,
+            title,
+            message,
+            customerName,
+            customerEmail,
+            leadId,
+            metadata
+        });
+
+        await notification.save();
+
+        // Keep only the 5 most recent notifications
+        const allNotifications = await Notification.find().sort({ createdAt: -1 });
+        if (allNotifications.length > 5) {
+            const toDelete = allNotifications.slice(5);
+            for (const oldNotification of toDelete) {
+                await Notification.findByIdAndDelete(oldNotification._id);
+            }
+            console.log(`🗑️ Cleaned up ${toDelete.length} old notifications`);
+        }
+
+        console.log(`📢 Notification created: ${title}`);
+        return notification;
+    } catch (error) {
+        console.error('Error creating notification:', error);
+    }
+}
 
 const { router: authRoutes, verifyToken: authenticateToken } = require('./routes/auth');
 
@@ -445,6 +526,20 @@ async function processIncomingEmail(parsed, attrs) {
 
         console.log(`💾 Email reply saved for customer: ${customer.name}`);
 
+        // Create in-app notification for customer reply
+        await createNotification(
+            'customer_reply',
+            `${customer.name} replied to your email`,
+            `New reply: "${subject || 'No subject'}" - ${textContent.substring(0, 100)}${textContent.length > 100 ? '...' : ''}`,
+            customer.name,
+            customer.email,
+            customer._id,
+            {
+                emailSubject: subject || 'No subject',
+                replyContent: textContent.substring(0, 200)
+            }
+        );
+
     } catch (error) {
         console.error('Error processing incoming email:', error);
     }
@@ -452,6 +547,12 @@ async function processIncomingEmail(parsed, attrs) {
 
 // Function to send notification about customer reply
 async function sendReplyNotification(customer, subject, content, fromEmail) {
+    // Check if reply notifications are enabled
+    if (global.notificationSettings?.replyNotifications === false) {
+        console.log('📧 Customer reply notification disabled - skipping notification email');
+        return;
+    }
+    
     try {
         const notificationHtml = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -617,6 +718,80 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Helper function for admin authentication - supports both token types
+function authenticateAdmin(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).json({ message: 'No authorization header' });
+    }
+    
+    const token = authHeader.replace('Bearer ', '');
+    const adminToken = process.env.ADMIN_TOKEN || 'Madman155!';
+    
+    // Check if it's an admin-session token (from /api/admin/login)
+    if (token.startsWith('admin-session-') || token === adminToken) {
+        req.user = { role: 'admin', id: 'admin' };
+        return next();
+    }
+    
+    // Check if it's a JWT token (from /api/auth/login)
+    const JWT_SECRET = process.env.JWT_SECRET || 'townranker-secret-key-2024';
+    try {
+        const jwt = require('jsonwebtoken');
+        const decoded = jwt.verify(token, JWT_SECRET);
+        
+        // Check if user has admin role
+        if (decoded.role !== 'admin') {
+            return res.status(403).json({ message: 'Admin access required' });
+        }
+        
+        req.user = decoded;
+        next();
+    } catch (error) {
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({ message: 'Token expired' });
+        }
+        return res.status(401).json({ message: 'Invalid token' });
+    }
+}
+
+// Admin login endpoint
+app.post('/api/admin/login', (req, res) => {
+    try {
+        const { password } = req.body;
+        const adminToken = process.env.ADMIN_TOKEN || 'dev-token';
+        
+        if (!password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password is required'
+            });
+        }
+        
+        if (password === adminToken) {
+            // Generate a session token for the admin
+            const sessionToken = 'admin-session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+            
+            res.json({
+                success: true,
+                message: 'Login successful',
+                token: sessionToken
+            });
+        } else {
+            res.status(401).json({
+                success: false,
+                message: 'Invalid password'
+            });
+        }
+    } catch (error) {
+        console.error('Admin login error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error'
+        });
+    }
+});
+
 // Force email check endpoint
 app.get('/api/check-emails', (req, res) => {
     console.log('🔄 Manual email check requested');
@@ -631,6 +806,7 @@ app.get('/api/check-emails', (req, res) => {
 // Submit contact form
 app.post('/api/contact', async (req, res) => {
     try {
+        console.log('📥 Lead form submission received:', req.body);
         const leadData = req.body;
         
         // Validate required fields
@@ -659,6 +835,21 @@ app.post('/api/contact', async (req, res) => {
         // Create new lead
         const lead = new Lead(leadData);
         await lead.save();
+        
+        // Create in-app notification for new lead
+        await createNotification(
+            'new_lead',
+            `New lead: ${lead.name}`,
+            `${lead.projectType ? lead.projectType.replace('-', ' ') : 'New project'} inquiry from ${lead.company || lead.name} - $${(lead.budget || 0).toLocaleString()} budget`,
+            lead.name,
+            lead.email,
+            lead._id,
+            {
+                projectType: lead.projectType,
+                budget: lead.budget,
+                company: lead.company
+            }
+        );
         
         
         // Prepare email content
@@ -783,14 +974,8 @@ app.post('/api/contact', async (req, res) => {
 });
 
 // Get all leads (for admin dashboard)
-app.get('/api/leads', async (req, res) => {
+app.get('/api/leads', authenticateAdmin, async (req, res) => {
     try {
-        // Basic authentication check (implement proper auth in production)
-        const authHeader = req.headers.authorization;
-        if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_TOKEN || 'dev-token'}`) {
-            return res.status(401).json({ message: 'Unauthorized' });
-        }
-        
         const leads = await Lead.find().sort({ createdAt: -1 });
         res.json({
             success: true,
@@ -806,15 +991,65 @@ app.get('/api/leads', async (req, res) => {
     }
 });
 
-// Update lead status
-app.patch('/api/leads/:id', async (req, res) => {
+// Get dashboard stats
+app.get('/api/stats', authenticateAdmin, async (req, res) => {
     try {
-        // Basic authentication check
-        const authHeader = req.headers.authorization;
-        if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_TOKEN || 'dev-token'}`) {
-            return res.status(401).json({ message: 'Unauthorized' });
-        }
+        const totalLeads = await Lead.countDocuments();
+        const newLeads = await Lead.countDocuments({ status: 'new' });
+        const qualifiedLeads = await Lead.countDocuments({ status: 'qualified' });
+        const closedWon = await Lead.countDocuments({ status: 'closed-won' });
         
+        // Get leads from last 30 days
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const recentLeads = await Lead.countDocuments({ 
+            createdAt: { $gte: thirtyDaysAgo } 
+        });
+        
+        res.json({
+            success: true,
+            stats: {
+                totalLeads,
+                newLeads,
+                qualifiedLeads,
+                closedWon,
+                recentLeads,
+                conversionRate: totalLeads > 0 ? ((closedWon / totalLeads) * 100).toFixed(1) : 0
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching stats:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching stats',
+            error: error.message
+        });
+    }
+});
+
+// Get users (for admin dashboard)
+app.get('/api/users', authenticateAdmin, async (req, res) => {
+    try {
+        const User = require('./models/User');
+        const users = await User.find().select('-password').sort({ createdAt: -1 });
+        res.json({
+            success: true,
+            count: users.length,
+            users
+        });
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching users',
+            error: error.message
+        });
+    }
+});
+
+// Update lead status
+app.patch('/api/leads/:id', authenticateAdmin, async (req, res) => {
+    try {
         const { status } = req.body;
         const lead = await Lead.findByIdAndUpdate(
             req.params.id,
@@ -842,15 +1077,165 @@ app.patch('/api/leads/:id', async (req, res) => {
     }
 });
 
-// Delete customer
-app.delete('/api/leads/:id', async (req, res) => {
+// Get notification settings
+app.get('/api/settings/notifications', authenticateAdmin, (req, res) => {
     try {
-        // Basic authentication check
-        const authHeader = req.headers.authorization;
-        if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_TOKEN || 'dev-token'}`) {
-            return res.status(401).json({ message: 'Unauthorized' });
-        }
+        // For now, return default settings - in production you might store these in database
+        res.json({
+            success: true,
+            settings: {
+                emailNotifications: true,
+                replyNotifications: true,
+                autoRefresh: false
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching notification settings:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching settings'
+        });
+    }
+});
+
+// Set notification settings
+app.post('/api/settings/notifications', authenticateAdmin, (req, res) => {
+    try {
+        const { emailNotifications, replyNotifications, autoRefresh } = req.body;
         
+        // Store in memory (in production, you'd store in database)
+        global.notificationSettings = {
+            emailNotifications: emailNotifications !== false,
+            replyNotifications: replyNotifications !== false,
+            autoRefresh: autoRefresh === true
+        };
+
+        console.log('📱 Notification settings updated:', global.notificationSettings);
+
+        res.json({
+            success: true,
+            message: 'Settings updated successfully',
+            settings: global.notificationSettings
+        });
+    } catch (error) {
+        console.error('Error updating notification settings:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating settings'
+        });
+    }
+});
+
+// Get recent notifications (limit to 5)
+app.get('/api/notifications', authenticateAdmin, async (req, res) => {
+    try {
+        const notifications = await Notification.find()
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .populate('leadId', 'name email projectType');
+
+        res.json({
+            success: true,
+            data: notifications
+        });
+    } catch (error) {
+        console.error('Error fetching notifications:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching notifications'
+        });
+    }
+});
+
+// Delete notification
+app.delete('/api/notifications/:id', authenticateAdmin, async (req, res) => {
+    try {
+
+        const { id } = req.params;
+        const notification = await Notification.findByIdAndDelete(id);
+
+        if (!notification) {
+            return res.status(404).json({
+                success: false,
+                message: 'Notification not found'
+            });
+        }
+
+        console.log(`🗑️ Notification deleted: ${notification.title}`);
+
+        res.json({
+            success: true,
+            message: 'Notification deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting notification:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting notification'
+        });
+    }
+});
+
+// Mark notification as read
+app.patch('/api/notifications/:id/read', authenticateAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const notification = await Notification.findByIdAndUpdate(
+            id,
+            { read: true },
+            { new: true }
+        );
+
+        if (!notification) {
+            return res.status(404).json({
+                success: false,
+                message: 'Notification not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: notification
+        });
+    } catch (error) {
+        console.error('Error marking notification as read:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating notification'
+        });
+    }
+});
+
+// Test endpoint to create a sample notification (for testing only)
+app.post('/api/test-notification', authenticateAdmin, async (req, res) => {
+    try {
+        // Create test notification
+        await createNotification(
+            'email_open',
+            'Test Email Opened',
+            'This is a test notification to verify the system is working',
+            'Test Customer',
+            'test@example.com',
+            null,
+            { emailSubject: 'Test Email', openCount: 1 }
+        );
+
+        res.json({
+            success: true,
+            message: 'Test notification created successfully'
+        });
+    } catch (error) {
+        console.error('Error creating test notification:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error creating test notification'
+        });
+    }
+});
+
+// Delete customer
+app.delete('/api/leads/:id', authenticateAdmin, async (req, res) => {
+    try {
         const { id } = req.params;
         const lead = await Lead.findByIdAndDelete(id);
         
@@ -1103,8 +1488,9 @@ app.get('/api/track-email-open/:trackingId', async (req, res) => {
             }, { new: true });
             
             // Update the most recent email's open count
+            let mostRecentEmail = null;
             if (updatedLead.emailHistory && updatedLead.emailHistory.length > 0) {
-                const mostRecentEmail = updatedLead.emailHistory[updatedLead.emailHistory.length - 1];
+                mostRecentEmail = updatedLead.emailHistory[updatedLead.emailHistory.length - 1];
                 mostRecentEmail.openCount = (mostRecentEmail.openCount || 0) + 1;
                 mostRecentEmail.lastOpened = new Date();
                 await updatedLead.save();
@@ -1112,7 +1498,22 @@ app.get('/api/track-email-open/:trackingId', async (req, res) => {
             
             console.log(`✅ Email open tracked for lead: ${lead.name}`);
             
-            // Send notification email about the email open
+            // Create in-app notification
+            await createNotification(
+                'email_open',
+                `${lead.name} opened your email`,
+                `Customer opened "${mostRecentEmail?.subject || 'your email'}" - ${mostRecentEmail?.openCount || 1} time${(mostRecentEmail?.openCount || 1) !== 1 ? 's' : ''}`,
+                lead.name,
+                lead.email,
+                lead._id,
+                {
+                    emailSubject: mostRecentEmail?.subject || 'No subject',
+                    openCount: mostRecentEmail?.openCount || 1
+                }
+            );
+            
+            // Send notification email about the email open (if enabled)
+            if (global.notificationSettings?.emailNotifications !== false) {
             try {
                 const openTime = new Date().toLocaleString('en-US', { 
                     timeZone: 'America/New_York',
@@ -1190,6 +1591,9 @@ app.get('/api/track-email-open/:trackingId', async (req, res) => {
                 console.error('Failed to send email open notification:', emailError);
                 // Don't fail the tracking if notification email fails
             }
+            } else {
+                console.log('📧 Email open notification disabled - skipping notification email');
+            }
         }
         
         // Return a 1x1 transparent pixel
@@ -1244,7 +1648,6 @@ app.get('/api/leads/:id/email-history', async (req, res) => {
             }));
         
         console.log(`📧 Returning ${emailHistory.length} emails for lead ${lead.name}`);
-        console.log('📧 Email statuses:', emailHistory.map(e => `${e.subject} (${e.status})`));
         
         res.json({
             success: true,
@@ -1333,6 +1736,81 @@ app.get('/api/leads/:id/notes', async (req, res) => {
             success: false,
             message: 'Failed to fetch notes',
             error: error.message
+        });
+    }
+});
+
+// Workflow API endpoints
+
+// Get workflow data for a lead
+app.get('/api/leads/:id/workflow', authenticateAdmin, async (req, res) => {
+    try {
+        const lead = await Lead.findById(req.params.id);
+        if (!lead) {
+            return res.status(404).json({
+                success: false,
+                message: 'Lead not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: {
+                workflowItems: lead.workflowItems || [],
+                workflowColumns: lead.workflowColumns || []
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching workflow data:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching workflow data'
+        });
+    }
+});
+
+// Update workflow data for a lead
+app.put('/api/leads/:id/workflow', authenticateAdmin, async (req, res) => {
+    try {
+        console.log('🔄 PUT /api/leads/' + req.params.id + '/workflow - Received workflow save request');
+        console.log('📋 Items received:', req.body.workflowItems?.length || 0);
+        console.log('📊 Columns received:', req.body.workflowColumns?.length || 0);
+        
+        const { workflowItems, workflowColumns } = req.body;
+        
+        const lead = await Lead.findByIdAndUpdate(
+            req.params.id,
+            { 
+                workflowItems: workflowItems || [],
+                workflowColumns: workflowColumns || [],
+                updatedAt: Date.now() 
+            },
+            { new: true }
+        );
+
+        if (!lead) {
+            console.log('❌ Lead not found for ID:', req.params.id);
+            return res.status(404).json({
+                success: false,
+                message: 'Lead not found'
+            });
+        }
+
+        console.log('✅ Workflow data saved successfully for:', lead.name);
+        console.log('✅ Saved items:', lead.workflowItems?.length || 0);
+
+        res.json({
+            success: true,
+            data: {
+                workflowItems: lead.workflowItems,
+                workflowColumns: lead.workflowColumns
+            }
+        });
+    } catch (error) {
+        console.error('Error updating workflow data:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating workflow data'
         });
     }
 });
