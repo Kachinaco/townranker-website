@@ -578,17 +578,98 @@ app.get('/api/track-email-open/:trackingId', async (req, res) => {
         // Find and update the lead with email open data
         const lead = await Lead.findById(trackingId);
         if (lead) {
+            const openData = {
+                timestamp: new Date(),
+                userAgent: req.get('User-Agent'),
+                ip: req.ip || req.connection.remoteAddress
+            };
+            
             await Lead.findByIdAndUpdate(trackingId, {
                 $push: {
-                    emailOpens: {
-                        timestamp: new Date(),
-                        userAgent: req.get('User-Agent'),
-                        ip: req.ip || req.connection.remoteAddress
-                    }
+                    emailOpens: openData
                 },
                 lastEmailOpened: new Date()
             });
             console.log(`✅ Email open tracked for lead: ${lead.name}`);
+            
+            // Send notification email about the email open
+            try {
+                const openTime = new Date().toLocaleString('en-US', { 
+                    timeZone: 'America/New_York',
+                    dateStyle: 'full',
+                    timeStyle: 'short'
+                });
+                
+                const deviceInfo = req.get('User-Agent');
+                const location = req.ip || req.connection.remoteAddress || 'Unknown';
+                
+                const notificationHtml = `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <div style="background: linear-gradient(135deg, #10b981 0%, #065f46 100%); padding: 20px; text-align: center;">
+                            <h1 style="color: white; margin: 0; font-size: 24px;">📧 Email Opened!</h1>
+                        </div>
+                        <div style="padding: 30px; background: #f0fdf4; line-height: 1.6;">
+                            <h2 style="color: #065f46; margin-top: 0;">Great news! Your email was just opened.</h2>
+                            
+                            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
+                                <h3 style="color: #065f46; margin-top: 0;">📋 Customer Details</h3>
+                                <p><strong>Name:</strong> ${lead.name}</p>
+                                <p><strong>Email:</strong> ${lead.email}</p>
+                                <p><strong>Company:</strong> ${lead.company || 'Not provided'}</p>
+                                <p><strong>Project:</strong> ${lead.projectType}</p>
+                                <p><strong>Budget:</strong> $${(lead.budget || 0).toLocaleString()}</p>
+                            </div>
+                            
+                            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3b82f6;">
+                                <h3 style="color: #1e40af; margin-top: 0;">🕒 Open Details</h3>
+                                <p><strong>Opened at:</strong> ${openTime}</p>
+                                <p><strong>Device/Browser:</strong> ${deviceInfo}</p>
+                                <p><strong>Location:</strong> ${location}</p>
+                            </div>
+                            
+                            <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h3 style="color: #92400e; margin-top: 0;">💡 Next Steps</h3>
+                                <p>This is a great time to follow up! They're actively engaging with your emails.</p>
+                                <p>Consider:</p>
+                                <ul>
+                                    <li>Sending a personalized follow-up</li>
+                                    <li>Scheduling a call</li>
+                                    <li>Sharing additional project examples</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="https://townranker.com/admin-dashboard.html" 
+                                   style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                          color: white; 
+                                          padding: 15px 30px; 
+                                          border-radius: 8px; 
+                                          text-decoration: none; 
+                                          display: inline-block; 
+                                          font-weight: bold;">
+                                    View Customer Profile →
+                                </a>
+                            </div>
+                        </div>
+                        <div style="background: #1f2937; padding: 20px; text-align: center;">
+                            <p style="color: white; margin: 0; font-weight: bold;">TownRanker Email Tracking</p>
+                            <p style="color: #9ca3af; margin: 5px 0; font-size: 14px;">Stay on top of customer engagement</p>
+                        </div>
+                    </div>
+                `;
+                
+                await transporter.sendMail({
+                    from: process.env.EMAIL_FROM || '"TownRanker Tracking" <tracking@townranker.com>',
+                    to: 'rank@townranker.com',
+                    subject: `📧 ${lead.name} opened your email - ${lead.projectType} project`,
+                    html: notificationHtml
+                });
+                
+                console.log(`📬 Email open notification sent to rank@townranker.com for ${lead.name}`);
+            } catch (emailError) {
+                console.error('Failed to send email open notification:', emailError);
+                // Don't fail the tracking if notification email fails
+            }
         }
         
         // Return a 1x1 transparent pixel
