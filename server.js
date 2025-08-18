@@ -27,16 +27,17 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/townranke
 const leadSchema = new mongoose.Schema({
     projectType: {
         type: String,
-        required: true,
+        required: false,
         enum: ['business', 'ecommerce', 'webapp', 'landing', 'business-website', 'ecommerce-store', 'web-application', 'landing-page']
     },
     budget: {
         type: Number,
-        required: true
+        required: false,
+        default: 0
     },
     timeline: {
         type: String,
-        required: true,
+        required: false,
         enum: ['asap', '1-2months', '3-4months']
     },
     features: [{
@@ -89,9 +90,6 @@ const leadSchema = new mongoose.Schema({
 // Create Lead model
 const Lead = mongoose.model('Lead', leadSchema);
 
-// Import CRM models and routes
-const Customer = require('./models/Customer');
-const crmRoutes = require('./routes/crm');
 const { router: authRoutes } = require('./routes/auth');
 
 // Email transporter setup
@@ -181,8 +179,6 @@ const getPackageName = (budget) => {
 // Mount auth routes
 app.use('/api/auth', authRoutes);
 
-// Mount CRM routes
-app.use('/api/crm', crmRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -210,50 +206,6 @@ app.post('/api/contact', async (req, res) => {
         const lead = new Lead(leadData);
         await lead.save();
         
-        // Auto-create customer profile in CRM
-        const customerData = {
-            name: leadData.name,
-            email: leadData.email,
-            phone: leadData.phone,
-            company: leadData.company,
-            projectType: leadData.projectType,
-            budget: leadData.budget,
-            timeline: leadData.timeline,
-            features: leadData.features,
-            initialMessage: leadData.message,
-            status: 'lead',
-            source: 'website',
-            firstContactDate: new Date(),
-            nextFollowUp: new Date(Date.now() + 2 * 60 * 60 * 1000) // 2 hours from now
-        };
-        
-        try {
-            // Check if customer already exists
-            let customer = await Customer.findOne({ email: leadData.email });
-            
-            if (!customer) {
-                // Create new customer
-                customer = new Customer(customerData);
-                await customer.save();
-                console.log('✅ Customer profile created:', customer._id);
-            } else {
-                // Update existing customer with new lead info
-                customer.projectType = leadData.projectType;
-                customer.budget = leadData.budget;
-                customer.timeline = leadData.timeline;
-                customer.features = leadData.features;
-                customer.lastContactDate = new Date();
-                customer.notes.push({
-                    content: `New form submission: ${leadData.projectType} project with budget ${formatBudget(leadData.budget)}`,
-                    createdBy: 'System'
-                });
-                await customer.save();
-                console.log('✅ Customer profile updated:', customer._id);
-            }
-        } catch (crmError) {
-            console.error('CRM customer creation error:', crmError);
-            // Don't fail the request if CRM fails
-        }
         
         // Prepare email content
         const emailHtml = `
@@ -272,16 +224,17 @@ app.post('/api/contact', async (req, res) => {
                         ${lead.company ? `<p><strong>Company:</strong> ${lead.company}</p>` : ''}
                     </div>
                     
+                    ${lead.projectType || lead.budget || lead.timeline ? `
                     <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                         <h3 style="color: #6366f1; margin-top: 0;">Project Requirements</h3>
-                        <p><strong>Project Type:</strong> ${lead.projectType.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</p>
-                        <p><strong>Budget:</strong> ${formatBudget(lead.budget)} (${getPackageName(lead.budget)})</p>
-                        <p><strong>Timeline:</strong> ${lead.timeline === 'asap' ? 'ASAP' : lead.timeline.replace('-', ' to ')}</p>
+                        ${lead.projectType ? `<p><strong>Project Type:</strong> ${lead.projectType.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</p>` : ''}
+                        ${lead.budget ? `<p><strong>Budget:</strong> ${formatBudget(lead.budget)} (${getPackageName(lead.budget)})</p>` : ''}
+                        ${lead.timeline ? `<p><strong>Timeline:</strong> ${lead.timeline === 'asap' ? 'ASAP' : lead.timeline.replace('-', ' to ')}</p>` : ''}
                         ${lead.features && lead.features.length > 0 ? 
                             `<p><strong>Features Requested:</strong></p>
                             <ul>${lead.features.map(f => `<li>${f}</li>`).join('')}</ul>` : ''}
                         ${lead.message ? `<p><strong>Additional Message:</strong><br>${lead.message}</p>` : ''}
-                    </div>
+                    </div>` : ''}
                     
                     <div style="background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
                         <p style="margin: 0; color: #92400e;"><strong>⏰ Action Required:</strong> Contact this lead within 2 hours as promised!</p>
@@ -598,8 +551,84 @@ app.post('/api/send-follow-up-24hr', async (req, res) => {
     }
 });
 
-// Serve CRM files
-app.use('/crm', express.static(path.join(__dirname, 'crm')));
+// Send custom email from Communication tab
+app.post('/api/send-customer-email', async (req, res) => {
+    try {
+        const { leadId, subject, body, template } = req.body;
+
+        // Validate input
+        if (!leadId || !subject || !body) {
+            return res.status(400).json({
+                success: false,
+                message: 'Lead ID, subject, and body are required'
+            });
+        }
+
+        // Find the lead
+        const lead = await Lead.findById(leadId);
+        if (!lead) {
+            return res.status(404).json({
+                success: false,
+                message: 'Customer not found'
+            });
+        }
+
+        if (!lead.email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Customer email not available'
+            });
+        }
+
+        // Create professional HTML email format
+        const emailHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 24px;">${subject}</h1>
+                </div>
+                <div style="padding: 30px; background: #f9fafb; line-height: 1.6; color: #1f2937;">
+                    ${body.replace(/\n/g, '<br>')}
+                </div>
+                <div style="background: #1f2937; padding: 20px; text-align: center;">
+                    <p style="color: white; margin: 0; font-weight: bold;">TownRanker</p>
+                    <p style="color: #9ca3af; margin: 5px 0; font-size: 14px;">Professional Web Development & Digital Solutions</p>
+                    <p style="color: #9ca3af; margin: 5px 0; font-size: 12px;">
+                        Customer ID: ${lead._id}
+                    </p>
+                </div>
+            </div>
+        `;
+
+        // Send the email using existing transporter
+        const result = await transporter.sendMail({
+            from: process.env.EMAIL_FROM || '"TownRanker" <hello@townranker.com>',
+            to: lead.email,
+            subject: subject,
+            html: emailHtml
+        });
+
+        // Update lead's last contacted time
+        await Lead.findByIdAndUpdate(leadId, {
+            lastContacted: new Date(),
+            $inc: { emailCount: 1 }
+        });
+
+        res.json({
+            success: true,
+            message: 'Email sent successfully',
+            recipient: lead.email,
+            messageId: result.messageId,
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Customer email error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to send email',
+            error: error.message
+        });
+    }
+});
 
 // Serve index.html for all other routes (SPA support)
 app.get('*', (req, res) => {

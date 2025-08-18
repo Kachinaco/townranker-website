@@ -2191,6 +2191,7 @@ TownRanker Team`
         async function sendEmail() {
             const subject = document.getElementById('emailSubject').value;
             const body = document.getElementById('emailBody').value;
+            const template = document.getElementById('emailTemplate').value;
             
             if (!subject || !body) {
                 alert('Please fill in subject and message fields');
@@ -2202,43 +2203,71 @@ TownRanker Team`
                 return;
             }
             
+            // Show sending indicator
+            const sendButton = event.target;
+            const originalText = sendButton.innerHTML;
+            sendButton.innerHTML = '<span class="material-icons" style="font-size: 16px; margin-right: 5px;">hourglass_empty</span>Sending...';
+            sendButton.disabled = true;
+            
             try {
-                // In a real implementation, this would send via your email API
-                // For now, we'll just simulate the action
+                // Send via the real API
+                const response = await fetch('/api/send-customer-email', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        leadId: currentLead._id,
+                        subject: subject,
+                        body: body,
+                        template: template
+                    })
+                });
                 
-                // Add to email history
-                const emailHistoryList = document.getElementById('emailHistoryList');
-                const newEmail = document.createElement('div');
-                newEmail.className = 'email-item';
-                newEmail.innerHTML = `
-                    <div class="email-header">
-                        <div class="email-subject">${subject}</div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span class="email-status sent">sent</span>
-                            <span class="email-date">Just now</span>
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Add to email history
+                    const emailHistoryList = document.getElementById('emailHistoryList');
+                    const newEmail = document.createElement('div');
+                    newEmail.className = 'email-item';
+                    newEmail.innerHTML = `
+                        <div class="email-header">
+                            <div class="email-subject">${subject}</div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="email-status sent">sent</span>
+                                <span class="email-date">Just now</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="email-preview">${body.substring(0, 100)}${body.length > 100 ? '...' : ''}</div>
-                `;
-                
-                if (emailHistoryList.querySelector('[style*="text-align: center"]')) {
-                    // Replace empty state
-                    emailHistoryList.innerHTML = '';
+                        <div class="email-preview">${body.substring(0, 100)}${body.length > 100 ? '...' : ''}</div>
+                    `;
+                    
+                    if (emailHistoryList.querySelector('[style*="text-align: center"]')) {
+                        // Replace empty state
+                        emailHistoryList.innerHTML = '';
+                    }
+                    emailHistoryList.insertBefore(newEmail, emailHistoryList.firstChild);
+                    
+                    // Clear form
+                    document.getElementById('emailSubject').value = '';
+                    document.getElementById('emailBody').value = '';
+                    document.getElementById('emailTemplate').value = '';
+                    
+                    // Add to timeline
+                    addEmailToTimeline(subject);
+                    
+                    alert(`Email sent successfully to ${result.recipient}!`);
+                } else {
+                    throw new Error(result.message || 'Failed to send email');
                 }
-                emailHistoryList.insertBefore(newEmail, emailHistoryList.firstChild);
-                
-                // Clear form
-                document.getElementById('emailSubject').value = '';
-                document.getElementById('emailBody').value = '';
-                document.getElementById('emailTemplate').value = '';
-                
-                // Add to timeline
-                addEmailToTimeline(subject);
-                
-                alert('Email sent successfully!');
             } catch (error) {
                 console.error('Error sending email:', error);
-                alert('Failed to send email');
+                alert('Failed to send email: ' + error.message);
+            } finally {
+                // Restore button
+                sendButton.innerHTML = originalText;
+                sendButton.disabled = false;
             }
         }
 
