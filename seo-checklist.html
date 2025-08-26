@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Checklist - TownRanker</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .checklist-item:hover {
+            background: #f3f4f6;
+            transform: translateX(5px);
+        }
+        
+        .checklist-item.checking {
+            background: #fef3c7;
+        }
+        
+        .checklist-item.success {
+            background: #d1fae5;
+        }
+        
+        .checklist-item.warning {
+            background: #fed7aa;
+        }
+        
+        .checklist-item.error {
+            background: #fee2e2;
+        }
+        
+        .status-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .status-icon.pending {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+        
+        .status-icon.checking {
+            background: #fbbf24;
+            color: white;
+            animation: spin 1s linear infinite;
+        }
+        
+        .status-icon.success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .status-icon.warning {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .status-icon.error {
+            background: #ef4444;
+            color: white;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .item-content {
+            flex: 1;
+        }
+        
+        .item-title {
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        
+        .item-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+        
+        .item-result {
+            font-size: 0.875rem;
+            color: #059669;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .item-result.show {
+            display: block;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .summary-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .stat {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 SEO Checklist</h1>
+            <p>Comprehensive SEO audit for TownRanker.com</p>
+        </div>
+        
+        <div class="content">
+            <!-- Technical SEO Section -->
+            <div class="section">
+                <h2 class="section-title">📊 Technical SEO</h2>
+                
+                <div class="checklist-item" data-check="ssl">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">SSL Certificate</div>
+                        <div class="item-description">HTTPS is enabled and SSL certificate is valid</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item" data-check="sitemap">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">XML Sitemap</div>
+                        <div class="item-description">Sitemap exists and is accessible</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item" data-check="robots">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">Robots.txt</div>
+                        <div class="item-description">Robots.txt file is properly configured</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item" data-check="mobile">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">Mobile Responsive</div>
+                        <div class="item-description">Website is mobile-friendly with viewport meta tag</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item" data-check="speed">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">Page Speed</div>
+                        <div class="item-description">Page loads quickly (under 3 seconds)</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- On-Page SEO Section -->
+            <div class="section">
+                <h2 class="section-title">📝 On-Page SEO</h2>
+                
+                <div class="checklist-item" data-check="title">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">Title Tag</div>
+                        <div class="item-description">Title tag is present and optimized (30-60 characters)</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item" data-check="meta-description">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">Meta Description</div>
+                        <div class="item-description">Meta description is present and optimized (150-160 characters)</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item" data-check="headings">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">Heading Structure</div>
+                        <div class="item-description">Proper H1-H6 heading hierarchy</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item" data-check="canonical">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">Canonical URL</div>
+                        <div class="item-description">Canonical tag is present and correct</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item" data-check="opengraph">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">Open Graph Tags</div>
+                        <div class="item-description">Social media tags are properly configured</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Structured Data Section -->
+            <div class="section">
+                <h2 class="section-title">🔍 Structured Data</h2>
+                
+                <div class="checklist-item" data-check="schema">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">Schema Markup</div>
+                        <div class="item-description">JSON-LD structured data is present and valid</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item" data-check="organization">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">Organization Schema</div>
+                        <div class="item-description">Business information is properly marked up</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item" data-check="breadcrumbs">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">Breadcrumb Schema</div>
+                        <div class="item-description">Navigation structure is marked up</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Search Console Section -->
+            <div class="section">
+                <h2 class="section-title">🎯 Search Console</h2>
+                
+                <div class="checklist-item" data-check="gsc-verified">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">Google Search Console</div>
+                        <div class="item-description">Property is verified in Search Console</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item" data-check="sitemap-submitted">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">Sitemap Submission</div>
+                        <div class="item-description">XML sitemap is submitted to Google</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item" data-check="analytics">
+                    <div class="status-icon pending">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-title">Google Analytics</div>
+                        <div class="item-description">Analytics tracking is configured</div>
+                        <div class="item-result"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="runSEOAudit()">
+                    <i class="fas fa-play"></i> Run SEO Audit
+                </button>
+                <button class="btn btn-secondary" onclick="exportReport()">
+                    <i class="fas fa-download"></i> Export Report
+                </button>
+            </div>
+            
+            <div class="summary" id="summary" style="display: none;">
+                <h3 class="summary-title">Audit Summary</h3>
+                <div class="summary-stats">
+                    <div class="stat">
+                        <div class="stat-value" id="passed-count">0</div>
+                        <div class="stat-label">Passed</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="warning-count">0</div>
+                        <div class="stat-label">Warnings</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="failed-count">0</div>
+                        <div class="stat-label">Failed</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="score">0%</div>
+                        <div class="stat-label">SEO Score</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function runSEOAudit() {
+            const checks = document.querySelectorAll('.checklist-item');
+            let passed = 0, warnings = 0, failed = 0;
+            
+            for (const check of checks) {
+                const type = check.dataset.check;
+                const icon = check.querySelector('.status-icon');
+                const result = check.querySelector('.item-result');
+                
+                // Set checking state
+                check.classList.add('checking');
+                icon.className = 'status-icon checking';
+                icon.innerHTML = '<i class="fas fa-spinner"></i>';
+                
+                // Simulate check delay
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // Run specific check
+                const checkResult = await runCheck(type);
+                
+                // Update UI based on result
+                check.classList.remove('checking');
+                if (checkResult.status === 'success') {
+                    check.classList.add('success');
+                    icon.className = 'status-icon success';
+                    icon.innerHTML = '<i class="fas fa-check"></i>';
+                    passed++;
+                } else if (checkResult.status === 'warning') {
+                    check.classList.add('warning');
+                    icon.className = 'status-icon warning';
+                    icon.innerHTML = '<i class="fas fa-exclamation"></i>';
+                    warnings++;
+                } else {
+                    check.classList.add('error');
+                    icon.className = 'status-icon error';
+                    icon.innerHTML = '<i class="fas fa-times"></i>';
+                    failed++;
+                }
+                
+                if (checkResult.message) {
+                    result.textContent = checkResult.message;
+                    result.classList.add('show');
+                }
+            }
+            
+            // Show summary
+            const total = passed + warnings + failed;
+            const score = Math.round((passed / total) * 100);
+            
+            document.getElementById('passed-count').textContent = passed;
+            document.getElementById('warning-count').textContent = warnings;
+            document.getElementById('failed-count').textContent = failed;
+            document.getElementById('score').textContent = score + '%';
+            document.getElementById('summary').style.display = 'block';
+        }
+        
+        async function runCheck(type) {
+            switch(type) {
+                case 'ssl':
+                    return {
+                        status: window.location.protocol === 'https:' ? 'success' : 'error',
+                        message: window.location.protocol === 'https:' ? 
+                            'SSL certificate is active and valid' : 
+                            'Site is not using HTTPS'
+                    };
+                    
+                case 'sitemap':
+                    try {
+                        const response = await fetch('/sitemap.xml');
+                        return {
+                            status: response.ok ? 'success' : 'error',
+                            message: response.ok ? 
+                                'Sitemap found at /sitemap.xml' : 
+                                'Sitemap not accessible'
+                        };
+                    } catch {
+                        return { status: 'error', message: 'Could not check sitemap' };
+                    }
+                    
+                case 'robots':
+                    try {
+                        const response = await fetch('/robots.txt');
+                        return {
+                            status: response.ok ? 'success' : 'error',
+                            message: response.ok ? 
+                                'Robots.txt is accessible' : 
+                                'Robots.txt not found'
+                        };
+                    } catch {
+                        return { status: 'error', message: 'Could not check robots.txt' };
+                    }
+                    
+                case 'mobile':
+                    const viewport = document.querySelector('meta[name="viewport"]');
+                    return {
+                        status: viewport ? 'success' : 'error',
+                        message: viewport ? 
+                            'Mobile viewport is configured' : 
+                            'Missing viewport meta tag'
+                    };
+                    
+                case 'speed':
+                    const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                    return {
+                        status: loadTime < 3000 ? 'success' : loadTime < 5000 ? 'warning' : 'error',
+                        message: `Page load time: ${loadTime}ms`
+                    };
+                    
+                case 'title':
+                    const title = document.title;
+                    const titleLength = title.length;
+                    return {
+                        status: titleLength > 30 && titleLength < 60 ? 'success' : 'warning',
+                        message: `Title length: ${titleLength} characters`
+                    };
+                    
+                case 'meta-description':
+                    const metaDesc = document.querySelector('meta[name="description"]');
+                    const descLength = metaDesc ? metaDesc.content.length : 0;
+                    return {
+                        status: descLength > 150 && descLength < 160 ? 'success' : 
+                                descLength > 0 ? 'warning' : 'error',
+                        message: `Meta description: ${descLength} characters`
+                    };
+                    
+                case 'headings':
+                    const h1Count = document.querySelectorAll('h1').length;
+                    return {
+                        status: h1Count === 1 ? 'success' : h1Count > 1 ? 'warning' : 'error',
+                        message: `Found ${h1Count} H1 tag(s)`
+                    };
+                    
+                case 'canonical':
+                    const canonical = document.querySelector('link[rel="canonical"]');
+                    return {
+                        status: canonical ? 'success' : 'warning',
+                        message: canonical ? 
+                            `Canonical: ${canonical.href}` : 
+                            'No canonical tag found'
+                    };
+                    
+                case 'opengraph':
+                    const ogTitle = document.querySelector('meta[property="og:title"]');
+                    const ogDesc = document.querySelector('meta[property="og:description"]');
+                    const ogImage = document.querySelector('meta[property="og:image"]');
+                    return {
+                        status: ogTitle && ogDesc && ogImage ? 'success' : 'warning',
+                        message: 'Open Graph tags detected'
+                    };
+                    
+                case 'schema':
+                    const schemas = document.querySelectorAll('script[type="application/ld+json"]');
+                    return {
+                        status: schemas.length > 0 ? 'success' : 'warning',
+                        message: `Found ${schemas.length} structured data blocks`
+                    };
+                    
+                case 'organization':
+                    const schemas = document.querySelectorAll('script[type="application/ld+json"]');
+                    let hasOrg = false;
+                    schemas.forEach(s => {
+                        try {
+                            const data = JSON.parse(s.textContent);
+                            if (data['@type'] === 'ProfessionalService' || data['@type'] === 'Organization') {
+                                hasOrg = true;
+                            }
+                        } catch {}
+                    });
+                    return {
+                        status: hasOrg ? 'success' : 'warning',
+                        message: hasOrg ? 'Organization schema found' : 'No organization schema'
+                    };
+                    
+                case 'breadcrumbs':
+                    const schemas = document.querySelectorAll('script[type="application/ld+json"]');
+                    let hasBreadcrumb = false;
+                    schemas.forEach(s => {
+                        try {
+                            const data = JSON.parse(s.textContent);
+                            if (data['@type'] === 'BreadcrumbList') {
+                                hasBreadcrumb = true;
+                            }
+                        } catch {}
+                    });
+                    return {
+                        status: hasBreadcrumb ? 'success' : 'warning',
+                        message: hasBreadcrumb ? 'Breadcrumb schema found' : 'No breadcrumb schema'
+                    };
+                    
+                case 'gsc-verified':
+                    const gscMeta = document.querySelector('meta[name="google-site-verification"]');
+                    return {
+                        status: gscMeta && gscMeta.content !== 'YOUR_GOOGLE_SEARCH_CONSOLE_VERIFICATION_CODE' ? 
+                            'success' : 'warning',
+                        message: 'Google Search Console verification tag present'
+                    };
+                    
+                case 'sitemap-submitted':
+                    return {
+                        status: 'warning',
+                        message: 'Manual verification required in Google Search Console'
+                    };
+                    
+                case 'analytics':
+                    const hasGA = typeof gtag !== 'undefined' || window.ga;
+                    return {
+                        status: hasGA ? 'success' : 'warning',
+                        message: hasGA ? 'Google Analytics detected' : 'No analytics found'
+                    };
+                    
+                default:
+                    return { status: 'warning', message: 'Check not implemented' };
+            }
+        }
+        
+        function exportReport() {
+            const results = [];
+            document.querySelectorAll('.checklist-item').forEach(item => {
+                const title = item.querySelector('.item-title').textContent;
+                const status = item.querySelector('.status-icon').className.split(' ')[1];
+                const result = item.querySelector('.item-result').textContent;
+                results.push(`${title}: ${status} - ${result}`);
+            });
+            
+            const report = `SEO Audit Report - TownRanker.com\n` +
+                          `Generated: ${new Date().toLocaleString()}\n\n` +
+                          results.join('\n');
+            
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'seo-audit-report.txt';
+            a.click();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TownRanker - Premium Web Development That Generates Revenue</title>
+    <meta name="description" content="Build websites that actually make money. Our clients regularly land $50k-$80k contracts within months.">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-600: #4b5563;
+            --gray-900: #111827;
+            --white: #ffffff;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-900);
+            background: var(--white);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        /* Header */
+        header {
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-100);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        
+        .logo img {
+            height: 48px;
+            width: auto;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--gray-600);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .cta-button {
+            background: var(--primary);
+            color: var(--white);
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .cta-button:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Mobile Navigation */
+        .mobile-menu {
+            display: none;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .mobile-menu {
+                display: block;
+            }
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+            padding: 80px 0 120px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            opacity: 0.05;
+            border-radius: 0 0 0 100px;
+        }
+        
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            color: var(--gray-900);
+        }
+        
+        .hero-text .highlight {
+            color: var(--primary);
+        }
+        
+        .hero-text p {
+            font-size: 1.25rem;
+            color: var(--gray-600);
+            margin-bottom: 32px;
+            max-width: 500px;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            padding: 16px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--gray-600);
+            padding: 16px 32px;
+            border: 2px solid var(--gray-100);
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+        
+        .hero-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .hero-card {
+            background: var(--white);
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+        }
+        
+        .hero-card h3 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .hero-card p {
+            color: var(--gray-600);
+            margin-bottom: 20px;
+        }
+        
+        .hero-card .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-top: 1px solid var(--gray-100);
+        }
+        
+        /* Responsive Hero */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 60px 0 80px;
+            }
+            
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+            }
+            
+            .hero-stats {
+                justify-content: space-around;
+            }
+        }
+        
+        /* Services Section */
+        .services {
+            padding: 80px 0;
+            background: var(--white);
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--gray-900);
+        }
+        
+        .section-header p {
+            font-size: 1.125rem;
+            color: var(--gray-600);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+        
+        .service-card {
+            background: var(--gray-50);
+            padding: 32px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-4px);
+        }
+        
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+        
+        .service-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--gray-900);
+        }
+        
+        .service-card p {
+            color: var(--gray-600);
+        }
+        
+        /* Portfolio Section */
+        .portfolio {
+            padding: 80px 0;
+            background: var(--gray-50);
+        }
+        
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .portfolio-item {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .portfolio-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .portfolio-image {
+            position: relative;
+            height: 320px;
+            overflow: hidden;
+            display: block;
+        }
+        
+        .browser-bar {
+            background: #f1f3f4;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 2;
+        }
+        
+        .browser-dots {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .browser-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+        }
+        
+        .browser-dot:nth-child(2) {
+            background: #ffbd2e;
+        }
+        
+        .browser-dot:nth-child(3) {
+            background: #27ca3f;
+        }
+        
+        .browser-url {
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 0.875rem;
+            background: var(--white);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .browser-url:hover {
+            color: var(--primary);
+        }
+        
+        .website-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            transform: scale(0.25);
+            transform-origin: 0 0;
+            width: 400%;
+            height: 400%;
+            pointer-events: auto;
+        }
+        
+        /* Specific zoom levels for different sites */
+        .website-iframe[src*="flagstaffwindows.com"] {
+            transform: scale(0.2);
+            width: 500%;
+            height: 500%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+        }
+        
+        .website-iframe[src*="coffeeroastingtimer.com"] {
+            transform: scale(0.2);
+            width: 500%;
+            height: 500%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+        }
+        
+        .portfolio-image:hover .website-iframe {
+            pointer-events: auto;
+        }
+        
+        .portfolio-iframe-container {
+            position: relative;
+            overflow: hidden;
+            height: 200px;
+            margin-top: 40px;
+        }
+        
+        .portfolio-content {
+            padding: 24px;
+        }
+        
+        .portfolio-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--gray-900);
+        }
+        
+        .portfolio-content p {
+            color: var(--gray-600);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        
+        .portfolio-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .tech-badge {
+            background: var(--primary);
+            color: var(--white);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        /* Contact Section */
+        .contact {
+            padding: 80px 0;
+            background: var(--primary);
+            color: var(--white);
+            text-align: center;
+        }
+        
+        .contact h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        .contact p {
+            font-size: 1.125rem;
+            margin-bottom: 32px;
+            opacity: 0.9;
+        }
+        
+        .contact .btn-primary {
+            background: var(--white);
+            color: var(--primary);
+        }
+        
+        .contact .btn-primary:hover {
+            background: var(--gray-100);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--gray-900);
+            color: var(--white);
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        footer p {
+            opacity: 0.8;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            margin-bottom: 24px;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-100);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        
+        .btn-cancel {
+            background: transparent;
+            color: var(--gray-600);
+            padding: 12px 24px;
+            border: 2px solid var(--gray-100);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">
+                <img src="/images/townranker-logo.svg" alt="TownRanker" />
+            </a>
+            <div class="nav-links">
+                <a href="#services">Services</a>
+                <a href="#portfolio">Portfolio</a>
+                <a href="#contact">Contact</a>
+                <a href="#" class="cta-button" onclick="openModal()">Get Started</a>
+            </div>
+            <button class="mobile-menu" onclick="openModal()">
+                ☰
+            </button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>
+                        Build Websites That <span class="highlight">Actually Make Money</span>
+                    </h1>
+                    <p>
+                        Stop wasting money on websites that don't convert. Our clients regularly land 
+                        $50k-$80k contracts within months of launching.
+                    </p>
+                    <div class="hero-buttons">
+                        <button class="btn-primary" onclick="openModal()">
+                            Get Your Revenue Website
+                        </button>
+                        <a href="#portfolio" class="btn-secondary">
+                            View Our Work
+                        </a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <div class="stat-number">$2.4M+</div>
+                            <div class="stat-label">Client Revenue</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">150+</div>
+                            <div class="stat-label">Sites Built</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">24hr</div>
+                            <div class="stat-label">Response</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="hero-card">
+                        <h3>💰 Revenue Results</h3>
+                        <p>Average client results within 6 months:</p>
+                        <div class="metric">
+                            <span>New Leads</span>
+                            <span><strong>+340%</strong></span>
+                        </div>
+                        <div class="metric">
+                            <span>Conversion Rate</span>
+                            <span><strong>+85%</strong></span>
+                        </div>
+                        <div class="metric">
+                            <span>Average Deal Size</span>
+                            <span><strong>$67k</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-header">
+                <h2>Revenue-Focused Web Solutions</h2>
+                <p>We don't just build websites. We build digital money-making machines that convert visitors into high-value clients.</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">🚀</div>
+                    <h3>High-Converting Websites</h3>
+                    <p>Custom-built sites designed to turn visitors into leads and leads into customers.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">📱</div>
+                    <h3>Mobile-First Design</h3>
+                    <p>Responsive designs that look perfect and convert on every device.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">⚡</div>
+                    <h3>Speed Optimization</h3>
+                    <p>Lightning-fast loading times that keep visitors engaged and boost rankings.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">📈</div>
+                    <h3>SEO & Analytics</h3>
+                    <p>Built-in SEO optimization and tracking to measure and improve performance.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🔧</div>
+                    <h3>Ongoing Support</h3>
+                    <p>24/7 maintenance and updates to keep your site running perfectly.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">💡</div>
+                    <h3>Strategy Consulting</h3>
+                    <p>Expert guidance on digital strategy to maximize your online revenue.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section class="portfolio" id="portfolio">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Client Success Stories</h2>
+                <p>See how we've helped businesses transform their online presence and generate real revenue</p>
+            </div>
+            <div class="portfolio-grid">
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <div class="browser-bar">
+                            <div class="browser-dots">
+                                <div class="browser-dot"></div>
+                                <div class="browser-dot"></div>
+                                <div class="browser-dot"></div>
+                            </div>
+                            <a href="https://flagstaffwindows.com" target="_blank" rel="dofollow" class="browser-url">flagstaffwindows.com</a>
+                        </div>
+                        <iframe 
+                            class="website-iframe"
+                            src="https://flagstaffwindows.com/?iframe=1" 
+                            title="Flagstaff Windows"
+                            loading="lazy"
+                            sandbox="allow-same-origin allow-scripts allow-pointer-lock"
+                            scrolling="yes"
+                            tabindex="0"
+                        ></iframe>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Flagstaff Windows</h3>
+                        <p>Premium window and door installation serving Northern Arizona. Custom solutions for residential and commercial properties.</p>
+                        <div class="portfolio-tech">
+                            <span class="tech-badge">3D Configurator</span>
+                            <span class="tech-badge">Quote Calculator</span>
+                            <span class="tech-badge">Review System</span>
+                            <span class="tech-badge">Lead Capture</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <div class="browser-bar">
+                            <div class="browser-dots">
+                                <div class="browser-dot"></div>
+                                <div class="browser-dot"></div>
+                                <div class="browser-dot"></div>
+                            </div>
+                            <a href="https://windowsdoorsnearme.com" target="_blank" rel="dofollow" class="browser-url">windowsdoorsnearme.com</a>
+                        </div>
+                        <iframe 
+                            class="website-iframe"
+                            src="https://windowsdoorsnearme.com" 
+                            title="Windows Doors Near Me"
+                            loading="lazy"
+                            sandbox="allow-same-origin allow-scripts allow-pointer-lock"
+                            scrolling="yes"
+                            tabindex="0"
+                        ></iframe>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>WindowsDoorsNearMe</h3>
+                        <p>Find trusted window and door contractors in your area. Instant quotes, verified professionals, and quality installations nationwide.</p>
+                        <div class="portfolio-tech">
+                            <span class="tech-badge">Geo-Location</span>
+                            <span class="tech-badge">Contractor Portal</span>
+                            <span class="tech-badge">Review System</span>
+                            <span class="tech-badge">Lead Distribution</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <div class="browser-bar">
+                            <div class="browser-dots">
+                                <div class="browser-dot"></div>
+                                <div class="browser-dot"></div>
+                                <div class="browser-dot"></div>
+                            </div>
+                            <a href="https://www.windowsanddoorsofsedona.com" target="_blank" rel="dofollow" class="browser-url">www.windowsanddoorsofsedona.com</a>
+                        </div>
+                        <iframe 
+                            class="website-iframe"
+                            src="https://www.windowsanddoorsofsedona.com" 
+                            title="Windows and Doors of Sedona"
+                            loading="lazy"
+                            sandbox="allow-same-origin allow-scripts allow-pointer-lock"
+                            scrolling="yes"
+                            tabindex="0"
+                        ></iframe>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Windows & Doors of Sedona</h3>
+                        <p>Luxury window and door solutions for Sedona's unique desert climate. Premium products with expert installation and design consultation.</p>
+                        <div class="portfolio-tech">
+                            <span class="tech-badge">Virtual Showroom</span>
+                            <span class="tech-badge">AR Preview</span>
+                            <span class="tech-badge">Design Tool</span>
+                            <span class="tech-badge">Climate Guide</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <div class="browser-bar">
+                            <div class="browser-dots">
+                                <div class="browser-dot"></div>
+                                <div class="browser-dot"></div>
+                                <div class="browser-dot"></div>
+                            </div>
+                            <a href="https://www.coffeeroastingtimer.com" target="_blank" rel="dofollow" class="browser-url">www.coffeeroastingtimer.com</a>
+                        </div>
+                        <iframe 
+                            class="website-iframe"
+                            src="https://www.coffeeroastingtimer.com/?iframe=1" 
+                            title="Coffee Roasting Timer"
+                            loading="lazy"
+                            sandbox="allow-same-origin allow-scripts allow-pointer-lock"
+                            scrolling="yes"
+                            tabindex="0"
+                        ></iframe>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Coffee Roasting Timer</h3>
+                        <p>Professional coffee roasting timer app for artisan roasters. Track temperature curves, roast profiles, and achieve perfect consistency.</p>
+                        <div class="portfolio-tech">
+                            <span class="tech-badge">Real-time Charts</span>
+                            <span class="tech-badge">Profile Saving</span>
+                            <span class="tech-badge">Data Export</span>
+                            <span class="tech-badge">Mobile App</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2>Ready to Build Your Revenue Website?</h2>
+            <p>Join 150+ successful businesses that trust TownRanker with their online presence.</p>
+            <button class="btn-primary" onclick="openModal()">
+                Start Your Project Today
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 TownRanker. All rights reserved. Built to generate revenue.</p>
+        </div>
+    </footer>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Let's Build Your Revenue Website</h3>
+                <p>Tell us about your project and we'll get back to you within 24 hours.</p>
+            </div>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="name">Your Name *</label>
+                    <input type="text" id="name" name="name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" name="phone" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="company">Company Name</label>
+                    <input type="text" id="company" name="company" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="budget">Project Budget</label>
+                    <select id="budget" name="budget" class="form-input">
+                        <option value="5000">$5,000 - $10,000</option>
+                        <option value="10000">$10,000 - $25,000</option>
+                        <option value="25000">$25,000 - $50,000</option>
+                        <option value="50000">$50,000+</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="message">Project Details</label>
+                    <textarea id="message" name="message" class="form-input form-textarea" 
+                              placeholder="Tell us about your project goals, timeline, and any specific requirements..."></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Send My Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Modal functionality
+        function openModal() {
+            document.getElementById('contactModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('contactModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('contactModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Form submission
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                company: formData.get('company'),
+                budget: parseInt(formData.get('budget')),
+                message: formData.get('message'),
+                projectType: 'business',
+                timeline: '1-2months'
+            };
+
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Thank you! We\'ll contact you within 24 hours.');
+                    closeModal();
+                    this.reset();
+                } else {
+                    alert('Something went wrong. Please try again or call us directly.');
+                }
+            } catch (error) {
+                alert('Something went wrong. Please try again or call us directly.');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+    </script>
+</body>
+</html>

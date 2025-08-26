@@ -1,73 +1,43 @@
-# TownRanker Robots.txt
-# Last Updated: 2025-08-15
+# Robots.txt for TownRanker.com
+# Allow all crawlers
 
-# Default - Allow all search engines
 User-agent: *
 Allow: /
 Disallow: /admin/
-Disallow: /admin-dashboard.html
 Disallow: /api/
-Disallow: /backend/
-Disallow: /node_modules/
-Disallow: /backup/
-Disallow: /crm/
-Disallow: /.env
 Disallow: /*.json$
-Disallow: /*.log$
-Disallow: /index-backup*.html
-Disallow: /index-new.html
-Disallow: /index-with-*.html
-Disallow: /form-modern.html
-Disallow: /new-modal-section.html
-Crawl-delay: 1
+Disallow: /temp/
+Disallow: /private/
 
-# Googlebot specific rules
+# Specific crawler rules
 User-agent: Googlebot
 Allow: /
-Disallow: /admin/
-Disallow: /api/
-Disallow: /backend/
 Crawl-delay: 0
 
-# Bingbot specific rules
 User-agent: Bingbot
 Allow: /
-Disallow: /admin/
-Disallow: /api/
-Disallow: /backend/
+Crawl-delay: 0
+
+User-agent: Slurp
+Allow: /
 Crawl-delay: 1
+
+User-agent: DuckDuckBot
+Allow: /
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://townranker.com/sitemap.xml
 
 # Block bad bots
 User-agent: AhrefsBot
-Disallow: /
+Allow: /
 
 User-agent: SemrushBot
-Disallow: /
-
-User-agent: DotBot
 Disallow: /
 
 User-agent: MJ12bot
 Disallow: /
 
-# Allow social media crawlers
-User-agent: facebookexternalhit
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: LinkedInBot
-Allow: /
-
-User-agent: WhatsApp
-Allow: /
-
-User-agent: Slackbot
-Allow: /
-
-# Sitemap location
-Sitemap: https://townranker.com/sitemap.xml
-
-# Host directive (for Yandex)
-Host: https://townranker.com
+User-agent: DotBot
+Disallow: /

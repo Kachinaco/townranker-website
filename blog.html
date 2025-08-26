@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog & Resources - TownRanker | Web Development Insights</title>
+    <meta name="description" content="Expert insights on web development, design trends, SEO tips, and digital marketing strategies to help your business succeed online.">
+    <meta name="keywords" content="web development blog, design resources, SEO tips, digital marketing, townranker blog, web design tutorials">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://townranker.com/blog.html">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="TownRanker Blog - Web Development Resources">
+    <meta property="og:description" content="Stay updated with the latest in web development, design trends, and digital strategies.">
+    <meta property="og:url" content="https://townranker.com/blog.html">
+    <meta property="og:type" content="blog">
+    <meta property="og:image" content="https://townranker.com/images/blog-hero.jpg">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Blog - TownRanker Web Development">
+    <meta name="twitter:description" content="Tips, tutorials, and insights for digital success">
+    
+    <!-- Schema.org Blog -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "name": "TownRanker Blog",
+        "description": "Web development insights and resources",
+        "url": "https://townranker.com/blog.html",
+        "publisher": {
+            "@type": "Organization",
+            "name": "TownRanker",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://townranker.com/logo.png"
+            }
+        },
+        "blogPost": [
+            {
+                "@type": "BlogPosting",
+                "headline": "The Importance of Mobile-First Design in 2024",
+                "datePublished": "2024-12-01",
+                "author": {"@type": "Organization", "name": "TownRanker"}
+            },
+            {
+                "@type": "BlogPosting",
+                "headline": "Local SEO Strategies That Actually Work",
+                "datePublished": "2024-12-01",
+                "author": {"@type": "Organization", "name": "TownRanker"}
+            }
+        ]
+    }
+    </script>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    
+    <!-- Ahrefs -->
+    <script>
+        (function(a,h,r,e,f,s){
+            a[h]=a[h]||function(){(a[h].q=a[h].q||[]).push(arguments)};
+            a[h].l=1*new Date();
+            s=r.createElement('script');
+            s.async=1;
+            s.src=e;
+            f=r.getElementsByTagName('script')[0];
+            f.parentNode.insertBefore(s,f);
+        })(window,'ahrefs','document','https://js.ahrefs.com/analytics.js');
+        ahrefs('init',{
+            domain: 'townranker.com'
+        });
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Navigation */
+        nav {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Categories */
+        .categories-section {
+            padding: 40px 20px;
+            background: #f8f9fa;
+        }
+        
+        .categories {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .category-btn {
+            padding: 10px 25px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .category-btn:hover,
+        .category-btn.active {
+            border-color: #2563eb;
+            color: #2563eb;
+            background: #e3f2fd;
+        }
+        
+        /* Blog Grid */
+        .blog-section {
+            padding: 60px 20px;
+        }
+        
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 40px;
+        }
+        
+        .blog-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .blog-image {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+        
+        .blog-content {
+            padding: 25px;
+        }
+        
+        .blog-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .blog-category {
+            color: #2563eb;
+            font-weight: 600;
+        }
+        
+        .blog-card h3 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .blog-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .read-more {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: gap 0.3s;
+        }
+        
+        .read-more:hover {
+            gap: 10px;
+        }
+        
+        /* Resources Section */
+        .resources-section {
+            padding: 60px 20px;
+            background: #f8f9fa;
+        }
+        
+        .resources-section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 3rem;
+        }
+        
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .resource-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .resource-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .resource-card h3 {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .resource-card p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .resource-link {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        /* Newsletter Section */
+        .newsletter-section {
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .newsletter-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .newsletter-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .newsletter-section p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+        
+        .newsletter-form {
+            display: flex;
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .newsletter-input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+        }
+        
+        .newsletter-btn {
+            padding: 15px 30px;
+            background: white;
+            color: #2563eb;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .newsletter-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .newsletter-form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">
+                <img src="/logo.png" alt="TownRanker Logo">
+                TownRanker
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about.html">About</a></li>
+                <li><a href="/services.html">Services</a></li>
+                <li><a href="/portfolio.html">Portfolio</a></li>
+                <li><a href="/pricing.html">Pricing</a></li>
+                <li><a href="/blog.html" style="color: #2563eb;">Blog</a></li>
+                <li><a href="/#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Blog & Resources</h1>
+            <p>Stay ahead with the latest web development insights, tutorials, and industry best practices</p>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories-section">
+        <div class="container">
+            <div class="categories">
+                <button class="category-btn active">All Posts</button>
+                <button class="category-btn">Web Development</button>
+                <button class="category-btn">Design</button>
+                <button class="category-btn">SEO</button>
+                <button class="category-btn">Marketing</button>
+                <button class="category-btn">Tutorials</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Grid -->
+    <section class="blog-section">
+        <div class="container">
+            <div class="blog-grid">
+                <!-- Blog Post 1 -->
+                <article class="blog-card">
+                    <div class="blog-image">📱</div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">Web Development</span>
+                            <span>December 2024</span>
+                        </div>
+                        <h3>The Importance of Mobile-First Design in 2024</h3>
+                        <p>With over 60% of web traffic coming from mobile devices, learn why mobile-first design is no longer optional for businesses. See how we implement this in our <a href="/services.html" style="color: #2563eb;">web development services</a>.</p>
+                        <a href="#" class="read-more">Read More →</a>
+                    </div>
+                </article>
+
+                <!-- Blog Post 2 -->
+                <article class="blog-card">
+                    <div class="blog-image">🔍</div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">SEO</span>
+                            <span>December 2024</span>
+                        </div>
+                        <h3>Local SEO Strategies That Actually Work</h3>
+                        <p>Discover proven techniques to improve your local search rankings and attract more customers in your area. Check our <a href="/portfolio.html" style="color: #2563eb;">portfolio</a> for successful local SEO implementations.</p>
+                        <a href="#" class="read-more">Read More →</a>
+                    </div>
+                </article>
+
+                <!-- Blog Post 3 -->
+                <article class="blog-card">
+                    <div class="blog-image">⚡</div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">Performance</span>
+                            <span>November 2024</span>
+                        </div>
+                        <h3>Speed Optimization: Make Your Website Lightning Fast</h3>
+                        <p>Learn how to optimize your website's performance for better user experience and higher conversion rates.</p>
+                        <a href="#" class="read-more">Read More →</a>
+                    </div>
+                </article>
+
+                <!-- Blog Post 4 -->
+                <article class="blog-card">
+                    <div class="blog-image">🎨</div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">Design</span>
+                            <span>November 2024</span>
+                        </div>
+                        <h3>2024 Web Design Trends You Can't Ignore</h3>
+                        <p>Explore the latest design trends that are shaping the web, from dark mode to micro-interactions and beyond.</p>
+                        <a href="#" class="read-more">Read More →</a>
+                    </div>
+                </article>
+
+                <!-- Blog Post 5 -->
+                <article class="blog-card">
+                    <div class="blog-image">🛒</div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">E-Commerce</span>
+                            <span>November 2024</span>
+                        </div>
+                        <h3>Building Trust in E-Commerce: Essential Features</h3>
+                        <p>Discover the key features that build customer trust and increase conversions in online stores.</p>
+                        <a href="#" class="read-more">Read More →</a>
+                    </div>
+                </article>
+
+                <!-- Blog Post 6 -->
+                <article class="blog-card">
+                    <div class="blog-image">🔒</div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">Security</span>
+                            <span>October 2024</span>
+                        </div>
+                        <h3>Website Security Best Practices for Small Businesses</h3>
+                        <p>Protect your website and customer data with these essential security measures every business should implement.</p>
+                        <a href="#" class="read-more">Read More →</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section class="resources-section">
+        <div class="container">
+            <h2>Free Resources</h2>
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon">📚</div>
+                    <h3>Website Planning Guide</h3>
+                    <p>A comprehensive guide to planning your website project from start to finish.</p>
+                    <a href="#" class="resource-link">Download PDF</a>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">✅</div>
+                    <h3>SEO Checklist</h3>
+                    <p>Essential SEO tasks to improve your website's search engine rankings.</p>
+                    <a href="#" class="resource-link">Get Checklist</a>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">🎯</div>
+                    <h3>Conversion Tips</h3>
+                    <p>10 proven strategies to increase your website's conversion rate.</p>
+                    <a href="#" class="resource-link">Learn More</a>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">📊</div>
+                    <h3>Analytics Setup</h3>
+                    <p>Step-by-step guide to setting up Google Analytics for your website.</p>
+                    <a href="#" class="resource-link">View Guide</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter-section">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2>Stay Updated</h2>
+                <p>Get the latest web development tips and insights delivered to your inbox</p>
+                <form class="newsletter-form">
+                    <input type="email" class="newsletter-input" placeholder="Enter your email" required>
+                    <button type="submit" class="newsletter-btn">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 TownRanker. All rights reserved.</p>
+            <p>Building Digital Excellence</p>
+        </div>
+    </footer>
+</body>
+</html>

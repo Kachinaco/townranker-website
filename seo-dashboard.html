@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Dashboard - TownRanker</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+        }
+        
+        .dashboard-header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--gray-900);
+        }
+        
+        .logo img {
+            height: 40px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-change {
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .stat-change.positive {
+            color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .stat-change.negative {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+        }
+        
+        .keywords-section, .opportunities-section, .competitors-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .keyword-input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .keyword-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+        
+        .keywords-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .keywords-table th {
+            text-align: left;
+            padding: 0.75rem;
+            background: var(--gray-50);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+        
+        .keywords-table td {
+            padding: 0.75rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .position-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .position-1-3 {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .position-4-10 {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+        }
+        
+        .position-11-20 {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+        
+        .position-20-plus {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .trend-up {
+            color: var(--success);
+        }
+        
+        .trend-down {
+            color: var(--danger);
+        }
+        
+        .opportunity-card {
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .opportunity-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .opportunity-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .quick-actions {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .action-btn {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--gray-200);
+            background: white;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .action-btn:hover {
+            background: var(--gray-50);
+            border-color: var(--primary);
+        }
+        
+        .action-btn i {
+            color: var(--primary);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--gray-300);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+        }
+        
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <a href="/" class="logo">
+            <img src="/images/logo.png" alt="TownRanker">
+            <h1>SEO Dashboard</h1>
+        </a>
+        <div>
+            <button class="btn btn-secondary" onclick="refreshData()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Keywords Tracked</div>
+                <div class="stat-value" id="total-keywords">0</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> 0 this week
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Average Position</div>
+                <div class="stat-value" id="avg-position">-</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> +0.0
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Top 10 Keywords</div>
+                <div class="stat-value" id="top10-keywords">0</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> +0
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Search Visibility</div>
+                <div class="stat-value" id="search-visibility">0%</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> +0%
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="main-section">
+                <!-- Keyword Tracking -->
+                <div class="keywords-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Keyword Rankings</h2>
+                        <button class="btn btn-primary" onclick="addKeywordModal()">
+                            <i class="fas fa-plus"></i> Add Keyword
+                        </button>
+                    </div>
+                    
+                    <div class="keyword-input-group">
+                        <input type="text" class="keyword-input" id="keyword-search" placeholder="Search keywords...">
+                        <button class="btn btn-secondary" onclick="searchKeywords()">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                    
+                    <div id="keywords-loading" style="display:none; text-align:center; padding:2rem;">
+                        <div class="loading"></div>
+                        <p style="margin-top:1rem; color:var(--gray-600);">Fetching keyword data...</p>
+                    </div>
+                    
+                    <table class="keywords-table" id="keywords-table">
+                        <thead>
+                            <tr>
+                                <th>Keyword</th>
+                                <th>Position</th>
+                                <th>Change</th>
+                                <th>Volume</th>
+                                <th>Difficulty</th>
+                                <th>URL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="keywords-tbody">
+                            <!-- Keywords will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Opportunities -->
+                <div class="opportunities-section">
+                    <div class="section-header">
+                        <h2 class="section-title">SEO Opportunities</h2>
+                        <span style="color: var(--gray-600); font-size: 0.875rem;">Low-hanging fruit</span>
+                    </div>
+                    
+                    <div id="opportunities-list">
+                        <!-- Opportunities will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Competitors -->
+                <div class="competitors-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Competitor Analysis</h2>
+                        <button class="btn btn-secondary" onclick="analyzeCompetitors()">
+                            <i class="fas fa-chart-line"></i> Analyze
+                        </button>
+                    </div>
+                    
+                    <div id="competitors-list">
+                        <!-- Competitors will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <h3 style="margin-bottom: 1rem;">Quick Actions</h3>
+                    
+                    <button class="action-btn" onclick="checkGoogleSearchConsole()">
+                        <i class="fab fa-google"></i>
+                        <span>Connect Search Console</span>
+                    </button>
+                    
+                    <button class="action-btn" onclick="generateSEOReport()">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Generate SEO Report</span>
+                    </button>
+                    
+                    <button class="action-btn" onclick="findKeywordGaps()">
+                        <i class="fas fa-search-plus"></i>
+                        <span>Find Keyword Gaps</span>
+                    </button>
+                    
+                    <button class="action-btn" onclick="auditSiteStructure()">
+                        <i class="fas fa-sitemap"></i>
+                        <span>Audit Site Structure</span>
+                    </button>
+                    
+                    <button class="action-btn" onclick="checkCoreWebVitals()">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Check Core Web Vitals</span>
+                    </button>
+                </div>
+                
+                <!-- SEO Tips -->
+                <div class="quick-actions">
+                    <h3 style="margin-bottom: 1rem;">SEO Tips</h3>
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>
+                            <strong>Tip:</strong> Focus on keywords ranking in positions 11-20. Small improvements can get them to page 1.
+                        </div>
+                    </div>
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Good:</strong> Your site has structured data implemented!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sample data for demonstration
+        const sampleKeywords = [
+            { keyword: 'web development agency', position: 12, change: 3, volume: 2400, difficulty: 68, url: '/services.html' },
+            { keyword: 'custom website development', position: 8, change: -2, volume: 1900, difficulty: 45, url: '/' },
+            { keyword: 'professional web developer', position: 15, change: 5, volume: 880, difficulty: 52, url: '/about.html' },
+            { keyword: 'website design services', position: 22, change: 0, volume: 3600, difficulty: 71, url: '/services.html' },
+            { keyword: 'e-commerce development', position: 35, change: 10, volume: 1300, difficulty: 65, url: '/portfolio.html' }
+        ];
+        
+        const sampleOpportunities = [
+            {
+                title: 'Add FAQ Schema to Homepage',
+                impact: 'High',
+                effort: 'Low',
+                description: 'Implement FAQ structured data to get rich snippets'
+            },
+            {
+                title: 'Optimize "web development agency" page',
+                impact: 'High',
+                effort: 'Medium',
+                description: 'Currently ranking #12, can reach top 10 with content improvements'
+            },
+            {
+                title: 'Create location-specific landing pages',
+                impact: 'Medium',
+                effort: 'Medium',
+                description: 'Target "web development [city]" keywords'
+            },
+            {
+                title: 'Improve Core Web Vitals on mobile',
+                impact: 'High',
+                effort: 'High',
+                description: 'LCP needs improvement on mobile devices'
+            }
+        ];
+        
+        const sampleCompetitors = [
+            { domain: 'competitor1.com', visibility: 45, keywords: 234, backlinks: 1250 },
+            { domain: 'competitor2.com', visibility: 38, keywords: 189, backlinks: 890 },
+            { domain: 'townranker.com', visibility: 25, keywords: 87, backlinks: 145, isYou: true },
+            { domain: 'competitor3.com', visibility: 22, keywords: 156, backlinks: 567 }
+        ];
+        
+        // Initialize dashboard
+        function initDashboard() {
+            loadKeywords();
+            loadOpportunities();
+            loadCompetitors();
+            updateStats();
+        }
+        
+        function loadKeywords() {
+            const tbody = document.getElementById('keywords-tbody');
+            tbody.innerHTML = '';
+            
+            sampleKeywords.forEach(kw => {
+                const positionClass = kw.position <= 3 ? 'position-1-3' : 
+                                    kw.position <= 10 ? 'position-4-10' : 
+                                    kw.position <= 20 ? 'position-11-20' : 
+                                    'position-20-plus';
+                
+                const changeIcon = kw.change > 0 ? 'fa-arrow-up trend-up' : 
+                                  kw.change < 0 ? 'fa-arrow-down trend-down' : 
+                                  'fa-minus';
+                
+                const row = `
+                    <tr>
+                        <td><strong>${kw.keyword}</strong></td>
+                        <td><span class="position-badge ${positionClass}">#${kw.position}</span></td>
+                        <td><i class="fas ${changeIcon}"></i> ${Math.abs(kw.change)}</td>
+                        <td>${kw.volume.toLocaleString()}</td>
+                        <td>${kw.difficulty}/100</td>
+                        <td><a href="${kw.url}" target="_blank">${kw.url}</a></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+        
+        function loadOpportunities() {
+            const container = document.getElementById('opportunities-list');
+            container.innerHTML = '';
+            
+            sampleOpportunities.forEach(opp => {
+                const impactColor = opp.impact === 'High' ? 'var(--success)' : 
+                                   opp.impact === 'Medium' ? 'var(--warning)' : 
+                                   'var(--gray-600)';
+                
+                const card = `
+                    <div class="opportunity-card">
+                        <div class="opportunity-title">${opp.title}</div>
+                        <div style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 0.5rem;">
+                            ${opp.description}
+                        </div>
+                        <div class="opportunity-stats">
+                            <span style="color: ${impactColor}">
+                                <i class="fas fa-chart-line"></i> Impact: ${opp.impact}
+                            </span>
+                            <span>
+                                <i class="fas fa-clock"></i> Effort: ${opp.effort}
+                            </span>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+        
+        function loadCompetitors() {
+            const container = document.getElementById('competitors-list');
+            container.innerHTML = `
+                <table class="keywords-table">
+                    <thead>
+                        <tr>
+                            <th>Domain</th>
+                            <th>Visibility</th>
+                            <th>Keywords</th>
+                            <th>Backlinks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            sampleCompetitors.forEach(comp => {
+                const row = `
+                    <tr ${comp.isYou ? 'style="background: var(--gray-50);"' : ''}>
+                        <td>
+                            ${comp.isYou ? '<strong>' : ''}
+                            ${comp.domain}
+                            ${comp.isYou ? ' (You)</strong>' : ''}
+                        </td>
+                        <td>${comp.visibility}%</td>
+                        <td>${comp.keywords}</td>
+                        <td>${comp.backlinks.toLocaleString()}</td>
+                    </tr>
+                `;
+                container.innerHTML += row;
+            });
+            
+            container.innerHTML += '</tbody></table>';
+        }
+        
+        function updateStats() {
+            document.getElementById('total-keywords').textContent = sampleKeywords.length;
+            
+            const avgPos = Math.round(sampleKeywords.reduce((sum, kw) => sum + kw.position, 0) / sampleKeywords.length);
+            document.getElementById('avg-position').textContent = avgPos;
+            
+            const top10 = sampleKeywords.filter(kw => kw.position <= 10).length;
+            document.getElementById('top10-keywords').textContent = top10;
+            
+            document.getElementById('search-visibility').textContent = '25%';
+        }
+        
+        // Action functions
+        function refreshData() {
+            const btn = event.target;
+            btn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Refreshing...';
+            setTimeout(() => {
+                initDashboard();
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                alert('Data refreshed successfully!');
+            }, 2000);
+        }
+        
+        function searchKeywords() {
+            const searchTerm = document.getElementById('keyword-search').value.toLowerCase();
+            const filtered = sampleKeywords.filter(kw => 
+                kw.keyword.toLowerCase().includes(searchTerm)
+            );
+            // Re-render table with filtered results
+            const tbody = document.getElementById('keywords-tbody');
+            tbody.innerHTML = '';
+            filtered.forEach(kw => {
+                // Same rendering logic as loadKeywords
+            });
+        }
+        
+        function addKeywordModal() {
+            const keyword = prompt('Enter a keyword to track:');
+            if (keyword) {
+                alert(`Keyword "${keyword}" added to tracking!`);
+                // In real implementation, this would call the API
+            }
+        }
+        
+        function checkGoogleSearchConsole() {
+            alert('Google Search Console verification needed.\n\nTo connect:\n1. Go to https://search.google.com/search-console\n2. Add your property\n3. Get verification code\n4. Add it to your site');
+        }
+        
+        function generateSEOReport() {
+            alert('Generating SEO report...\nThis will analyze:\n- Current rankings\n- Technical issues\n- Content gaps\n- Competitor comparison');
+        }
+        
+        function findKeywordGaps() {
+            alert('Finding keyword gaps...\nAnalyzing competitors to find keywords they rank for but you don\'t.');
+        }
+        
+        function auditSiteStructure() {
+            alert('Auditing site structure...\nChecking:\n- Internal linking\n- URL structure\n- XML sitemap\n- Robots.txt');
+        }
+        
+        function checkCoreWebVitals() {
+            alert('Checking Core Web Vitals...\nAnalyzing:\n- Largest Contentful Paint (LCP)\n- First Input Delay (FID)\n- Cumulative Layout Shift (CLS)');
+        }
+        
+        function analyzeCompetitors() {
+            document.getElementById('competitors-list').innerHTML = '<div style="text-align:center; padding:2rem;"><div class="loading"></div><p style="margin-top:1rem;">Analyzing competitors...</p></div>';
+            setTimeout(() => {
+                loadCompetitors();
+            }, 2000);
+        }
+        
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>

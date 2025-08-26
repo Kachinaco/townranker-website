@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Calendar API Test - TownRanker</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .credentials-info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗓️ Google Calendar API Test</h1>
+        
+        <div class="test-section">
+            <h3>1. API Configuration Test</h3>
+            <p>Testing if the Google Calendar API credentials are configured correctly.</p>
+            <button onclick="testApiConfig()">Test API Configuration</button>
+            <div id="configResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Google Calendar Manager Test</h3>
+            <p>Testing if the Google Calendar Manager is loaded and functional.</p>
+            <button onclick="testCalendarManager()">Test Calendar Manager</button>
+            <div id="managerResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Google API Authentication Test</h3>
+            <p>Testing Google API authentication (requires user interaction).</p>
+            <button onclick="testAuthentication()" id="authBtn">Test Authentication</button>
+            <div id="authResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Mock Event Creation Test</h3>
+            <p>Testing event creation with mock client data.</p>
+            <button onclick="testMockEventCreation()" id="eventBtn">Test Mock Event Creation</button>
+            <div id="eventResult"></div>
+        </div>
+
+        <div class="test-results" id="overallResults">
+            <h3>Overall Test Results</h3>
+            <p>Run tests above to see results here.</p>
+        </div>
+    </div>
+
+    <!-- Google Calendar API -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    <!-- Enhanced Google Calendar Integration -->
+    <script src="/js/google-calendar-integration.js"></script>
+
+    <script>
+        let testResults = {
+            config: false,
+            manager: false,
+            auth: false,
+            event: false
+        };
+
+        // Test API Configuration
+        async function testApiConfig() {
+            const resultDiv = document.getElementById('configResult');
+            resultDiv.innerHTML = '<div class="status info">Testing API configuration...</div>';
+
+            try {
+                const response = await fetch('/api/google-calendar-config', {
+                    headers: {
+                        'Authorization': 'Bearer Madman155!'
+                    }
+                });
+
+                if (response.ok) {
+                    const config = await response.json();
+                    
+                    if (config.success && config.clientId && config.apiKey) {
+                        resultDiv.innerHTML = `
+                            <div class="status success">✅ API Configuration Test PASSED</div>
+                            <div class="credentials-info">
+                                <strong>Client ID:</strong> ${config.clientId}<br>
+                                <strong>API Key:</strong> ${config.apiKey.substring(0, 20)}...
+                            </div>
+                        `;
+                        testResults.config = true;
+                    } else {
+                        resultDiv.innerHTML = '<div class="status error">❌ API Configuration incomplete</div>';
+                    }
+                } else {
+                    resultDiv.innerHTML = '<div class="status error">❌ Failed to fetch API configuration</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
+            }
+            updateOverallResults();
+        }
+
+        // Test Calendar Manager
+        async function testCalendarManager() {
+            const resultDiv = document.getElementById('managerResult');
+            resultDiv.innerHTML = '<div class="status info">Testing Calendar Manager...</div>';
+
+            try {
+                // Wait for manager to initialize
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                if (typeof window.googleCalendarManager !== 'undefined') {
+                    const authStatus = window.googleCalendarManager.getAuthStatus();
+                    
+                    resultDiv.innerHTML = `
+                        <div class="status success">✅ Calendar Manager Test PASSED</div>
+                        <div class="credentials-info">
+                            <strong>Manager Loaded:</strong> Yes<br>
+                            <strong>Has Credentials:</strong> ${authStatus.hasCredentials}<br>
+                            <strong>Initialized:</strong> ${authStatus.initialized}<br>
+                            <strong>Authenticated:</strong> ${authStatus.authenticated}
+                        </div>
+                    `;
+                    testResults.manager = true;
+                } else {
+                    resultDiv.innerHTML = '<div class="status error">❌ Calendar Manager not loaded</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
+            }
+            updateOverallResults();
+        }
+
+        // Test Authentication
+        async function testAuthentication() {
+            const resultDiv = document.getElementById('authResult');
+            const authBtn = document.getElementById('authBtn');
+            
+            resultDiv.innerHTML = '<div class="status info">Testing authentication...</div>';
+            authBtn.disabled = true;
+
+            try {
+                if (typeof window.googleCalendarManager === 'undefined') {
+                    throw new Error('Calendar Manager not loaded');
+                }
+
+                const authStatus = window.googleCalendarManager.getAuthStatus();
+                
+                if (!authStatus.hasCredentials || !authStatus.initialized) {
+                    throw new Error('Calendar Manager not properly initialized');
+                }
+
+                if (authStatus.authenticated) {
+                    resultDiv.innerHTML = '<div class="status success">✅ Already authenticated with Google Calendar</div>';
+                    testResults.auth = true;
+                } else {
+                    // Try to authenticate
+                    resultDiv.innerHTML = '<div class="status info">Requesting Google Calendar authentication...</div>';
+                    
+                    await window.googleCalendarManager.authenticate();
+                    
+                    resultDiv.innerHTML = '<div class="status success">✅ Authentication Test PASSED</div>';
+                    testResults.auth = true;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="status error">❌ Authentication failed: ${error.message}</div>`;
+            }
+            
+            authBtn.disabled = false;
+            updateOverallResults();
+        }
+
+        // Test Mock Event Creation
+        async function testMockEventCreation() {
+            const resultDiv = document.getElementById('eventResult');
+            const eventBtn = document.getElementById('eventBtn');
+            
+            resultDiv.innerHTML = '<div class="status info">Testing mock event creation...</div>';
+            eventBtn.disabled = true;
+
+            try {
+                if (typeof window.googleCalendarManager === 'undefined') {
+                    throw new Error('Calendar Manager not loaded');
+                }
+
+                const authStatus = window.googleCalendarManager.getAuthStatus();
+                
+                if (!authStatus.authenticated) {
+                    resultDiv.innerHTML = '<div class="status error">❌ Please authenticate first before testing event creation</div>';
+                    eventBtn.disabled = false;
+                    return;
+                }
+
+                // Mock client data
+                const mockClientData = {
+                    name: 'Test Client',
+                    email: 'test@example.com',
+                    projectType: 'business',
+                    budget: 5000,
+                    timeline: '1-2months',
+                    phone: '+1234567890',
+                    company: 'Test Company',
+                    message: 'This is a test appointment created by the TownRanker Calendar API test.'
+                };
+
+                const event = await window.googleCalendarManager.createClientAppointment(mockClientData);
+                
+                resultDiv.innerHTML = `
+                    <div class="status success">✅ Mock Event Creation Test PASSED</div>
+                    <div class="credentials-info">
+                        <strong>Event ID:</strong> ${event.id}<br>
+                        <strong>Title:</strong> ${event.summary}<br>
+                        <strong>Start Time:</strong> ${new Date(event.start.dateTime).toLocaleString()}<br>
+                        <strong>Calendar Link:</strong> <a href="${event.htmlLink}" target="_blank">View in Google Calendar</a>
+                    </div>
+                `;
+                testResults.event = true;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="status error">❌ Event creation failed: ${error.message}</div>`;
+            }
+            
+            eventBtn.disabled = false;
+            updateOverallResults();
+        }
+
+        // Update overall results
+        function updateOverallResults() {
+            const overallDiv = document.getElementById('overallResults');
+            const passedTests = Object.values(testResults).filter(result => result).length;
+            const totalTests = Object.keys(testResults).length;
+            
+            let statusClass = 'info';
+            let statusText = `${passedTests}/${totalTests} tests passed`;
+            
+            if (passedTests === totalTests) {
+                statusClass = 'success';
+                statusText = '🎉 All tests passed! Google Calendar API is fully functional.';
+            } else if (passedTests === 0) {
+                statusClass = 'error';
+                statusText = '❌ No tests passed yet. Please run the tests above.';
+            } else {
+                statusClass = 'info';
+                statusText = `⚠️ ${passedTests}/${totalTests} tests passed. Some features may not work properly.`;
+            }
+            
+            overallDiv.innerHTML = `
+                <h3>Overall Test Results</h3>
+                <div class="status ${statusClass}">${statusText}</div>
+                <div style="margin-top: 15px;">
+                    <strong>Test Details:</strong><br>
+                    ${testResults.config ? '✅' : '❌'} API Configuration<br>
+                    ${testResults.manager ? '✅' : '❌'} Calendar Manager<br>
+                    ${testResults.auth ? '✅' : '❌'} Authentication<br>
+                    ${testResults.event ? '✅' : '❌'} Event Creation
+                </div>
+            `;
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', async () => {
+            setTimeout(async () => {
+                await testApiConfig();
+                setTimeout(testCalendarManager, 1000);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

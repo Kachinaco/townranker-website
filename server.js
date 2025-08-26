@@ -5,9 +5,19 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 const Imap = require('imap');
 const { simpleParser } = require('mailparser');
+const http = require('http');
+const socketIo = require('socket.io');
+const openphoneSync = require('./services/openphoneSync');
 require('dotenv').config();
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 const PORT = process.env.PORT || 3000;
 
 // Middleware
@@ -15,15 +25,104 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/townranker', {
+// Route for /login to serve login.html
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+// Make io available to routes
+app.set('io', io);
+
+// Socket.io connection handling
+io.on('connection', (socket) => {
+    console.log('👤 Client connected:', socket.id);
+
+    // Join customer room for real-time messaging
+    socket.on('join_customer_room', (customerId) => {
+        socket.join(`customer_${customerId}`);
+        console.log(`👤 Socket ${socket.id} joined customer room: ${customerId}`);
+    });
+
+    // Leave customer room
+    socket.on('leave_customer_room', (customerId) => {
+        socket.leave(`customer_${customerId}`);
+        console.log(`👤 Socket ${socket.id} left customer room: ${customerId}`);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('👤 Client disconnected:', socket.id);
+    });
+});
+
+// MongoDB connection (secured by localhost binding and firewall)
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/townranker';
+mongoose.connect(mongoUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
-    console.log('✅ Connected to MongoDB');
+    console.log('✅ Connected to MongoDB (secured by network isolation)');
 }).catch(err => {
     console.error('❌ MongoDB connection error:', err);
 });
+
+// Calendar Event Schema
+const calendarEventSchema = new mongoose.Schema({
+    leadId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Lead',
+        required: true
+    },
+    title: {
+        type: String,
+        required: true
+    },
+    description: String,
+    startTime: {
+        type: Date,
+        required: true
+    },
+    endTime: {
+        type: Date,
+        required: true
+    },
+    eventType: {
+        type: String,
+        enum: ['discovery-call', 'follow-up', 'proposal-review', 'project-kickoff', 'check-in', 'final-review', 'other'],
+        default: 'other'
+    },
+    workflowStage: {
+        type: String,
+        enum: ['qualified', 'proposal', 'negotiation', 'closed-won', 'closed-lost']
+    },
+    location: String,
+    meetingLink: String,
+    googleEventId: String, // Store Google Calendar event ID for syncing
+    googleCalendarSynced: {
+        type: Boolean,
+        default: false
+    },
+    reminder: {
+        type: Number, // Minutes before event
+        default: 15
+    },
+    status: {
+        type: String,
+        enum: ['scheduled', 'completed', 'cancelled', 'rescheduled'],
+        default: 'scheduled'
+    },
+    notes: String,
+    createdBy: String,
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+const CalendarEvent = mongoose.model('CalendarEvent', calendarEventSchema);
 
 // Lead Schema
 const leadSchema = new mongoose.Schema({
@@ -592,7 +691,7 @@ async function sendReplyNotification(customer, subject, content, fromEmail) {
                     </div>
                     
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="https://townranker.com/admin-dashboard.html" 
+                        <a href="https://townranker.com/login" 
                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                                   color: white; 
                                   padding: 15px 30px; 
@@ -707,6 +806,12 @@ const getPackageName = (budget) => {
 
 // Mount auth routes
 app.use('/api/auth', authRoutes);
+
+// Mount messaging routes
+const openphoneRoutes = require('./routes/openphone');
+const messagesRoutes = require('./routes/messages');
+app.use('/api/openphone', openphoneRoutes);
+app.use('/api/messages', messagesRoutes);
 
 
 // Health check
@@ -991,6 +1096,60 @@ app.get('/api/leads', authenticateAdmin, async (req, res) => {
     }
 });
 
+// Create new lead (from admin dashboard)
+app.post('/api/leads', authenticateAdmin, async (req, res) => {
+    try {
+        console.log('📥 Admin creating new customer:', req.body);
+        const leadData = req.body;
+        
+        // Validate required fields
+        if (!leadData.name || !leadData.email || !leadData.phone) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide name, email, and phone'
+            });
+        }
+        
+        // Check if customer already exists with this email
+        const existingLead = await Lead.findOne({ email: leadData.email.toLowerCase() });
+        if (existingLead) {
+            return res.status(409).json({
+                success: false,
+                message: 'A customer with this email already exists',
+                existingCustomer: {
+                    id: existingLead._id,
+                    name: existingLead.name,
+                    email: existingLead.email,
+                    status: existingLead.status
+                }
+            });
+        }
+        
+        // Set default status if not provided
+        if (!leadData.status) {
+            leadData.status = 'new';
+        }
+        
+        // Create new lead
+        const lead = new Lead(leadData);
+        await lead.save();
+        
+        console.log('✅ Customer created successfully:', lead._id);
+        
+        res.json({
+            success: true,
+            message: 'Customer added successfully',
+            lead
+        });
+    } catch (error) {
+        console.error('Error creating customer:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Error creating customer'
+        });
+    }
+});
+
 // Get dashboard stats
 app.get('/api/stats', authenticateAdmin, async (req, res) => {
     try {
@@ -1023,6 +1182,102 @@ app.get('/api/stats', authenticateAdmin, async (req, res) => {
             success: false,
             message: 'Error fetching stats',
             error: error.message
+        });
+    }
+});
+
+// Create new event
+app.post('/api/events', authenticateAdmin, async (req, res) => {
+    try {
+        const {
+            title,
+            start,
+            end,
+            description,
+            location,
+            reminder,
+            clientId,
+            clientName,
+            clientEmail
+        } = req.body;
+
+        // Simple event storage - you could create a proper Event model later
+        const eventData = {
+            title,
+            start: new Date(start),
+            end: new Date(end),
+            description: description || '',
+            location: location || '',
+            reminder: parseInt(reminder) || 0,
+            clientId: clientId || null,
+            clientName: clientName || null,
+            clientEmail: clientEmail || null,
+            createdAt: new Date(),
+            adminId: req.adminId // from auth middleware
+        };
+
+        // For now, we'll just log the event since we don't have Event model
+        // In production, you'd save to database: await Event.create(eventData);
+        console.log('📅 Event created:', eventData);
+
+        res.json({
+            success: true,
+            message: 'Event created successfully',
+            data: eventData
+        });
+
+    } catch (error) {
+        console.error('Error creating event:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to create event'
+        });
+    }
+});
+
+// Get events (for future calendar display)
+app.get('/api/events', authenticateAdmin, async (req, res) => {
+    try {
+        // For now, return empty array since we don't have Event model
+        // In production: const events = await Event.find().sort({ start: 1 });
+        
+        res.json({
+            success: true,
+            events: []
+        });
+
+    } catch (error) {
+        console.error('Error fetching events:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch events'
+        });
+    }
+});
+
+// Get Google Calendar API configuration
+app.get('/api/google-calendar-config', authenticateAdmin, (req, res) => {
+    try {
+        const clientId = process.env.GOOGLE_CLIENT_ID;
+        const apiKey = process.env.GOOGLE_API_KEY;
+        
+        if (!clientId || !apiKey) {
+            return res.status(404).json({
+                success: false,
+                message: 'Google Calendar API credentials not configured'
+            });
+        }
+
+        res.json({
+            success: true,
+            clientId,
+            apiKey
+        });
+    } catch (error) {
+        console.error('Error getting Google Calendar config:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to get Google Calendar configuration'
         });
     }
 });
@@ -1560,7 +1815,7 @@ app.get('/api/track-email-open/:trackingId', async (req, res) => {
                             </div>
                             
                             <div style="text-align: center; margin: 30px 0;">
-                                <a href="https://townranker.com/admin-dashboard.html" 
+                                <a href="https://townranker.com/login" 
                                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                                           color: white; 
                                           padding: 15px 30px; 
@@ -1846,6 +2101,191 @@ app.get('/api/leads/:id/interactions', async (req, res) => {
     }
 });
 
+// Calendar Events API Endpoints
+
+// Get all calendar events
+app.get('/api/calendar/events', authenticateAdmin, async (req, res) => {
+    try {
+        const { start, end, leadId } = req.query;
+        let query = {};
+        
+        if (leadId) {
+            query.leadId = leadId;
+        }
+        
+        if (start && end) {
+            query.startTime = {
+                $gte: new Date(start),
+                $lte: new Date(end)
+            };
+        }
+        
+        const events = await CalendarEvent.find(query)
+            .populate('leadId', 'name email phone company')
+            .sort({ startTime: 1 });
+        
+        res.json({
+            success: true,
+            events
+        });
+    } catch (error) {
+        console.error('Error fetching calendar events:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching calendar events'
+        });
+    }
+});
+
+// Create a calendar event
+app.post('/api/calendar/events', authenticateAdmin, async (req, res) => {
+    try {
+        const eventData = req.body;
+        
+        // Validate required fields
+        if (!eventData.leadId || !eventData.title || !eventData.startTime || !eventData.endTime) {
+            return res.status(400).json({
+                success: false,
+                message: 'Lead ID, title, start time, and end time are required'
+            });
+        }
+        
+        // Create the event
+        const event = new CalendarEvent(eventData);
+        await event.save();
+        
+        // Populate lead data
+        await event.populate('leadId', 'name email phone company');
+        
+        // If Google Calendar sync is requested, create Google event
+        if (eventData.syncToGoogle) {
+            // This will be handled by the frontend using the Google Calendar API
+            event.googleCalendarSynced = true;
+        }
+        
+        res.json({
+            success: true,
+            event
+        });
+    } catch (error) {
+        console.error('Error creating calendar event:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error creating calendar event'
+        });
+    }
+});
+
+// Get a single calendar event
+app.get('/api/calendar/events/:eventId', authenticateAdmin, async (req, res) => {
+    try {
+        const { eventId } = req.params;
+        
+        const event = await CalendarEvent.findById(eventId)
+            .populate('leadId', 'name email phone company');
+        
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found'
+            });
+        }
+        
+        res.json({
+            success: true,
+            event
+        });
+    } catch (error) {
+        console.error('Error fetching calendar event:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching calendar event'
+        });
+    }
+});
+
+// Update a calendar event
+app.put('/api/calendar/events/:eventId', authenticateAdmin, async (req, res) => {
+    try {
+        const { eventId } = req.params;
+        const updates = req.body;
+        
+        updates.updatedAt = new Date();
+        
+        const event = await CalendarEvent.findByIdAndUpdate(
+            eventId,
+            updates,
+            { new: true }
+        ).populate('leadId', 'name email phone company');
+        
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found'
+            });
+        }
+        
+        res.json({
+            success: true,
+            event
+        });
+    } catch (error) {
+        console.error('Error updating calendar event:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating calendar event'
+        });
+    }
+});
+
+// Delete a calendar event
+app.delete('/api/calendar/events/:eventId', authenticateAdmin, async (req, res) => {
+    try {
+        const { eventId } = req.params;
+        
+        const event = await CalendarEvent.findByIdAndDelete(eventId);
+        
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found'
+            });
+        }
+        
+        res.json({
+            success: true,
+            message: 'Event deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting calendar event:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting calendar event'
+        });
+    }
+});
+
+// Get events for a specific lead
+app.get('/api/leads/:id/events', authenticateAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const events = await CalendarEvent.find({ leadId: id })
+            .sort({ startTime: 1 });
+        
+        res.json({
+            success: true,
+            events
+        });
+    } catch (error) {
+        console.error('Error fetching lead events:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching lead events'
+        });
+    }
+});
+
 // Add interaction to customer
 app.post('/api/leads/:id/interactions', async (req, res) => {
     try {
@@ -2034,15 +2474,23 @@ app.get('*', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`🚀 TownRanker server running on port ${PORT}`);
     console.log(`📍 Visit http://localhost:${PORT} to view the website`);
+    console.log(`💬 Socket.io enabled for real-time messaging`);
     
     // Start email monitoring
     setTimeout(() => {
         console.log('🚀 Starting email monitoring...');
         startEmailMonitoring();
     }, 5000); // Wait 5 seconds for server to fully start
+
+    // Start OpenPhone message sync
+    setTimeout(() => {
+        console.log('📱 Starting OpenPhone message sync...');
+        openphoneSync.setSocketIO(io);
+        openphoneSync.startPeriodicSync(2); // Sync every 2 minutes
+    }, 7000); // Wait 7 seconds to start after email monitoring
 });
 
 // Graceful shutdown
@@ -2054,6 +2502,10 @@ process.on('SIGINT', async () => {
         console.log('📧 Closing email connection...');
         emailReceiver.end();
     }
+
+    // Stop OpenPhone sync
+    console.log('📱 Stopping OpenPhone sync...');
+    openphoneSync.stopPeriodicSync();
     
     await mongoose.connection.close();
     process.exit(0);

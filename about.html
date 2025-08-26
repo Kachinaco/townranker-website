@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - TownRanker | Web Development Experts Since 2020</title>
+    <meta name="description" content="Learn about TownRanker's journey, mission, and the team behind your digital success. Expert web developers serving businesses nationwide with 500+ successful projects.">
+    <meta name="keywords" content="about townranker, web development team, digital agency story, web design experts, Arizona web developers">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://townranker.com/about.html">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="About TownRanker - Your Web Development Partner">
+    <meta property="og:description" content="Discover the team and vision behind TownRanker's web development success stories.">
+    <meta property="og:url" content="https://townranker.com/about.html">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://townranker.com/images/about-team.jpg">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="About TownRanker | Web Development Experts">
+    <meta name="twitter:description" content="Meet the team behind 500+ successful web projects">
+    <meta name="twitter:image" content="https://townranker.com/images/about-team.jpg">
+    
+    <!-- Schema.org Markup -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "AboutPage",
+        "mainEntity": {
+            "@type": "Organization",
+            "name": "TownRanker",
+            "url": "https://townranker.com",
+            "logo": "https://townranker.com/logo.png",
+            "description": "Professional web development agency specializing in custom websites, e-commerce, and web applications",
+            "foundingDate": "2020",
+            "founder": {
+                "@type": "Person",
+                "name": "TownRanker Team"
+            },
+            "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "US",
+                "addressRegion": "AZ"
+            },
+            "numberOfEmployees": {
+                "@type": "QuantitativeValue",
+                "value": 10
+            },
+            "sameAs": [
+                "https://www.facebook.com/townranker",
+                "https://www.linkedin.com/company/townranker",
+                "https://twitter.com/townranker"
+            ]
+        }
+    }
+    </script>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    
+    <!-- Ahrefs -->
+    <script>
+        (function(a,h,r,e,f,s){
+            a[h]=a[h]||function(){(a[h].q=a[h].q||[]).push(arguments)};
+            a[h].l=1*new Date();
+            s=r.createElement('script');
+            s.async=1;
+            s.src=e;
+            f=r.getElementsByTagName('script')[0];
+            f.parentNode.insertBefore(s,f);
+        })(window,'ahrefs','document','https://js.ahrefs.com/analytics.js');
+        ahrefs('init',{
+            domain: 'townranker.com'
+        });
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Navigation */
+        nav {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+        
+        /* Story Section */
+        .story-section {
+            padding: 80px 20px;
+            background: #f8f9fa;
+        }
+        
+        .story-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        .story-text h2 {
+            font-size: 2.5rem;
+            color: #2563eb;
+            margin-bottom: 1.5rem;
+        }
+        
+        .story-text p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+        
+        .story-image {
+            position: relative;
+        }
+        
+        .story-image img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .stat-overlay {
+            position: absolute;
+            bottom: -30px;
+            left: 30px;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .stat-overlay .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        
+        .stat-overlay .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* Values Section */
+        .values-section {
+            padding: 80px 20px;
+        }
+        
+        .values-section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 3rem;
+        }
+        
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+        
+        .value-card {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .value-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .value-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .value-card h3 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .value-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* Team Section */
+        .team-section {
+            padding: 80px 20px;
+            background: #f8f9fa;
+        }
+        
+        .team-section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 3rem;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .team-member {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        
+        .team-member:hover {
+            transform: translateY(-5px);
+        }
+        
+        .team-member-image {
+            height: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+        }
+        
+        .team-member-info {
+            padding: 25px;
+        }
+        
+        .team-member h3 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .team-member .role {
+            color: #2563eb;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        .team-member p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            text-align: center;
+            color: white;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .btn-white {
+            background: white;
+            color: #2563eb;
+        }
+        
+        .btn-white:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-outline:hover {
+            background: white;
+            color: #2563eb;
+        }
+        
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        footer p {
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .story-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-overlay {
+                position: static;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">
+                <img src="/logo.png" alt="TownRanker Logo">
+                TownRanker
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about.html">About</a></li>
+                <li><a href="/services.html">Services</a></li>
+                <li><a href="/portfolio.html">Portfolio</a></li>
+                <li><a href="/pricing.html">Pricing</a></li>
+                <li><a href="/blog.html">Blog</a></li>
+                <li><a href="/#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>About TownRanker</h1>
+            <p>Building digital excellence since our inception, we're passionate about helping businesses thrive online</p>
+        </div>
+    </section>
+
+    <!-- Story Section -->
+    <section class="story-section">
+        <div class="container">
+            <div class="story-content">
+                <div class="story-text">
+                    <h2>Our Story</h2>
+                    <p>TownRanker began with a simple mission: to make professional web development accessible to businesses of all sizes. We noticed that many companies struggled to find reliable, skilled developers who could deliver both quality and value.</p>
+                    <p>Today, we've grown into a trusted partner for businesses nationwide, from local service companies in Flagstaff to national directories and e-commerce platforms. Our <a href="/portfolio.html" style="color: #2563eb; text-decoration: underline;">portfolio</a> speaks to our versatility and commitment to excellence.</p>
+                    <p>We specialize in creating <a href="/services.html" style="color: #2563eb; text-decoration: underline;">custom solutions</a> that not only look great but also drive real business results. Every project we take on is an opportunity to help our clients succeed in the digital world. Check out our <a href="/pricing.html" style="color: #2563eb; text-decoration: underline;">transparent pricing</a> to get started.</p>
+                </div>
+                <div class="story-image">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 400'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23764ba2;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='500' height='400' fill='url(%23grad)' /%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-family='Arial' font-size='24' font-weight='bold'%3EOur Journey%3C/text%3E%3C/svg%3E" alt="TownRanker Journey - 500+ Successful Projects">
+                    <div class="stat-overlay">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Projects Completed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="values-section">
+        <div class="container">
+            <h2>Our Core Values</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">🎯</div>
+                    <h3>Results-Driven</h3>
+                    <p>We focus on delivering measurable outcomes that impact your bottom line. Every feature we build has a purpose.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">💡</div>
+                    <h3>Innovation</h3>
+                    <p>Staying ahead of technology trends to give our clients a competitive edge in their markets.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">🤝</div>
+                    <h3>Partnership</h3>
+                    <p>We work as an extension of your team, invested in your success as much as you are.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">⚡</div>
+                    <h3>Efficiency</h3>
+                    <p>Fast turnaround times without compromising quality. We respect your time and budget.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section">
+        <div class="container">
+            <h2>Meet Our Team</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="team-member-image">👨‍💻</div>
+                    <div class="team-member-info">
+                        <h3>Lead Developer</h3>
+                        <div class="role">Full-Stack Development</div>
+                        <p>Expert in modern web technologies with over 10 years of experience building scalable applications.</p>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <div class="team-member-image">👩‍🎨</div>
+                    <div class="team-member-info">
+                        <h3>UI/UX Designer</h3>
+                        <div class="role">Design & User Experience</div>
+                        <p>Creates beautiful, intuitive designs that users love and that drive conversions.</p>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <div class="team-member-image">👨‍💼</div>
+                    <div class="team-member-info">
+                        <h3>Project Manager</h3>
+                        <div class="role">Client Success</div>
+                        <p>Ensures smooth project delivery and maintains clear communication throughout the process.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Start Your Project?</h2>
+            <p>Let's discuss how we can help transform your business online</p>
+            <div class="cta-buttons">
+                <a href="/services.html" class="btn btn-white">View Our Services</a>
+                <a href="/pricing.html" class="btn btn-outline" style="margin: 0 10px;">See Pricing</a>
+                <a href="/#contact" class="btn btn-outline">Get in Touch</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 TownRanker. All rights reserved.</p>
+            <p>Building Digital Excellence</p>
+        </div>
+    </footer>
+</body>
+</html>

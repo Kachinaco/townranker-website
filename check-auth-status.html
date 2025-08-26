@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Calendar Auth Status</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; }
+        .status { padding: 20px; margin: 10px 0; border-radius: 8px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+        .auth-btn { background: #007bff; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Google Calendar Authentication Status</h1>
+    <div id="authStatus">Checking...</div>
+    <button class="auth-btn" onclick="testAuth()">Test Authentication</button>
+    <button class="auth-btn" onclick="forceAuth()">Force Authentication</button>
+    
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    
+    <script>
+        let isInitialized = false;
+        let isAuthenticated = false;
+        
+        // Initialize GAPI
+        function initializeGAPI() {
+            gapi.load('client:auth2', async () => {
+                try {
+                    await gapi.client.init({
+                        apiKey: 'AIzaSyAN8TZL-pbR-VRbgvjwVnjLJf9-SOGJABo',
+                        clientId: '410008002816-pja5c9estqiloavso5dinnc7ij2squ45.apps.googleusercontent.com',
+                        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+                        scope: 'https://www.googleapis.com/auth/calendar'
+                    });
+                    
+                    isInitialized = true;
+                    const authInstance = gapi.auth2.getAuthInstance();
+                    isAuthenticated = authInstance.isSignedIn.get();
+                    
+                    updateStatus();
+                } catch (error) {
+                    document.getElementById('authStatus').innerHTML = 
+                        `<div class="status error">❌ GAPI Initialization failed: ${error.message}</div>`;
+                }
+            });
+        }
+        
+        function updateStatus() {
+            const statusDiv = document.getElementById('authStatus');
+            let html = '';
+            
+            if (isInitialized) {
+                html += '<div class="status success">✅ Google API Initialized</div>';
+                
+                if (isAuthenticated) {
+                    html += '<div class="status success">✅ Authenticated with Google Calendar</div>';
+                    
+                    // Try to get user info
+                    const authInstance = gapi.auth2.getAuthInstance();
+                    const user = authInstance.currentUser.get();
+                    const profile = user.getBasicProfile();
+                    
+                    html += `<div class="status success">
+                        👤 Authenticated as: ${profile.getName()} (${profile.getEmail()})
+                    </div>`;
+                } else {
+                    html += '<div class="status warning">⚠️ Not authenticated with Google Calendar</div>';
+                    html += '<div class="status warning">This is why events are not syncing to Google Calendar!</div>';
+                }
+            } else {
+                html += '<div class="status error">❌ Google API not initialized</div>';
+            }
+            
+            statusDiv.innerHTML = html;
+        }
+        
+        async function testAuth() {
+            if (!isInitialized) {
+                alert('Google API not initialized yet. Please wait a moment and try again.');
+                return;
+            }
+            
+            const authInstance = gapi.auth2.getAuthInstance();
+            isAuthenticated = authInstance.isSignedIn.get();
+            updateStatus();
+        }
+        
+        async function forceAuth() {
+            if (!isInitialized) {
+                alert('Google API not initialized yet. Please wait a moment and try again.');
+                return;
+            }
+            
+            try {
+                const authInstance = gapi.auth2.getAuthInstance();
+                await authInstance.signIn();
+                isAuthenticated = true;
+                updateStatus();
+                alert('✅ Authentication successful! Now events should sync to Google Calendar.');
+            } catch (error) {
+                alert(`❌ Authentication failed: ${error.error || error.message}`);
+            }
+        }
+        
+        // Auto-initialize when page loads
+        window.addEventListener('load', () => {
+            setTimeout(initializeGAPI, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -30,6 +30,38 @@ const communicationSchema = new mongoose.Schema({
         unique: true,
         sparse: true
     },
+    
+    // SMS/Messaging Specific Fields
+    phoneNumber: {
+        type: String,
+        required: function() { return this.type === 'sms'; }
+    },
+    platform: {
+        type: String,
+        enum: ['email', 'openphone', 'imessage', 'bluebubbles'],
+        default: function() { return this.type === 'email' ? 'email' : 'openphone'; }
+    },
+    openphoneMessageId: {
+        type: String,
+        sparse: true
+    },
+    imessageId: {
+        type: String,
+        sparse: true
+    },
+    conversationId: {
+        type: String,
+        index: true
+    },
+    isIphone: {
+        type: Boolean,
+        default: false
+    },
+    deliveryChannel: {
+        type: String,
+        enum: ['sms', 'imessage', 'unknown'],
+        default: 'unknown'
+    },
     subject: {
         type: String,
         required: function() { return this.type === 'email'; }
@@ -320,6 +352,10 @@ communicationSchema.pre('save', function(next) {
 // Indexes
 communicationSchema.index({ customer: 1, type: 1, createdAt: -1 });
 communicationSchema.index({ emailId: 1 }, { unique: true, sparse: true });
+communicationSchema.index({ openphoneMessageId: 1 }, { unique: true, sparse: true });
+communicationSchema.index({ imessageId: 1 }, { unique: true, sparse: true });
+communicationSchema.index({ phoneNumber: 1, createdAt: -1 });
+communicationSchema.index({ conversationId: 1, createdAt: 1 });
 communicationSchema.index({ trackingId: 1 });
 communicationSchema.index({ 'campaign.id': 1 });
 communicationSchema.index({ threadId: 1 });

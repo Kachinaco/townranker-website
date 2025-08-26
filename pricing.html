@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - TownRanker | Transparent Web Development Pricing</title>
+    <meta name="description" content="Clear, transparent pricing for web development services. From simple websites to complex applications, find the perfect package for your business.">
+    <meta name="keywords" content="web development pricing, website cost, townranker pricing, web design packages, affordable web development">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://townranker.com/pricing.html">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="TownRanker Pricing - Web Development Packages">
+    <meta property="og:description" content="Transparent pricing for professional web development services. Starting at $2,500.">
+    <meta property="og:url" content="https://townranker.com/pricing.html">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://townranker.com/images/pricing-hero.jpg">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Web Development Pricing - TownRanker">
+    <meta name="twitter:description" content="Clear, transparent pricing. No hidden fees.">
+    
+    <!-- Schema.org Pricing -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "PriceSpecification",
+        "url": "https://townranker.com/pricing.html",
+        "priceCurrency": "USD",
+        "description": "Web development service pricing",
+        "eligibleTransactionVolume": {
+            "@type": "PriceSpecification",
+            "price": "2500-15000",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    
+    <!-- Ahrefs -->
+    <script>
+        (function(a,h,r,e,f,s){
+            a[h]=a[h]||function(){(a[h].q=a[h].q||[]).push(arguments)};
+            a[h].l=1*new Date();
+            s=r.createElement('script');
+            s.async=1;
+            s.src=e;
+            f=r.getElementsByTagName('script')[0];
+            f.parentNode.insertBefore(s,f);
+        })(window,'ahrefs','document','https://js.ahrefs.com/analytics.js');
+        ahrefs('init',{
+            domain: 'townranker.com'
+        });
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Navigation */
+        nav {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Pricing Toggle */
+        .pricing-toggle {
+            text-align: center;
+            padding: 40px 20px;
+            background: #f8f9fa;
+        }
+        
+        .toggle-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 20px;
+            padding: 5px;
+            background: white;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .toggle-option {
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .toggle-option.active {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .save-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #10b981;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-left: 10px;
+        }
+        
+        /* Pricing Cards */
+        .pricing-section {
+            padding: 60px 20px;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .pricing-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .pricing-card.featured {
+            border: 3px solid #2563eb;
+            transform: scale(1.05);
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2563eb;
+            color: white;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .pricing-header {
+            text-align: center;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .plan-name {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .plan-description {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+        
+        .price {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        
+        .price-prefix {
+            font-size: 1.5rem;
+            vertical-align: top;
+        }
+        
+        .price-suffix {
+            font-size: 1rem;
+            color: #666;
+            font-weight: normal;
+        }
+        
+        .features-list {
+            list-style: none;
+            padding: 30px 0;
+        }
+        
+        .features-list li {
+            padding: 12px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .check-icon {
+            color: #10b981;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .x-icon {
+            color: #ef4444;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #2563eb;
+            color: white;
+            text-align: center;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: #2563eb;
+            border: 2px solid #2563eb;
+        }
+        
+        .btn-outline:hover {
+            background: #2563eb;
+            color: white;
+        }
+        
+        /* Custom Solutions Section */
+        .custom-section {
+            padding: 60px 20px;
+            background: #f8f9fa;
+        }
+        
+        .custom-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            background: white;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .custom-content h2 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+        
+        .custom-content p {
+            font-size: 1.1rem;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+        
+        /* FAQ Section */
+        .faq-section {
+            padding: 60px 20px;
+        }
+        
+        .faq-section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .faq-item {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .faq-item h3 {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .faq-item p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pricing-card.featured {
+                transform: none;
+            }
+            
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">
+                <img src="/logo.png" alt="TownRanker Logo">
+                TownRanker
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about.html">About</a></li>
+                <li><a href="/services.html">Services</a></li>
+                <li><a href="/portfolio.html">Portfolio</a></li>
+                <li><a href="/pricing.html">Pricing</a></li>
+                <li><a href="/blog.html">Blog</a></li>
+                <li><a href="/#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Simple, Transparent Pricing</h1>
+            <p>Choose the perfect plan for your business. All plans include hosting, SSL, and basic support.</p>
+        </div>
+    </section>
+
+    <!-- Pricing Toggle -->
+    <section class="pricing-toggle">
+        <div class="container">
+            <div class="toggle-container">
+                <div class="toggle-option active" data-billing="project">One-Time Project</div>
+                <div class="toggle-option" data-billing="monthly">Monthly Retainer<span class="save-badge">Save 20%</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Cards -->
+    <section class="pricing-section">
+        <div class="container">
+            <div class="pricing-grid">
+                <!-- Starter Plan -->
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3 class="plan-name">Starter</h3>
+                        <p class="plan-description">Perfect for small businesses and startups</p>
+                        <div class="price">
+                            <span class="price-prefix">$</span>2,500
+                            <span class="price-suffix project-price">one-time</span>
+                            <span class="price-suffix monthly-price" style="display:none;">$500/mo</span>
+                        </div>
+                    </div>
+                    <ul class="features-list">
+                        <li><span class="check-icon">✓</span> 5-10 Page Website</li>
+                        <li><span class="check-icon">✓</span> Responsive Design</li>
+                        <li><span class="check-icon">✓</span> Basic SEO Setup</li>
+                        <li><span class="check-icon">✓</span> Contact Forms</li>
+                        <li><span class="check-icon">✓</span> Social Media Integration</li>
+                        <li><span class="check-icon">✓</span> 3 Months Support</li>
+                        <li><span class="x-icon">✗</span> E-commerce Features</li>
+                        <li><span class="x-icon">✗</span> Custom Functionality</li>
+                    </ul>
+                    <a href="/#contact" class="btn btn-outline">Get Started</a>
+                </div>
+
+                <!-- Professional Plan -->
+                <div class="pricing-card featured">
+                    <span class="popular-badge">MOST POPULAR</span>
+                    <div class="pricing-header">
+                        <h3 class="plan-name">Professional</h3>
+                        <p class="plan-description">Ideal for growing businesses</p>
+                        <div class="price">
+                            <span class="price-prefix">$</span>5,000
+                            <span class="price-suffix project-price">one-time</span>
+                            <span class="price-suffix monthly-price" style="display:none;">$1,000/mo</span>
+                        </div>
+                    </div>
+                    <ul class="features-list">
+                        <li><span class="check-icon">✓</span> 15-25 Page Website</li>
+                        <li><span class="check-icon">✓</span> Custom Design</li>
+                        <li><span class="check-icon">✓</span> Advanced SEO</li>
+                        <li><span class="check-icon">✓</span> CMS Integration</li>
+                        <li><span class="check-icon">✓</span> Blog/News Section</li>
+                        <li><span class="check-icon">✓</span> Analytics Setup</li>
+                        <li><span class="check-icon">✓</span> 6 Months Support</li>
+                        <li><span class="check-icon">✓</span> Basic E-commerce</li>
+                    </ul>
+                    <a href="/#contact" class="btn">Get Started</a>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3 class="plan-name">Enterprise</h3>
+                        <p class="plan-description">For complex projects and applications</p>
+                        <div class="price">
+                            <span class="price-prefix">$</span>10,000+
+                            <span class="price-suffix project-price">custom quote</span>
+                            <span class="price-suffix monthly-price" style="display:none;">$2,000+/mo</span>
+                        </div>
+                    </div>
+                    <ul class="features-list">
+                        <li><span class="check-icon">✓</span> Unlimited Pages</li>
+                        <li><span class="check-icon">✓</span> Custom Web Application</li>
+                        <li><span class="check-icon">✓</span> API Integrations</li>
+                        <li><span class="check-icon">✓</span> Advanced E-commerce</li>
+                        <li><span class="check-icon">✓</span> Database Design</li>
+                        <li><span class="check-icon">✓</span> User Authentication</li>
+                        <li><span class="check-icon">✓</span> 12 Months Support</li>
+                        <li><span class="check-icon">✓</span> Priority Support</li>
+                    </ul>
+                    <a href="/#contact" class="btn btn-outline">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Custom Solutions -->
+    <section class="custom-section">
+        <div class="container">
+            <div class="custom-content">
+                <h2>Need Something Custom?</h2>
+                <p>Every business is unique. If our standard packages don't fit your needs, we'll create a custom solution tailored specifically for you. From complex web applications to enterprise integrations, we've got you covered. Check out our <a href="/portfolio.html" style="color: #2563eb;">portfolio</a> to see examples of our custom work.</p>
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 20px;">
+                    <a href="/services.html" class="btn" style="background: white; color: #2563eb; border: 2px solid #2563eb;">View All Services</a>
+                    <a href="/#contact" class="btn">Let's Discuss Your Project</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>What's included in the price?</h3>
+                    <p>All packages include design, development, basic SEO, hosting setup, SSL certificate, and the specified support period.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>How long does a project take?</h3>
+                    <p>Starter projects typically take 2-3 weeks, Professional 4-6 weeks, and Enterprise projects 8-12 weeks or more.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Do you offer payment plans?</h3>
+                    <p>Yes! We typically work with 50% upfront and 50% on completion. Monthly payment plans are also available.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>What about ongoing maintenance?</h3>
+                    <p>We offer monthly maintenance packages starting at $200/month for updates, backups, and technical support.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 TownRanker. All rights reserved.</p>
+            <p>Building Digital Excellence</p>
+        </div>
+    </footer>
+
+    <script>
+        // Pricing toggle functionality
+        document.querySelectorAll('.toggle-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Update active state
+                document.querySelectorAll('.toggle-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Toggle prices
+                const billing = this.dataset.billing;
+                if (billing === 'monthly') {
+                    document.querySelectorAll('.project-price').forEach(el => el.style.display = 'none');
+                    document.querySelectorAll('.monthly-price').forEach(el => el.style.display = 'inline');
+                } else {
+                    document.querySelectorAll('.project-price').forEach(el => el.style.display = 'inline');
+                    document.querySelectorAll('.monthly-price').forEach(el => el.style.display = 'none');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
