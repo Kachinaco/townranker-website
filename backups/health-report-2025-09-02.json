@@ -1,0 +1,33 @@
+{
+  "timestamp": "2025-09-02T03:41:45.686Z",
+  "database": {
+    "name": "townranker",
+    "collections": 12,
+    "indexes": 42,
+    "dataSize": "0.08MB",
+    "storageSize": "0.36MB",
+    "indexSize": "1.07MB"
+  },
+  "server": {
+    "version": "7.0.22",
+    "uptime": "343.71 hours",
+    "connections": {
+      "current": 8,
+      "available": 51192,
+      "totalCreated": 2679,
+      "rejected": 0,
+      "active": 2,
+      "threaded": 8,
+      "exhaustIsMaster": 0,
+      "exhaustHello": 1,
+      "awaitingTopologyChanges": 1
+    }
+  },
+  "backups": {
+    "totalBackups": 0,
+    "totalSizeMB": "0.00",
+    "newest": null,
+    "oldest": null,
+    "files": []
+  }
+}
