@@ -7,7 +7,7 @@ const Imap = require('imap');
 const { simpleParser } = require('mailparser');
 const http = require('http');
 const socketIo = require('socket.io');
-const openphoneSync = require('./services/openphoneSync');
+const openphoneSync = require('./server/services/openphoneSync');
 require('dotenv').config();
 
 const app = express();
@@ -23,11 +23,11 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Route for /login to serve login.html
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'login.html'));
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 // Make io available to routes
@@ -322,7 +322,7 @@ async function createNotification(type, title, message, customerName, customerEm
     }
 }
 
-const { router: authRoutes, verifyToken: authenticateToken } = require('./routes/auth');
+const { router: authRoutes, verifyToken: authenticateToken } = require('./server/routes/auth');
 
 // Email transporter setup
 const fs = require('fs').promises;
@@ -808,8 +808,8 @@ const getPackageName = (budget) => {
 app.use('/api/auth', authRoutes);
 
 // Mount messaging routes
-const openphoneRoutes = require('./routes/openphone');
-const messagesRoutes = require('./routes/messages');
+const openphoneRoutes = require('./server/routes/openphone');
+const messagesRoutes = require('./server/routes/messages');
 app.use('/api/openphone', openphoneRoutes);
 app.use('/api/messages', messagesRoutes);
 
@@ -1285,7 +1285,7 @@ app.get('/api/google-calendar-config', authenticateAdmin, (req, res) => {
 // Get users (for admin dashboard)
 app.get('/api/users', authenticateAdmin, async (req, res) => {
     try {
-        const User = require('./models/User');
+        const User = require('./server/models/User');
         const users = await User.find().select('-password').sort({ createdAt: -1 });
         res.json({
             success: true,
@@ -1522,7 +1522,7 @@ app.delete('/api/leads/:id', authenticateAdmin, async (req, res) => {
 });
 
 // Import email templates
-const emailTemplates = require('./email-templates');
+const emailTemplates = require('./server/config/email-templates');
 
 // Test email endpoint
 app.post('/api/test-email', async (req, res) => {
