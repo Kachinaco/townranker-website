@@ -2470,7 +2470,7 @@ app.post('/api/send-customer-email', async (req, res) => {
 
 // Serve index.html for all other routes (SPA support)
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start server
@@ -2485,11 +2485,13 @@ server.listen(PORT, () => {
         startEmailMonitoring();
     }, 5000); // Wait 5 seconds for server to fully start
 
-    // Start OpenPhone message sync
+    // OpenPhone message sync disabled - using webhooks instead
+    // The OpenPhone API v1 doesn't have a working messages endpoint for syncing
+    // All message handling is done through webhooks at /api/openphone/webhook
     setTimeout(() => {
-        console.log('📱 Starting OpenPhone message sync...');
+        console.log('📱 OpenPhone webhooks ready for incoming messages');
         openphoneSync.setSocketIO(io);
-        openphoneSync.startPeriodicSync(2); // Sync every 2 minutes
+        // openphoneSync.startPeriodicSync(2); // Disabled - using webhooks only
     }, 7000); // Wait 7 seconds to start after email monitoring
 });
 
@@ -2503,9 +2505,9 @@ process.on('SIGINT', async () => {
         emailReceiver.end();
     }
 
-    // Stop OpenPhone sync
-    console.log('📱 Stopping OpenPhone sync...');
-    openphoneSync.stopPeriodicSync();
+    // Stop OpenPhone sync (if it was running)
+    // console.log('📱 Stopping OpenPhone sync...');
+    // openphoneSync.stopPeriodicSync();
     
     await mongoose.connection.close();
     process.exit(0);

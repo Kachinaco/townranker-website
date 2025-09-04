@@ -2267,8 +2267,8 @@
 				</div>
 			</div>
 		</div>
-		<!-- Google Calendar - HIDDEN -->
-		<div class="calendar-container" style="display: none !important;">
+		<!-- Google Calendar -->
+		<div class="calendar-container" style="margin: 30px 0; background: var(--bg-secondary); border-radius: 12px; padding: 20px; box-shadow: var(--shadow);">
 			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
 				<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; color: var(--text-primary);">
 					<span class="material-icons" style="color: var(--primary);">calendar_month</span>

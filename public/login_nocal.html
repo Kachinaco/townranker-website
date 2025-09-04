@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>TownRanker Admin - Lead Management Dashboard</title>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+		:root {
+			--primary: #6366f1;
+			--primary-dark: #4f46e5;
+			--success: #10b981;
+			--warning: #f59e0b;
+			--danger: #ef4444;
+			--dark: #1f2937;
+			--gray: #6b7280;
+			--light: #f9fafb;
+			--white: #ffffff;
+			--shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+			--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+			
+		}
+		
+				async function loadAndDisplayGoogleEvents() {
+			if (typeof window.googleCalendarManager !== 'undefined' && window.googleCalendarManager.isAuthenticated) {
+				try {
+					// Get current month's date range
+					const startOfMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
+					const endOfMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0, 23, 59, 59);
+					
+										const events = await window.googleCalendarManager.listEvents(startOfMonth, endOfMonth);
+					
+										events.forEach(event => {
+						const eventDate = new Date(event.start.dateTime || event.start.date);
+						const dayElement = document.querySelector(`[data-date="${eventDate.toISOString().split('T')[0]}"]`);
+						if (dayElement) {
+							dayElement.classList.add('has-google-events');
+														const eventIndicator = document.createElement('div');
+							eventIndicator.style.cssText = 'width: 6px; height: 6px; background: #4285f4; border-radius: 50%; margin: 2px auto;';
+							eventIndicator.title = event.summary;
+							if (!dayElement.querySelector('
+						}
+					});
+					
+					console.log(`Loaded ${events.length} Google Calendar events`);
+				} catch (error) {
+					console.error('Failed to load Google Calendar events:', error);
+				}
+			}
+		}
+
+				async function handleGoogleCalendarAuth() {
+			if (!googleAuthInstance) {
+				showError('Google Calendar API not initialized');
+				return;
+			}
+
+			try {
+				if (googleCalendarConnected) {
+					// Disconnect
+					await googleAuthInstance.signOut();
+					googleCalendarConnected = false;
+					updateGoogleCalendarButton('disconnected');
+					localEvents = localEvents.filter(event => !event.googleEventId);
+					localStorage.setItem('calendarEvents', JSON.stringify(localEvents));
+					
+					showSuccess('Google Calendar disconnected');
+				} else {
+					// Connect
+					await googleAuthInstance.signIn();
+					googleCalendarConnected = true;
+					updateGoogleCalendarButton('connected');
+					await loadGoogleCalendarEvents();
+					showSuccess('Google Calendar connected successfully!');
+				}
+			} catch (error) {
+				console.error('Google Calendar auth error:', error);
+				showError('Failed to connect to Google Calendar. Please try again.');
+			}
+		}
+
+				function updateGoogleCalendarButton(status) {
+			const btn = 
+			const btnText = document.getElementById('googleCalendarBtnText');
+			
+			// Also check for old button ID for backward compatibility
+			const oldBtn = 
+			
+			if (btn && btnText) {
+				if (status === 'connected') {
+					btnText.textContent = 'Google Calendar Connected';
+					btn.style.background = '#34a853';
+					btn.disabled = false;
+				} else if (status === 'disconnected' || !status) {
+					btnText.textContent = 'Connect Google Calendar';
+					btn.style.background = '#4285f4';
+					btn.disabled = false;
+				} else if (status === 'unavailable') {
+					btnText.textContent = 'Setup Required';
+					btn.style.background = '#ff9800';
+					btn.onclick = showGoogleCalendarSetupInfo;
+					btn.disabled = false;
+				} else if (status === 'error') {
+					btnText.textContent = 'Connection Error';
+					btn.style.background = '#f44336';
+					btn.disabled = false;
+				}
+			}
+			
+			// Update old button if it exists
+			if (oldBtn) {
+				if (status === 'connected') {
+					oldBtn.innerHTML = '<span class="material-icons" style="font-size: 16px;">sync</span>Disconnect Google Calendar';
+					oldBtn.style.background = '#34a853';
+					oldBtn.disabled = false;
+				} else if (status === 'unavailable') {
+					oldBtn.innerHTML = '<span class="material-icons" style="font-size: 16px;">info</span>Setup Required';
+					oldBtn.style.background = '#ff9800';
+					oldBtn.onclick = showGoogleCalendarSetupInfo;
+					oldBtn.disabled = false;
+				} else if (status === 'error') {
+					oldBtn.innerHTML = '<span class="material-icons" style="font-size: 16px;">error</span>API Error';
+					oldBtn.style.background = '#f44336';
+					oldBtn.disabled = true;
+				} else {
+					oldBtn.innerHTML = '<span class="material-icons" style="font-size: 16px;">sync</span>Connect Google Calendar';
+					oldBtn.style.background = '#4285f4';
+					oldBtn.disabled = false;
+				}
+			}
+		}
+
+		// Show setup information
+
+				async function loadGoogleCalendarEvents() {
+			if (!googleCalendarConnected || !gapi.client.calendar) {
+				return;
+			}
+
+			try {
+				// Get current month's date range
+				const now = new Date();
+				const startOfMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
+				const endOfMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0, 23, 59, 59);
+
+				const response = await gapi.client.calendar.events.list({
+					calendarId: 'primary',
+					timeMin: startOfMonth.toISOString(),
+					timeMax: endOfMonth.toISOString(),
+					showDeleted: false,
+					singleEvents: true,
+					orderBy: 'startTime'
+				});
+
+				const googleEvents = response.result.items || [];
+				
+								localEvents = localEvents.filter(event => !event.googleEventId);
+
+								googleEvents.forEach(event => {
+					const startTime = event.start.dateTime || event.start.date;
+					const endTime = event.end.dateTime || event.end.date;
+					
+					localEvents.push({
+						title: event.summary || 'Untitled Event',
+						start: startTime,
+						end: endTime,
+						description: event.description || '',
+						location: event.location || '',
+						googleEventId: event.id,
+						isGoogleEvent: true
+					});
+				});
+
+				localStorage.setItem('calendarEvents', JSON.stringify(localEvents));
+
+				console.log(`Loaded ${googleEvents.length} events from Google Calendar`);
+			} catch (error) {
+				console.error('Error loading Google Calendar events:', error);
+				showError('Failed to load Google Calendar events');
+			}
+		}
+
+				async function createGoogleCalendarEventAPI(eventData) {
+			if (!googleCalendarConnected || !gapi.client.calendar) {
+				return null;
+			}
+
+			try {
+				const event = {
+					summary: eventData.title,
+					start: {
+						dateTime: eventData.start,
+						timeZone: 'America/New_York'
+					},
+					end: {
+						dateTime: eventData.end,
+						timeZone: 'America/New_York'
+					},
+					description: eventData.description || '',
+					location: eventData.location || ''
+				};
+
+				if (eventData.clientEmail) {
+					event.attendees = [{ email: eventData.clientEmail }];
+				}
+
+				const response = await gapi.client.calendar.events.insert({
+					calendarId: 'primary',
+					resource: event
+				});
+
+				return response.result.id;
+			} catch (error) {
+				console.error('Error creating Google Calendar event:', error);
+				throw error;
+			}
+		}
+		// Delete customer function
+		async function deleteCustomer() {
+			// Use the global currentLeadId or window.currentLeadId as fallback
+			const leadIdToDelete = currentLeadId || window.currentLeadId || (currentLead && currentLead._id);
+			if (!leadIdToDelete) {
+				alert('No customer selected. Please open a customer profile first.');
+				return;
+			}
+			// Get customer name for confirmation
+			const customerName = document.getElementById('profileName').textContent || 'this customer';
+			// Confirm deletion
+			if (!confirm(`Are you sure you want to permanently delete ${customerName}?\n\nThis action cannot be undone and will remove:\n• Customer profile\n• Email history\n• Notes and interactions\n• All associated data`)) {
+				return;
+			}
+			// Show loading state
+			const deleteBtn = document.getElementById('deleteCustomerBtn');
+			const originalContent = deleteBtn.innerHTML;
+			deleteBtn.innerHTML = '<span style="font-size: 12px;">⏳</span>';
+			deleteBtn.disabled = true;
+			try {
+				const response = await fetch(`/api/leads/${leadIdToDelete}`, {
+					method: 'DELETE',
+					headers: {
+						'Authorization': `Bearer ${authToken}`,
+						'Content-Type': 'application/json'
+					}
+				});
+				
+				// Check if response is ok first
+				if (!response.ok) {
+					const errorText = await response.text();
+					throw new Error(`Server error: ${response.status} - ${errorText}`);
+				}
+				
+				// Try to parse JSON response
+				let result;
+				try {
+					result = await response.json();
+				} catch (jsonError) {
+					// If JSON parsing fails but response was ok, treat as success
+					console.log('Delete response was not JSON, but status was OK');
+					result = { success: true };
+				}
+				
+				if (result.success) {
+					// Show success message
+					alert(`✅ ${customerName} has been permanently deleted`);
+					// Clear current lead references before closing modal
+					currentLead = null;
+					window.currentLeadId = null;
+					currentLeadId = null;
+					// Close modal
+					closeModal();
+					// Refresh the leads table
+					await loadLeads();
+				} else {
+					throw new Error(result.message || 'Failed to delete customer');
+				}
+			} catch (error) {
+				alert(`❌ Failed to delete customer: ${error.message}`);
+				// Restore button
+				deleteBtn.innerHTML = originalContent;
+				deleteBtn.disabled = false;
+			} finally {
+				// Always ensure button is re-enabled if it exists
+				const deleteBtn = document.getElementById('deleteCustomerBtn');
+				if (deleteBtn && deleteBtn.disabled) {
+					deleteBtn.disabled = false;
+					if (!deleteBtn.innerHTML || deleteBtn.innerHTML.includes('⏳')) {
+						deleteBtn.innerHTML = '🗑️';
+					}
+				}
+			}
+		}
+		// Quick reply functions for conversation
+		function insertQuickReply(text) {
+			const emailBody = document.getElementById('emailBody');
+			if (emailBody) {
+				emailBody.value = text;
+				emailBody.focus();
+				// Scroll to email composer
+				emailBody.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			}
+		}
+		// Refresh conversation
+		async function refreshConversation() {
+			if (currentLead) {
+				await populateEmailHistory(currentLead);
+			}
+		}
+		// Refresh data
+		function refreshData() {
+			loadLeads();
+		}
+		// Export to CSV
+		function exportLeads() {
+			if (filteredLeads.length === 0) {
+				alert('No leads to export');
+				return;
+			}
+			const headers = ['Date', 'Name', 'Email', 'Phone', 'Company', 'Project Type', 'Budget', 'Timeline', 'Features', 'Status', 'Message'];
+			const csvContent = [
+				headers.join(','),
+				...filteredLeads.map(lead => [
+					new Date(lead.createdAt).toLocaleDateString(),
+					lead.name,
+					lead.email,
+					lead.phone,
+					lead.company || '',
+					lead.projectType,
+					lead.budget,
+					lead.timeline,
+					(lead.features || []).join('; '),
+					lead.status,
+					lead.message || ''
+				].map(v => `"${v}"`).join(','))
+			].join('\n');
+			const blob = new Blob([csvContent], { type: 'text/csv' });
+			const url = window.URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.setAttribute('hidden', '');
+			a.setAttribute('href', url);
+			a.setAttribute('download', `leads-${new Date().toISOString().split('T')[0]}.csv`);
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+		}
+		
+		// Add Customer Modal Functions
+		function openAddCustomerModal() {
+			document.getElementById('addCustomerModal').classList.add('active');
+			// Clear form
+			document.getElementById('addCustomerForm').reset();
+		}
+		
+		function closeAddCustomerModal() {
+			document.getElementById('addCustomerModal').classList.remove('active');
+		}
+		
+		async function handleAddCustomer(event) {
+			event.preventDefault();
+			
+			// Get form values
+			const customerData = {
+				name: document.getElementById('newCustomerName').value.trim(),
+				email: document.getElementById('newCustomerEmail').value.trim().toLowerCase(),
+				phone: document.getElementById('newCustomerPhone').value.trim(),
+				company: document.getElementById('newCustomerCompany').value.trim(),
+				projectType: document.getElementById('newCustomerProjectType').value,
+				budget: parseInt(document.getElementById('newCustomerBudget').value) || 0,
+				timeline: document.getElementById('newCustomerTimeline').value,
+				message: document.getElementById('newCustomerMessage').value.trim(),
+				status: 'new'
+			};
+			
+			// Validate required fields
+			if (!customerData.name || !customerData.email || !customerData.phone) {
+				alert('Please fill in all required fields (Name, Email, Phone)');
+				return;
+			}
+			
+			// Show loading state - get button reference early and safely
+			const submitBtn = document.querySelector('#addCustomerForm button[type="submit"]');
+			let originalText = 'Add Customer';
+			if (submitBtn) {
+				originalText = submitBtn.innerHTML;
+				submitBtn.innerHTML = 'Adding Customer...';
+				submitBtn.disabled = true;
+			}
+			
+			try {
+				const response = await fetch('/api/leads', {
+					method: 'POST',
+					headers: {
+						'Authorization': `Bearer ${authToken}`,
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(customerData)
+				});
+				
+				const result = await response.json();
+				
+				if (response.status === 409) {
+					// Customer already exists
+					alert(`⚠️ ${result.message}\n\nExisting customer:\n${result.existingCustomer.name} (${result.existingCustomer.email})`);
+					if (submitBtn) {
+						submitBtn.innerHTML = originalText;
+						submitBtn.disabled = false;
+					}
+					return;
+				}
+				
+				if (result.success) {
+					alert(`✅ Customer "${customerData.name}" added successfully!`);
+					closeAddCustomerModal();
+					// Refresh the leads table
+					await loadLeads();
+					// Optionally open the new customer's profile
+					if (result.lead && result.lead._id) {
+						viewLead(result.lead._id);
+					}
+				} else {
+					throw new Error(result.message || 'Failed to add customer');
+				}
+			} catch (error) {
+				alert(`❌ Failed to add customer: ${error.message}`);
+			} finally {
+				// Restore button if it exists
+				if (submitBtn) {
+					submitBtn.innerHTML = originalText;
+					submitBtn.disabled = false;
+				}
+			}
+		}
+		
+				function scheduleWorkflowEvent(itemIndex, itemType, item) {
+			// Get current lead data
+			if (!currentLead) {
+				alert('No customer selected');
+				return;
+			}
+			
+						document.getElementById('scheduleEventModal').classList.add('active');
+			
+			// Pre-fill the form with workflow item data
+			document.getElementById('eventTitle').value = item.name || 'Meeting with ' + currentLead.name;
+			document.getElementById('eventLeadId').value = currentLead._id;
+			document.getElementById('workflowItemId').value = itemIndex;
+			document.getElementById('workflowItemType').value = itemType;
+			
+			// Set default date to tomorrow
+			const tomorrow = new Date();
+			tomorrow.setDate(tomorrow.getDate() + 1);
+			document.getElementById('eventDate').value = tomorrow.toISOString().split('T')[0];
+			document.getElementById('eventTime').value = '10:00';
+			
+			// Add workflow details to description
+			const description = `Customer: ${currentLead.name}\nEmail: ${currentLead.email}\nPhone: ${currentLead.phone}\n\nWorkflow Item: ${item.name}\nStatus: ${item.status || 'Pending'}`;
+			document.getElementById('eventDescription').value = description;
+		}
+		
+		function closeScheduleEventModal() {
+			document.getElementById('scheduleEventModal').classList.remove('active');
+			document.getElementById('scheduleEventForm').reset();
+		}
+		
+				function scheduleStageEvent(leadId, leadName, stageName, stageIndex) {
+						document.getElementById('eventLeadId').value = leadId;
+			
+			// Set default title based on stage
+			const stageEventTitles = {
+				'Initial Contact': `Initial Contact - ${leadName}`,
+				'Discovery': `Discovery Call - ${leadName}`,
+				'Proposal': `Proposal Review - ${leadName}`,
+				'Negotiation': `Contract Discussion - ${leadName}`,
+				'Project Start': `Project Kickoff - ${leadName}`
+			};
+			document.getElementById('eventTitle').value = stageEventTitles[stageName] || `${stageName} - ${leadName}`;
+			
+						const stageEventTypes = {
+				'Initial Contact': 'discovery-call',
+				'Discovery': 'discovery-call',
+				'Proposal': 'proposal-review',
+				'Negotiation': 'follow-up',
+				'Project Start': 'project-kickoff'
+			};
+			document.getElementById('eventType').value = stageEventTypes[stageName] || 'other';
+			
+			// Set default description
+			document.getElementById('eventDescription').value = `${stageName} stage meeting for ${leadName}`;
+			
+			// Set workflow item ID for tracking
+			document.getElementById('workflowItemId').value = `stage-${stageIndex}`;
+			
+			// Set default date to tomorrow and time to 10 AM
+			const tomorrow = new Date();
+			tomorrow.setDate(tomorrow.getDate() + 1);
+			document.getElementById('eventDate').value = tomorrow.toISOString().split('T')[0];
+			document.getElementById('eventTime').value = '10:00';
+			
+			// Show the modal
+			openScheduleEventModal();
+		}
+		
+				function scheduleNewEventForLead() {
+			if (!currentLead) return;
+			
+			document.getElementById('eventLeadId').value = currentLead._id;
+			document.getElementById('eventTitle').value = `Meeting with ${currentLead.name || 'Customer'}`;
+			document.getElementById('eventType').value = 'follow-up';
+			document.getElementById('eventDescription').value = '';
+			
+			// Set default date to tomorrow and time to 10 AM
+			const tomorrow = new Date();
+			tomorrow.setDate(tomorrow.getDate() + 1);
+			document.getElementById('eventDate').value = tomorrow.toISOString().split('T')[0];
+			document.getElementById('eventTime').value = '10:00';
+			
+			openScheduleEventModal();
+		}
+		
+				async function loadCustomerEvents(leadId) {
+			try {
+				const response = await fetch(`/api/calendar/events?leadId=${leadId}`, {
+					headers: {
+						'Authorization': `Bearer ${authToken}`
+					}
+				});
+				
+				if (!response.ok) {
+					throw new Error('Failed to load events');
+				}
+				
+				const data = await response.json();
+				displayCustomerEvents(data.events || []);
+			} catch (error) {
+				console.error('Error loading customer events:', error);
+				displayCustomerEvents([]);
+			}
+		}
+		
+				function displayCustomerEvents(events) {
+			const eventsList = document.getElementById('customerEventsList');
+			const noEventsMessage = document.getElementById('noEventsMessage');
+			
+			if (events.length === 0) {
+				eventsList.style.display = 'none';
+				noEventsMessage.style.display = 'block';
+				return;
+			}
+			
+			eventsList.style.display = 'flex';
+			noEventsMessage.style.display = 'none';
+			
+						events.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+			
+			eventsList.innerHTML = events.map(event => {
+				const startDate = new Date(event.startTime);
+				const endDate = new Date(event.endTime);
+				const isPast = startDate < new Date();
+				
+				return `
+					<div class="event-card" style="background: ${isPast ? '#f9fafb' : 'white'}; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; position: relative;">
+						<div style="display: flex; justify-content: space-between; align-items: start;">
+							<div style="flex: 1;">
+								<h5 style="margin: 0 0 8px 0; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+									<span class="material-icons" style="font-size: 20px; color: ${isPast ? '#9ca3af' : '#4285f4'};">
+										${getEventIcon(event.eventType)}
+									</span>
+									${event.title}
+									${isPast ? '<span style="background: #e5e7eb; color: #6b7280; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px;">Past</span>' : ''}
+								</h5>
+								<div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">
+									<span class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">schedule</span>
+									${startDate.toLocaleDateString()} at ${startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+									- ${endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+								</div>
+								${event.description ? `<p style="margin: 8px 0; font-size: 13px; color: var(--text-secondary);">${event.description}</p>` : ''}
+								${event.location ? `
+									<div style="font-size: 13px; color: var(--text-secondary);">
+										<span class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">place</span>
+										${event.location}
+									</div>
+								` : ''}
+							</div>
+							<div style="display: flex; gap: 8px;">
+								${!isPast ? `
+									<button onclick="editCalendarEvent('${event._id}')" 
+										style="background: transparent; border: 1px solid var(--border-color); padding: 6px; border-radius: 4px; cursor: pointer;"
+										title="Edit Event">
+										<span class="material-icons" style="font-size: 18px; color: var(--text-secondary);">edit</span>
+									</button>
+								` : ''}
+								<button onclick="deleteCalendarEvent('${event._id}')" 
+									style="background: transparent; border: 1px solid var(--border-color); padding: 6px; border-radius: 4px; cursor: pointer;"
+									title="Delete Event">
+									<span class="material-icons" style="font-size: 18px; color: #ef4444;">delete</span>
+								</button>
+							</div>
+						</div>
+						${event.googleCalendarSynced ? `
+							<div style="position: absolute; bottom: 8px; right: 8px; font-size: 11px; color: #10b981; display: flex; align-items: center; gap: 4px;">
+								<span class="material-icons" style="font-size: 14px;">sync</span>
+								Synced to Google
+							</div>
+						` : ''}
+					</div>
+				`;
+			}).join('');
+		}
+		
+				function getEventIcon(eventType) {
+			const icons = {
+				'discovery-call': 'phone',
+				'follow-up': 'chat',
+				'proposal-review': 'description',
+				'project-kickoff': 'rocket_launch',
+				'check-in': 'check_circle',
+				'final-review': 'rate_review',
+				'workflow-task': 'task_alt',
+				'other': 'event'
+			};
+			return icons[eventType] || 'event';
+		}
+		
+		// Drag and drop for column reordering
+		let draggedColumnIndex = null;
+		
+		function dragStartColumn(event, index) {
+			draggedColumnIndex = index;
+			event.dataTransfer.effectAllowed = 'move';
+			event.target.style.opacity = '0.5';
+		}
+		
+		function dragOverColumn(event) {
+			event.preventDefault();
+			event.dataTransfer.dropEffect = 'move';
+		}
+		
+		function dropColumn(event, targetIndex) {
+			event.preventDefault();
+			
+			if (draggedColumnIndex !== null && draggedColumnIndex !== targetIndex) {
+				// Reorder columns
+				const columns = [...workflowData.columns];
+				const draggedColumn = columns[draggedColumnIndex];
+				
+				// Don't allow moving fixed columns
+				if (draggedColumn.fixed) return;
+				
+				// Remove dragged column
+				columns.splice(draggedColumnIndex, 1);
+				
+				// Insert at new position
+				if (targetIndex > draggedColumnIndex) {
+					columns.splice(targetIndex - 1, 0, draggedColumn);
+				} else {
+					columns.splice(targetIndex, 0, draggedColumn);
+				}
+				
+				workflowData.columns = columns;
+				
+				// Refresh the dialog
+				const currentColumnsDiv = document.getElementById('currentColumns');
+				if (currentColumnsDiv) {
+					refreshColumnsList();
+				}
+			}
+			
+			// Reset opacity
+			document.querySelectorAll('.column-item').forEach(item => {
+				item.style.opacity = '1';
+			});
+			
+			draggedColumnIndex = null;
+		}
+		
+		// Edit column width
+		function editColumnWidth(columnId) {
+			const column = workflowData.columns.find(c => c.id === columnId);
+			if (!column) return;
+			
+			const newWidth = prompt(`Enter width for "${column.name}" column (in pixels):`, column.width);
+			if (newWidth !== null) {
+				const width = parseInt(newWidth);
+				if (width >= 50 && width <= 500) {
+					column.width = width;
+					refreshColumnsList();
+				} else {
+					alert('Width must be between 50 and 500 pixels');
+				}
+			}
+		}
+		
+		// Toggle quick column menu
+		function toggleQuickColumnMenu() {
+			const menu = document.getElementById('quickColumnMenu');
+			const isVisible = menu.style.display !== 'none';
+			
+			if (!isVisible) {
+				// Populate menu with column options
+				const existingColumns = workflowData.columns.map(c => c.id);
+				const availableColumns = [
+					{ id: 'budget', name: 'Budget', type: 'number', icon: 'attach_money' },
+					{ id: 'hours', name: 'Est. Hours', type: 'number', icon: 'schedule' },
+					{ id: 'actualHours', name: 'Actual Hours', type: 'number', icon: 'timer' },
+					{ id: 'tags', name: 'Tags', type: 'text', icon: 'label' },
+					{ id: 'notes', name: 'Notes', type: 'text', icon: 'note' },
+					{ id: 'client', name: 'Client', type: 'text', icon: 'person' },
+					{ id: 'team', name: 'Team', type: 'text', icon: 'group' },
+					{ id: 'category', name: 'Category', type: 'select', icon: 'category', options: ['Design', 'Development', 'Testing', 'Marketing', 'Other'] },
+					{ id: 'phase', name: 'Phase', type: 'select', icon: 'timeline', options: ['Planning', 'Execution', 'Review', 'Complete'] },
+					{ id: 'risk', name: 'Risk Level', type: 'select', icon: 'warning', options: ['Low', 'Medium', 'High', 'Critical'] },
+					{ id: 'reviewer', name: 'Reviewer', type: 'text', icon: 'rate_review' },
+					{ id: 'link', name: 'Link/URL', type: 'url', icon: 'link' },
+					{ id: 'attachment', name: 'Attachment', type: 'text', icon: 'attach_file' },
+					{ id: 'custom', name: 'Custom Column...', type: 'custom', icon: 'add_circle' }
+				];
+				
+				// Filter out already added columns
+				const filteredColumns = availableColumns.filter(col => 
+					col.id === 'custom' || !existingColumns.includes(col.id)
+				);
+				
+				menu.innerHTML = `
+					<div style="padding: 8px 0;">
+						<div style="padding: 8px 16px; font-size: 12px; color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid var(--border-color);">
+							QUICK ADD COLUMN
+						</div>
+						${filteredColumns.length > 1 ? filteredColumns.map(col => `
+							<div onclick="${col.id === 'custom' ? 'showCustomColumnDialog()' : `quickAddColumn('${col.id}', '${col.name}', '${col.type}', '${col.options ? col.options.join(',') : ''}')`}" 
+								style="padding: 10px 16px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background 0.2s;"
+								onmouseover="this.style.background='var(--hover-bg)'" 
+								onmouseout="this.style.background='transparent'">
+								<span class="material-icons" style="font-size: 18px; color: var(--text-secondary);">${col.icon}</span>
+								<div>
+									<div style="font-size: 14px; color: var(--text-primary);">${col.name}</div>
+									${col.id !== 'custom' ? `<div style="font-size: 11px; color: var(--text-secondary);">Type: ${col.type}</div>` : ''}
+								</div>
+							</div>
+						`).join('') : `
+							<div style="padding: 20px 16px; text-align: center; color: var(--text-secondary);">
+								<span class="material-icons" style="font-size: 32px; color: var(--border-color); margin-bottom: 8px;">check_circle</span>
+								<div style="font-size: 14px;">All columns added!</div>
+								<button onclick="showCustomColumnDialog()" style="margin-top: 12px; background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">
+									Add Custom Column
+								</button>
+							</div>
+						`}
+					</div>
+				`;
+				
+				menu.style.display = 'block';
+				
+				// Close menu when clicking outside
+				setTimeout(() => {
+					document.addEventListener('click', closeQuickColumnMenu);
+				}, 100);
+			} else {
+				closeQuickColumnMenu();
+			}
+		}
+		
+		function closeQuickColumnMenu() {
+			document.getElementById('quickColumnMenu').style.display = 'none';
+			document.removeEventListener('click', closeQuickColumnMenu);
+		}
+		
+		// Quick add predefined column
+		function quickAddColumn(id, name, type, optionsStr) {
+			const newColumn = {
+				id: id,
+				name: name,
+				type: type,
+				width: 120
+			};
+			
+			if (optionsStr) {
+				newColumn.options = optionsStr.split(',');
+			}
+			
+			// Add to columns array
+			workflowData.columns.push(newColumn);
+			
+			// Initialize values for existing items
+			workflowData.items.forEach(item => {
+				if (!item[id]) {
+					item[id] = type === 'number' ? 0 : '';
+				}
+				if (item.subitems) {
+					item.subitems.forEach(subitem => {
+						if (!subitem[id]) {
+							subitem[id] = type === 'number' ? 0 : '';
+						}
+					});
+				}
+			});
+			
+			closeQuickColumnMenu();
+			renderWorkflowBoard();
+			saveWorkflowData();
+			showTemporaryMessage(`✅ Added "${name}" column`);
+		}
+		
+		// Show custom column dialog
+		function showCustomColumnDialog() {
+			closeQuickColumnMenu();
+			
+			const modal = document.createElement('div');
+			modal.style.cssText = `
+				position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+				background: rgba(0,0,0,0.5); display: flex; align-items: center;
+				justify-content: center; z-index: 10001;
+			`;
+			
+			const dialog = document.createElement('div');
+			dialog.style.cssText = `
+				background: white; padding: 24px; border-radius: 12px;
+				box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 400px; max-width: 90%;
+			`;
+			
+			dialog.innerHTML = `
+				<h3 style="margin: 0 0 20px 0; font-size: 18px;">Add Custom Column</h3>
+				
+				<div style="margin-bottom: 16px;">
+					<label style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500;">Column Name</label>
+					<input type="text" id="customColumnName" placeholder="e.g., Location, Contract #" 
+						style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+				</div>
+				
+				<div style="margin-bottom: 16px;">
+					<label style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500;">Column Type</label>
+					<select id="customColumnType" onchange="toggleOptionsField()" 
+						style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+						<option value="text">Text</option>
+						<option value="number">Number</option>
+						<option value="date">Date</option>
+						<option value="select">Dropdown</option>
+						<option value="url">URL/Link</option>
+						<option value="email">Email</option>
+						<option value="phone">Phone</option>
+						<option value="checkbox">Checkbox</option>
+					</select>
+				</div>
+				
+				<div id="optionsField" style="margin-bottom: 16px; display: none;">
+					<label style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500;">Dropdown Options</label>
+					<input type="text" id="customColumnOptions" placeholder="Option 1, Option 2, Option 3" 
+						style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+					<small style="color: var(--text-secondary); font-size: 12px;">Separate options with commas</small>
+				</div>
+				
+				<div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+					<button onclick="closeCustomColumnDialog()" 
+						style="padding: 10px 20px; border: 1px solid var(--border-color); background: white; border-radius: 6px; cursor: pointer;">
+						Cancel
+					</button>
+					<button onclick="addCustomColumn()" 
+						style="padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer;">
+						Add Column
+					</button>
+				</div>
+			`;
+			
+			modal.appendChild(dialog);
+			document.body.appendChild(modal);
+			
+			// Focus on name input
+			setTimeout(() => {
+				document.getElementById('customColumnName').focus();
+			}, 100);
+			
+			// Make functions available
+			window.toggleOptionsField = () => {
+				const type = document.getElementById('customColumnType').value;
+				document.getElementById('optionsField').style.display = type === 'select' ? 'block' : 'none';
+			};
+			
+			window.addCustomColumn = () => {
+				const name = document.getElementById('customColumnName').value.trim();
+				const type = document.getElementById('customColumnType').value;
+				const optionsStr = document.getElementById('customColumnOptions').value.trim();
+				
+				if (!name) {
+					alert('Please enter a column name');
+					return;
+				}
+				
+				// Generate ID from name
+				const id = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+				
+				// Check if column already exists
+				if (workflowData.columns.some(c => c.id === id)) {
+					alert('A column with this name already exists');
+					return;
+				}
+				
+				const newColumn = {
+					id: id,
+					name: name,
+					type: type,
+					width: 120
+				};
+				
+				if (type === 'select' && optionsStr) {
+					newColumn.options = optionsStr.split(',').map(o => o.trim());
+				}
+				
+				// Add column
+				workflowData.columns.push(newColumn);
+				
+				// Initialize values
+				const defaultValue = type === 'number' ? 0 : type === 'checkbox' ? false : '';
+				workflowData.items.forEach(item => {
+					item[id] = defaultValue;
+					if (item.subitems) {
+						item.subitems.forEach(subitem => {
+							subitem[id] = defaultValue;
+						});
+					}
+				});
+				
+				closeCustomColumnDialog();
+				renderWorkflowBoard();
+				saveWorkflowData();
+				showTemporaryMessage(`✅ Added custom column "${name}"`);
+			};
+			
+			window.closeCustomColumnDialog = () => {
+				document.body.removeChild(modal);
+				delete window.toggleOptionsField;
+				delete window.addCustomColumn;
+				delete window.closeCustomColumnDialog;
+			};
+			
+			// Close on background click
+			modal.onclick = (e) => {
+				if (e.target === modal) {
+					closeCustomColumnDialog();
+				}
+			};
+		}
+		
+				async function syncWorkflowDateToCalendar(itemIndex, workflowItem, dateColumn, parentName = '') {
+			// Get the current lead from various possible sources
+			const lead = currentLead || window.currentSelectedLead || getCurrentLead();
+			if (!lead || !lead._id) {
+				console.error('[Calendar Sync] No lead found for calendar sync', {
+					currentLead,
+					windowSelectedLead: window.currentSelectedLead,
+					getCurrentLead: getCurrentLead()
+				});
+				showTemporaryMessage('❌ Cannot sync to calendar - no customer selected', 3000);
+				return;
+			}
+			
+			const itemName = parentName ? `${parentName} - ${workflowItem.name}` : workflowItem.name;
+			const workflowItemId = `workflow-${itemIndex}-${dateColumn}`;  			
+			console.log(`[Calendar Sync] Starting sync for item: ${itemName}, column: ${dateColumn}, leadId: ${lead._id}`);
+			
+			try {
+								const existingEventsResponse = await fetch(`/api/calendar/events?leadId=${lead._id}`, {
+					headers: {
+						'Authorization': `Bearer ${authToken}`
+					}
+				});
+				
+				let existingEvent = null;
+				if (existingEventsResponse.ok) {
+					const data = await existingEventsResponse.json();
+					existingEvent = data.events.find(e => e.workflowItemId === workflowItemId);
+					console.log(`[Calendar Sync] Found existing event: ${existingEvent ? 'Yes' : 'No'}`);
+				} else {
+					console.error('[Calendar Sync] Failed to fetch existing events:', existingEventsResponse.status);
+				}
+				
+				// Get the date value for the specific column
+				const dateValue = workflowItem[dateColumn] ? new Date(workflowItem[dateColumn]) : null;
+				
+								const column = workflowData.columns.find(c => c.id === dateColumn);
+				const columnName = column ? column.name : dateColumn;
+				
+				console.log(`[Calendar Sync] ${columnName}: ${dateValue}`);
+				
+								if (!dateValue) {
+					if (existingEvent) {
+						await fetch(`/api/calendar/events/${existingEvent._id}`, {
+							method: 'DELETE',
+							headers: {
+								'Authorization': `Bearer ${authToken}`
+							}
+						});
+						console.log('[Calendar Sync] Deleted calendar event for cleared date');
+						showTemporaryMessage('📅 Removed from calendar', 2000);
+												if (document.querySelector('#calendarTab').style.display !== 'none') {
+							await populateCalendarTab(lead);
+						}
+					}
+					return;
+				}
+				
+								let eventStart, eventEnd;
+				let eventTitle = itemName;
+				
+				if (dateColumn === 'dueDate' || columnName.toLowerCase().includes('due') || columnName.toLowerCase().includes('deadline')) {
+										eventStart = new Date(dateValue);
+					eventStart.setHours(14, 0, 0, 0); // 2 PM for deadlines
+					eventEnd = new Date(dateValue);
+					eventEnd.setHours(16, 0, 0, 0);
+					eventTitle = `${itemName} (${columnName})`;
+				} else if (dateColumn === 'startDate' || columnName.toLowerCase().includes('start')) {
+										eventStart = new Date(dateValue);
+					eventStart.setHours(9, 0, 0, 0);
+					eventEnd = new Date(dateValue);
+					eventEnd.setHours(11, 0, 0, 0);
+					eventTitle = `${itemName} (${columnName})`;
+				} else {
+										eventStart = new Date(dateValue);
+					eventStart.setHours(12, 0, 0, 0);
+					eventEnd = new Date(dateValue);
+					eventEnd.setHours(13, 0, 0, 0);
+					eventTitle = `${itemName} - ${columnName}`;
+				}
+				
+				const eventData = {
+					leadId: lead._id,
+					title: eventTitle,
+					eventType: 'workflow-task',
+					description: `Workflow Task: ${itemName}\n${columnName}: ${dateValue.toLocaleDateString()}\nStatus: ${workflowItem.status || 'Not Started'}\nPriority: ${workflowItem.priority || 'Medium'}\nProgress: ${workflowItem.progress || 0}%`,
+					location: '',
+					workflowItemId: workflowItemId,
+					startTime: eventStart.toISOString(),
+					endTime: eventEnd.toISOString(),
+					syncToGoogle: true
+				};
+				
+				if (existingEvent) {
+										const updateResponse = await fetch(`/api/calendar/events/${existingEvent._id}`, {
+						method: 'PUT',
+						headers: {
+							'Authorization': `Bearer ${authToken}`,
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(eventData)
+					});
+					
+					if (updateResponse.ok) {
+						console.log('[Calendar Sync] Updated calendar event from workflow date');
+						showTemporaryMessage(`✅ Calendar updated: ${eventTitle}`, 3000);
+					} else {
+						console.error('[Calendar Sync] Failed to update event:', updateResponse.status);
+						showTemporaryMessage('❌ Failed to update calendar event', 3000);
+					}
+				} else {
+										const createResponse = await fetch('/api/calendar/events', {
+						method: 'POST',
+						headers: {
+							'Authorization': `Bearer ${authToken}`,
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(eventData)
+					});
+					
+					if (createResponse.ok) {
+						console.log('[Calendar Sync] Created calendar event from workflow date');
+						showTemporaryMessage(`✅ Added to calendar: ${eventTitle}`, 3000);
+					} else {
+						console.error('[Calendar Sync] Failed to create event:', createResponse.status);
+						showTemporaryMessage('❌ Failed to create calendar event', 3000);
+					}
+				}
+				
+								if (document.getElementById('customCalendar')) {
+					await 
+					
+				}
+				
+								if (document.getElementById('tab-calendar').classList.contains('active')) {
+					await loadCustomerEvents(lead._id);  // Fixed: was using currentLead._id
+				}
+				
+								const calendarTab = document.querySelector('#calendarTab');
+				if (calendarTab && calendarTab.style.display !== 'none') {
+					await populateCalendarTab(lead);
+				}
+			} catch (error) {
+				console.error('[Calendar Sync] Error syncing workflow date to calendar:', error);
+			}
+		}
+		
+		async function handleScheduleEvent(event) {
+			event.preventDefault();
+			
+			const form = document.getElementById('scheduleEventForm');
+			const eventId = form.dataset.eventId; // Check if we're editing
+			
+			const eventData = {
+				leadId: document.getElementById('eventLeadId').value,
+				title: document.getElementById('eventTitle').value,
+				eventType: document.getElementById('eventType').value,
+				description: document.getElementById('eventDescription').value,
+				location: document.getElementById('eventLocation').value,
+				workflowItemId: document.getElementById('workflowItemId').value,
+				syncToGoogle: document.getElementById('syncToGoogle').checked
+			};
+			
+			// Calculate start and end times
+			const date = document.getElementById('eventDate').value;
+			const time = document.getElementById('eventTime').value;
+			const duration = parseInt(document.getElementById('eventDuration').value);
+			
+			const startTime = new Date(`${date}T${time}`);
+			const endTime = new Date(startTime.getTime() + duration * 60000);
+			
+			eventData.startTime = startTime.toISOString();
+			eventData.endTime = endTime.toISOString();
+			
+			try {
+				let response;
+				if (eventId) {
+										response = await fetch(`/api/calendar/events/${eventId}`, {
+						method: 'PUT',
+						headers: {
+							'Authorization': `Bearer ${authToken}`,
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(eventData)
+					});
+				} else {
+										response = await fetch('/api/calendar/events', {
+						method: 'POST',
+						headers: {
+							'Authorization': `Bearer ${authToken}`,
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(eventData)
+					});
+				}
+				
+				const result = await response.json();
+				
+				if (result.success) {
+										if (eventData.syncToGoogle) {
+						createGoogleCalendarEventFromWorkflow(result.event);
+					}
+					
+					alert(`✅ Event ${eventId ? 'updated' : 'scheduled'} successfully!`);
+					closeScheduleEventModal();
+					
+										delete form.dataset.eventId;
+					
+					// Reset submit button text
+					const submitBtn = form.querySelector('button[type="submit"]');
+					if (submitBtn) {
+						submitBtn.innerHTML = '<span class="material-icons" style="font-size: 18px;">event</span> Schedule Event';
+					}
+					
+										await 
+
+										if (currentLead) {
+						await loadCustomerEvents(currentLead._id);
+					}
+				} else {
+					throw new Error(result.message || `Failed to ${eventId ? 'update' : 'schedule'} event`);
+				}
+			} catch (error) {
+				alert(`❌ Failed to ${eventId ? 'update' : 'schedule'} event: ${error.message}`);
+			}
+		}
+		
+		function createGoogleCalendarEventFromWorkflow(event) {
+						const title = encodeURIComponent(event.title);
+			const details = encodeURIComponent(event.description || '');
+			const location = encodeURIComponent(event.location || '');
+			
+						const startDate = new Date(event.startTime);
+			const endDate = new Date(event.endTime);
+			
+			const formatDateForGoogle = (date) => {
+				return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+			};
+			
+			let calendarUrl = 'https:			calendarUrl += `&text=${title}`;
+			calendarUrl += `&details=${details}`;
+			calendarUrl += `&location=${location}`;
+			calendarUrl += `&dates=${formatDateForGoogle(startDate)}/${formatDateForGoogle(endDate)}`;
+			
+			// Add customer email if available
+			if (currentLead && currentLead.email) {
+				calendarUrl += `&add=${encodeURIComponent(currentLead.email)}`;
+			}
+			
+			// Open in new tab
+			window.open(calendarUrl, '_blank');
+		}
+		
+				async function  {
+			try {
+				// Get current month's date range
+				const startOfMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
+				const endOfMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0, 23, 59, 59);
+				
+				const response = await fetch(`/api/calendar/events?start=${startOfMonth.toISOString()}&end=${endOfMonth.toISOString()}`, {
+					headers: {
+						'Authorization': `Bearer ${authToken}`
+					}
+				});
+				
+				if (response.ok) {
+					const result = await response.json();
+					if (result.success) {
+												window.calendarEvents = result.events;
+						
+												displayEventsOnCalendar(result.events);
+					}
+				}
+			} catch (error) {
+				console.error('Failed to load calendar events:', error);
+			}
+		}
+		
+				function displayEventsOnCalendar(events) {
+						document.querySelectorAll('"]`);
+				
+				if (dayElement) {
+										const indicator = document.createElement('div');
+					indicator.className = 'event-indicator';
+					indicator.style.cssText = 'width: 6px; height: 6px; background: #667eea; border-radius: 50%; margin: 2px auto;';
+					indicator.title = event.title;
+					
+										indicator.onclick = (e) => {
+						e.stopPropagation();
+						showEventDetails(event);
+					};
+					
+					dayElement.appendChild(indicator);
+					dayElement.classList.add('has-events');
+				}
+			});
+		}
+		
+				function showEventDetails(event) {
+			const lead = event.leadId;
+			const popup = document.getElementById('eventDetailsPopup');
+			
+			popup.innerHTML = `
+				<div style="font-weight: 600; margin-bottom: 10px;">${event.title}</div>
+				<div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+					${new Date(event.startTime).toLocaleString()} - ${new Date(event.endTime).toLocaleTimeString()}
+				</div>
+				${lead ? `<div style="font-size: 13px; margin-bottom: 8px;">Customer: ${lead.name}</div>` : ''}
+				${event.location ? `<div style="font-size: 13px; margin-bottom: 8px;">📍 ${event.location}</div>` : ''}
+				${event.description ? `<div style="font-size: 13px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color);">${event.description.replace(/\n/g, '<br>')}</div>` : ''}
+				<div style="margin-top: 15px; display: flex; gap: 8px;">
+					<button onclick="editCalendarEvent('${event._id}')" style="padding: 6px 12px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Edit</button>
+					<button onclick="deleteCalendarEvent('${event._id}')" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Delete</button>
+				</div>
+			`;
+			
+			popup.style.display = 'block';
+			// Position popup near the clicked element
+			popup.style.top = '50%';
+			popup.style.left = '50%';
+			popup.style.transform = 'translate(-50%, -50%)';
+		}
+		
+				async function editCalendarEvent(eventId) {
+			try {
+								const response = await fetch(`/api/calendar/events/${eventId}`, {
+					headers: {
+						'Authorization': `Bearer ${authToken}`
+					}
+				});
+				
+				if (!response.ok) {
+					throw new Error('Failed to fetch event');
+				}
+				
+				const data = await response.json();
+				const event = data.event;
+				
+								document.getElementById('eventLeadId').value = event.leadId;
+				document.getElementById('eventTitle').value = event.title;
+				document.getElementById('eventType').value = event.eventType || 'other';
+				document.getElementById('eventDescription').value = event.description || '';
+				document.getElementById('eventLocation').value = event.location || '';
+				
+				// Set date and time
+				const startDate = new Date(event.startTime);
+				const endDate = new Date(event.endTime);
+				const duration = Math.round((endDate - startDate) / 60000); // Convert to minutes
+				
+				document.getElementById('eventDate').value = startDate.toISOString().split('T')[0];
+				document.getElementById('eventTime').value = startDate.toTimeString().substring(0, 5);
+				document.getElementById('eventDuration').value = duration;
+				
+								document.getElementById('scheduleEventForm').dataset.eventId = eventId;
+				
+				// Change submit button text
+				const submitBtn = document.querySelector('#scheduleEventForm button[type="submit"]');
+				if (submitBtn) {
+					submitBtn.innerHTML = '<span class="material-icons" style="font-size: 18px;">save</span> Update Event';
+				}
+				
+				// Show the modal
+				openScheduleEventModal();
+			} catch (error) {
+				console.error('Error editing event:', error);
+				alert('Failed to load event for editing');
+			}
+		}
+		
+				async function deleteCalendarEvent(eventId) {
+			if (!confirm('Are you sure you want to delete this event?')) {
+				return;
+			}
+			
+			try {
+				const response = await fetch(`/api/calendar/events/${eventId}`, {
+					method: 'DELETE',
+					headers: {
+						'Authorization': `Bearer ${authToken}`
+					}
+				});
+				
+				if (response.ok) {
+					alert('Event deleted successfully');
+										const popup = document.getElementById('eventDetailsPopup');
+					if (popup) {
+						popup.style.display = 'none';
+					}
+										await 
+					
+										if (currentLead) {
+						await loadCustomerEvents(currentLead._id);
+					}
+				}
+			} catch (error) {
+				alert('Failed to delete event');
+			}
+		}
+		
+		// Tab switching functionality
+		function switchTab(tabName) {
+			// Remove active class from all tabs and content
+			document.querySelectorAll('.profile-tab').forEach(tab => tab.classList.remove('active'));
+			document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+			// Add active class to selected tab and content
+			event.target.classList.add('active');
+			document.getElementById(`tab-${tabName}`).classList.add('active');
+			// Start/stop notification polling based on tab and auto-scroll communication
+			if (tabName === 'communication') {
+				startNotificationPolling();
+				// Auto-scroll to bottom of conversation when switching to communication tab
+				setTimeout(() => {
+					scrollConversationToBottom();
+				}, 100);
+				setTimeout(() => {
+					scrollConversationToBottom();
+				}, 300);
+			} else {
+				stopNotificationPolling();
+			}
+		}
+		// Update editable field
+		async function updateField(fieldName, value) {
+			if (!currentLead || !value) return;
+			try {
+				const response = await fetch(`/api/leads/${currentLead._id}`, {
+					method: 'PATCH',
+					headers: {
+						'Authorization': `Bearer ${authToken}`,
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ [fieldName]: value })
+				});
+				const data = await response.json();
+				if (data.success) {
+					// Update local data
+					currentLead[fieldName] = value;
+					const leadIndex = allLeads.findIndex(l => l._id === currentLead._id);
+					if (leadIndex !== -1) {
+						allLeads[leadIndex][fieldName] = value;
+					}
+					// Update profile header if it's name or email
+					if (fieldName === 'name') {
+						const initials = value.split(' ').map(n => n[0]).join('').toUpperCase();
+						document.getElementById('profileAvatar').textContent = initials;
+						document.getElementById('profileName').textContent = value;
+						renderLeads(); // Refresh table
+					}
+					if (fieldName === 'email' || fieldName === 'phone') {
+						document.getElementById('profileSubtitle').textContent = 
+							`${currentLead.email || 'No email'} • ${currentLead.phone || 'No phone'}`;
+						renderLeads(); // Refresh table
+					}
+				} else {
+					alert('Failed to update field');
+					// Revert the field value
+					document.getElementById(`editable${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}`).value = currentLead[fieldName] || '';
+				}
+			} catch (error) {
+				alert('Failed to update field');
+				// Revert the field value
+				document.getElementById(`editable${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}`).value = currentLead[fieldName] || '';
+			}
+		}
+		// Add new interaction
+		async function addInteraction() {
+			const type = document.getElementById('interactionType').value;
+			const note = document.getElementById('interactionNote').value.trim();
+			if (!note) {
+				alert('Please enter interaction details');
+				return;
+			}
+			if (!currentLead) {
+				alert('No customer selected');
+				return;
+			}
+			try {
+				// Send interaction to server
+				const response = await fetch(`/api/leads/${currentLead._id}/interactions`, {
+					method: 'POST',
+					headers: {
+						'Authorization': `Bearer ${authToken}`,
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						type: type,
+						title: `${type.charAt(0).toUpperCase() + type.slice(1)} Interaction`,
+						description: note
+					})
+				});
+				const result = await response.json();
+				if (result.success) {
+					// Clear form
+					document.getElementById('interactionNote').value = '';
+					// Refresh timeline to show the new interaction
+					await populateTimelineTab(currentLead);
+					// Update interaction count
+					const currentCount = parseInt(document.getElementById('totalInteractions').textContent) || 0;
+					document.getElementById('totalInteractions').textContent = currentCount + 1;
+					alert('Interaction logged successfully');
+				} else {
+					throw new Error(result.message || 'Failed to log interaction');
+				}
+			} catch (error) {
+				alert('Failed to log interaction: ' + error.message);
+			}
+		}
+		// Add new note
+		async function addNote() {
+			const noteText = document.getElementById('newNoteText').value.trim();
+			const priority = document.getElementById('notePriority').value;
+			if (!noteText) {
+				alert('Please enter a note');
+				return;
+			}
+			if (!currentLead) {
+				alert('No customer selected');
+				return;
+			}
+			try {
+				// Send note to server
+				const response = await fetch(`/api/leads/${currentLead._id}/notes`, {
+					method: 'POST',
+					headers: {
+						'Authorization': `Bearer ${authToken}`,
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						content: noteText,
+						priority: priority
+					})
+				});
+				const result = await response.json();
+				if (result.success) {
+					// Clear form
+					document.getElementById('newNoteText').value = '';
+					document.getElementById('notePriority').value = 'low';
+					// Refresh notes list to show the new note
+					await populateNotesTab(currentLead);
+					alert('Note added successfully');
+				} else {
+					throw new Error(result.message || 'Failed to add note');
+				}
+			} catch (error) {
+				alert('Failed to add note: ' + error.message);
+			}
+		}
+		// Close modal when clicking outside
+		window.onclick = function(event) {
+			const leadModal = document.getElementById('leadModal');
+			const settingsModal = document.getElementById('settingsModal');
+			const eventModal = document.getElementById('createEventModal');
+			if (event.target == leadModal) {
+				closeModal();
+			} else if (event.target == settingsModal) {
+				closeSettings();
+			} else if (event.target == eventModal) {
+				closeCreateEventModal();
+			}
+		}
+		// Dark mode toggle
+		function toggleDarkMode() {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', newTheme);
+			localStorage.setItem('theme', newTheme);
+			updateThemeIcon(newTheme);
+		}
+		// Update theme icon and text
+		function updateThemeIcon(theme) {
+			const icon = document.getElementById('themeIcon');
+			const text = document.querySelector('.theme-text');
+			if (icon) {
+				icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
+			}
+			if (text) {
+				text.textContent = theme === 'dark' ? 'Light' : 'Dark';
+			}
+		}
+
+		// Initialize the page when DOM is loaded
+		document.addEventListener('DOMContentLoaded', function() {
+			console.log('DOM loaded, initializing...');
+			// Update debug info to show JavaScript is ready
+			const debugInfo = document.getElementById('debugInfo');
+			console.log('Debug element found:', debugInfo);
+			if (debugInfo) {
+				debugInfo.textContent = 'Ready to login';
+				debugInfo.style.color = 'blue';
+				console.log('Debug message updated');
+			}
+
+			// Test if login form exists
+			const loginForm = document.getElementById('loginForm');
+			console.log('Login form found:', loginForm);
+			
+			// Add a test button click handler
+			window.testLogin = function() {
+				console.log('Test login function called');
+				const password = document.getElementById('password').value;
+				console.log('Password value:', password);
+				alert('Test: Password = ' + password);
+			};
+			console.log('Test login function added to window');
+
+			// Load theme from localStorage
+			const savedTheme = localStorage.getItem('theme') || 'light';
+			document.documentElement.setAttribute('data-theme', savedTheme);
+			updateThemeIcon(savedTheme);
+
+			// Check if user is already logged in
+			const storedToken = localStorage.getItem('adminToken');
+			if (storedToken) {
+				authToken = storedToken;
+				showDashboard();
+			}
+		});
+
+		// Open chat for current lead
+		function openChatForCurrentLead() {
+			console.log('openChatForCurrentLead called');
+			console.log('currentLead:', currentLead);
+			
+			if (!currentLead) {
+				alert('No customer selected. Please select a customer first.');
+				return;
+			}
+			
+			if (!currentLead.phone) {
+				alert('This customer does not have a phone number on file.');
+				return;
+			}
+
+			// Check if openCustomerChat function exists
+			if (typeof openCustomerChat === 'function') {
+				openCustomerChat(currentLead._id, currentLead.name, currentLead.phone);
+			} else {
+				console.error('openCustomerChat function not found');
+				alert('Chat functionality is not loaded. Please refresh the page.');
+			}
+		}
+
+		// Make function globally available
+		window.openChatForCurrentLead = openChatForCurrentLead;
+
+				async function enhancedScheduleAppointment() {
+			const currentLead = window.currentSelectedLead;
+			
+			if (!currentLead) {
+				showError('Please select a client first');
+				return;
+			}
+
+			try {
+								if (typeof window.googleCalendarManager !== 'undefined') {
+					const authStatus = window.googleCalendarManager.getAuthStatus();
+					
+					if (authStatus.hasCredentials && authStatus.initialized) {
+						if (!authStatus.authenticated) {
+							// Try to authenticate
+							const confirmAuth = confirm(`Authenticate with Google Calendar to create events directly?\n\nClick OK to authenticate, or Cancel to use the fallback method.`);
+							if (confirmAuth) {
+								try {
+									await window.googleCalendarManager.authenticate();
+									// Create the appointment after successful authentication
+									const event = await window.googleCalendarManager.createClientAppointment(currentLead);
+									showSuccess(`✅ Strategy session scheduled successfully!\n\nEvent: ${event.summary}\nTime: ${new Date(event.start.dateTime).toLocaleString()}`);
+									
+																		if (typeof renderCustomCalendar === 'function') {
+										
+									}
+									return;
+								} catch (authError) {
+									console.error('Authentication failed:', authError);
+									showError('Authentication failed. Using fallback method.');
+								}
+							}
+						} else {
+														try {
+								const event = await window.googleCalendarManager.createClientAppointment(currentLead);
+								showSuccess(`✅ Strategy session scheduled successfully!\n\nEvent: ${event.summary}\nTime: ${new Date(event.start.dateTime).toLocaleString()}`);
+								
+																if (typeof renderCustomCalendar === 'function') {
+									
+								}
+								return;
+							} catch (createError) {
+								console.error('Event creation failed:', createError);
+								showError('Failed to create event directly. Using fallback method.');
+							}
+						}
+					}
+				}
+				
+								console.log('Using fallback quick schedule method');
+				if (typeof window.googleCalendarManager !== 'undefined') {
+					window.googleCalendarManager.quickScheduleWithClient(currentLead);
+				} else {
+										scheduleAppointment();
+				}
+				
+			} catch (error) {
+				console.error('Enhanced schedule error:', error);
+				showError('An error occurred while scheduling. Please try the basic schedule option.');
+			}
+		}
+
+				async function enhancedGoogleCalendarAuth() {
+			try {
+				if (typeof window.googleCalendarManager === 'undefined') {
+					showError('Google Calendar Manager not loaded. Please refresh the page.');
+					return;
+				}
+
+				const authStatus = window.googleCalendarManager.getAuthStatus();
+				
+				if (!authStatus.hasCredentials) {
+					showGoogleCalendarSetupInfo();
+					return;
+				}
+
+				if (!authStatus.initialized) {
+					showError('Google Calendar API not initialized. Please check your configuration.');
+					return;
+				}
+
+				if (authStatus.authenticated) {
+					// Sign out
+					const confirmSignOut = confirm('Are you sure you want to disconnect from Google Calendar?');
+					if (confirmSignOut) {
+						await window.googleCalendarManager.signOut();
+						updateGoogleCalendarButton('disconnected');
+						showSuccess('Disconnected from Google Calendar');
+						
+												if (typeof renderCustomCalendar === 'function') {
+							
+						}
+					}
+				} else {
+					// Sign in
+					try {
+						await window.googleCalendarManager.authenticate();
+						updateGoogleCalendarButton('connected');
+						showSuccess('Successfully connected to Google Calendar!');
+						
+												if (typeof loadGoogleCalendarEvents === 'function') {
+							await loadGoogleCalendarEvents();
+						}
+						if (typeof renderCustomCalendar === 'function') {
+							
+						}
+					} catch (authError) {
+						console.error('Authentication error:', authError);
+						showError('Failed to authenticate with Google Calendar. Please try again.');
+					}
+				}
+			} catch (error) {
+				console.error('Enhanced auth error:', error);
+				showError('An error occurred during authentication.');
+			}
+		}
+
+				if (typeof handleGoogleCalendarAuth !== 'undefined') {
+			window.originalHandleGoogleCalendarAuth = handleGoogleCalendarAuth;
+		}
+		window.handleGoogleCalendarAuth = enhancedGoogleCalendarAuth;
+
+				async function enhancedRefreshCalendar() {
+			try {
+				if (typeof window.googleCalendarManager !== 'undefined') {
+					const authStatus = window.googleCalendarManager.getAuthStatus();
+					
+					if (authStatus.authenticated) {
+						// Get current month's date range
+						const now = new Date();
+						const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+						const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+						
+												await window.googleCalendarManager.listEvents(startOfMonth, endOfMonth);
+						console.log('✅ Google Calendar events refreshed');
+					}
+				}
+				
+				// Call the original refresh function
+				if (typeof renderCustomCalendar === 'function') {
+					
+				}
+				
+				showSuccess('Calendar refreshed successfully!');
+			} catch (error) {
+				console.error('Enhanced refresh error:', error);
+				showError('Failed to refresh calendar from Google.');
+				
+				// Fallback to basic refresh
+				if (typeof renderCustomCalendar === 'function') {
+					
+				}
+			}
+		}
+
+				if (typeof refreshCalendar !== 'undefined') {
+			window.originalRefreshCalendar = refreshCalendar;
+		}
+		window.refreshCalendar = enhancedRefreshCalendar;
+
+		// Make enhanced functions globally available
+		window.enhancedScheduleAppointment = enhancedScheduleAppointment;
+		window.enhancedGoogleCalendarAuth = enhancedGoogleCalendarAuth;
+		window.enhancedRefreshCalendar = enhancedRefreshCalendar;
+
+	</script>
+</body>
+</html>

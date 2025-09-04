@@ -10,7 +10,7 @@ class OpenPhoneSync {
         this.apiUrl = 'https://api.openphone.com/v1';
         this.apiKey = process.env.OPENPHONE_API_KEY;
         this.phoneNumber = process.env.OPENPHONE_PHONE_NUMBER;
-        this.phoneNumberId = 'PN6guvaY6r'; // OpenPhone number ID from webhooks
+        this.phoneNumberId = 'PNfOUIvv5X'; // OpenPhone number ID from webhooks
         this.lastSyncTime = new Date(Date.now() - 24 * 60 * 60 * 1000); // Start from 24 hours ago
         this.io = null; // Will be set by server
     }
@@ -23,23 +23,27 @@ class OpenPhoneSync {
         try {
             console.log('🔄 Syncing OpenPhone messages...');
             
-            // Get messages from the last sync time
-            const response = await axios.get(`${this.apiUrl}/messages`, {
+            // Get conversations first
+            const convResponse = await axios.get(`${this.apiUrl}/conversations`, {
                 headers: {
                     'Authorization': this.apiKey,
                     'Content-Type': 'application/json'
                 },
                 params: {
-                    maxResults: 100,
-                    createdAfter: this.lastSyncTime.toISOString()
+                    phoneNumberId: this.phoneNumberId,
+                    limit: 20
                 }
             });
 
-            const messages = response.data.data || [];
-            console.log(`📱 Found ${messages.length} messages to sync`);
+            const conversations = convResponse.data.data || [];
+            console.log(`📱 Found ${conversations.length} conversations to check`);
 
-            for (const message of messages) {
-                await this.processMessage(message);
+            // For each conversation, check if it has new messages
+            for (const conversation of conversations) {
+                if (conversation.lastActivityAt && new Date(conversation.lastActivityAt) > this.lastSyncTime) {
+                    // This conversation has new activity
+                    await this.syncConversationMessages(conversation);
+                }
             }
 
             // Update last sync time
@@ -48,6 +52,21 @@ class OpenPhoneSync {
 
         } catch (error) {
             console.error('❌ OpenPhone sync error:', error.message);
+        }
+    }
+
+    async syncConversationMessages(conversation) {
+        try {
+            // Get messages for this conversation using the proper endpoint
+            // Note: OpenPhone API doesn't have a direct messages endpoint that works
+            // We'll need to use webhooks for real-time updates instead
+            console.log(`📱 Checking conversation with ${conversation.participants[0]}`);
+            
+            // For now, we'll rely on webhooks for message updates
+            // The sync will mainly be used to ensure we have all conversations tracked
+            
+        } catch (error) {
+            console.error('❌ Error syncing conversation messages:', error);
         }
     }
 

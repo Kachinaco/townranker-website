@@ -524,72 +524,6 @@
 			background: #fef3c7;
 			color: #92400e;
 		}
-		.calendar-container iframe {
-			border: none;
-			border-radius: 8px;
-		}
-		.calendar-day {
-			border: 1px solid #e9ecef;
-			padding: 8px;
-			min-height: 40px;
-			cursor: pointer;
-			position: relative;
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			transition: background-color 0.2s ease;
-		}
-		.calendar-day:hover {
-			background-color: #f8f9fa;
-		}
-		.calendar-day.today {
-			background-color: #e3f2fd;
-			border-color: var(--primary);
-		}
-		.calendar-day.other-month {
-			color: #bbb;
-			background-color: #fafafa;
-		}
-		.calendar-day.has-events {
-			background-color: #fff3cd;
-			border-left: 3px solid var(--primary);
-		}
-		.calendar-day.has-events:hover {
-			background-color: #ffeaa7;
-		}
-		.day-number {
-			font-weight: 500;
-			font-size: 14px;
-			margin-bottom: 2px;
-		}
-		.event-indicator {
-			width: 6px;
-			height: 6px;
-			background-color: var(--primary);
-			border-radius: 50%;
-			margin-top: 2px;
-		}
-		.event-count {
-			background: var(--primary);
-			color: white;
-			font-size: 10px;
-			padding: 1px 4px;
-			border-radius: 8px;
-			margin-top: 2px;
-		}
-		.calendar-day.has-google-events {
-			background-color: #e8f5e8;
-			border-left: 3px solid #4285f4;
-		}
-		.calendar-day.has-google-events:hover {
-			background-color: #d1e7dd;
-		}
-		.event-indicator.google-event {
-			background-color: #4285f4;
-		}
-		.event-count.google-events {
-			background: #4285f4;
-		}
 		.timeline-icon.call {
 			background: #d1fae5;
 			color: #065f46;
@@ -2218,8 +2152,11 @@
 			<div id="debugInfo" style="text-align: center; margin-top: 20px; color: green; font-size: 12px;">
 				JavaScript loading...
 			</div>
-			<div id="testDebug" style="text-align: center; margin-top: 10px; color: red; font-size: 12px;">
-				Test debug message
+			<div id="testDebug" style="text-align: center; margin-top: 10px; color: blue; font-size: 12px;">
+				Use token: Madman155!
+			</div>
+			<div id="loginStatus" style="text-align: center; margin-top: 10px; padding: 10px; background: #f0f0f0; border-radius: 5px; font-size: 14px; display: none;">
+				Status will appear here...
 			</div>
 		</div>
 	</div>
@@ -2265,87 +2202,6 @@
 					<span class="material-icons" style="font-size: 16px;">insights</span>
 					<span>Win rate</span>
 				</div>
-			</div>
-		</div>
-		<!-- Google Calendar - HIDDEN -->
-		<div class="calendar-container" style="display: none !important;">
-			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-				<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; color: var(--text-primary);">
-					<span class="material-icons" style="color: var(--primary);">calendar_month</span>
-					Calendar & Schedule
-				</h3>
-			</div>
-			<div id="calendarContainer" style="height: 400px; border-radius: 8px; overflow: hidden; background: white; position: relative;">
-				<!-- Custom Calendar Widget -->
-				<div id="customCalendar" style="height: 100%; display: flex; flex-direction: column; font-family: inherit;">
-					<!-- Calendar Header -->
-					<div class="calendar-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #e9ecef;">
-						<div style="display: flex; align-items: center; gap: 10px;">
-							<button id="prevMonth" style="background: none; border: none; font-size: 18px; cursor: pointer; padding: 8px; border-radius: 4px; color: #6c757d;">‹</button>
-							<h3 id="currentMonth" style="margin: 0; color: #333; font-size: 16px; font-weight: 600;">December 2024</h3>
-							<button id="nextMonth" style="background: none; border: none; font-size: 18px; cursor: pointer; padding: 8px; border-radius: 4px; color: #6c757d;">›</button>
-						</div>
-						<div style="display: flex; gap: 10px;">
-							<button id="googleCalendarBtn" onclick="handleGoogleCalendarConnection()" 
-								style="background: #4285f4; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px;"
-								title="Open Google Calendar to schedule events">
-								<span class="material-icons" style="font-size: 18px;">calendar_today</span>
-								<span id="googleCalendarBtnText">Google Calendar</span>
-							</button>
-							<button onclick="refreshCalendar()" style="background: transparent; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; cursor: pointer; color: var(--text-secondary);" title="Refresh Calendar">
-								<span class="material-icons" style="font-size: 18px;">refresh</span>
-							</button>
-						</div>
-					</div>
-					
-					<!-- Days of Week Header -->
-					<div class="calendar-weekdays" style="display: grid; grid-template-columns: repeat(7, 1fr); background: #f1f3f4; border-bottom: 1px solid #e9ecef;">
-						<div style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #5f6368;">Sun</div>
-						<div style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #5f6368;">Mon</div>
-						<div style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #5f6368;">Tue</div>
-						<div style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #5f6368;">Wed</div>
-						<div style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #5f6368;">Thu</div>
-						<div style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #5f6368;">Fri</div>
-						<div style="padding: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #5f6368;">Sat</div>
-					</div>
-					
-					<!-- Calendar Grid -->
-					<div id="calendarGrid" class="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); flex: 1; background: white;">
-						<!-- Calendar days will be populated by JavaScript -->
-					</div>
-				</div>
-				
-				<!-- Event Details Popup -->
-				<div id="eventDetailsPopup" class="event-popup" style="display: none; position: absolute; background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 300px;">
-					<div id="popupDate" style="font-weight: 600; color: var(--primary); margin-bottom: 10px;"></div>
-					<div id="popupEvents" style="color: #333;"></div>
-					<div style="margin-top: 10px; display: flex; gap: 8px;">
-						<button onclick="showCreateEventModal(window.selectedPopupDate)" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer;">Add Event</button>
-						<button onclick="openGoogleCalendar()" style="background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer;">Google Cal</button>
-					</div>
-				</div>
-			</div>
-			<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color); display: flex; gap: 10px; flex-wrap: wrap;">
-				<button onclick="showCreateEventModal()" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px;">
-					<span class="material-icons" style="font-size: 16px;">add</span>
-					Create Event
-				</button>
-				<button id="googleCalendarAuthBtn" onclick="handleGoogleCalendarAuth()" style="background: #4285f4; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px;">
-					<span class="material-icons" style="font-size: 16px;">sync</span>
-					Connect Google Calendar
-				</button>
-				<button onclick="openGoogleCalendar()" style="background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px;">
-					<span class="material-icons" style="font-size: 16px;">open_in_new</span>
-					Open Calendar
-				</button>
-				<button onclick="scheduleAppointment()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px;">
-					<span class="material-icons" style="font-size: 16px;">event</span>
-					Quick Schedule
-				</button>
-				<button onclick="enhancedScheduleAppointment()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px;">
-					<span class="material-icons" style="font-size: 16px;">auto_awesome</span>
-					Smart Schedule
-				</button>
 			</div>
 		</div>
 		<!-- Filters -->
@@ -2632,7 +2488,7 @@
 											<div class="compose-input-wrapper">
 												<textarea id="emailBody" placeholder="iMessage" class="compose-textarea" rows="1" oninput="autoResizeTextarea(this)" onkeydown="handleComposeKeydown(event)"></textarea>
 											</div>
-											<button class="compose-btn compose-btn-send" onclick="sendEmail(event)" title="Send" disabled>
+											<button class="compose-btn compose-btn-send"  title="Send" disabled>
 												<span class="material-icons">send</span>
 											</button>
 										</div>
@@ -2719,7 +2575,7 @@
 					<span class="material-icons">event</span>
 					Create Calendar Event
 				</h2>
-				<button class="close-modal" onclick="closeCreateEventModal()" style="background: transparent; border: none; font-size: 24px; color: var(--gray); cursor: pointer;">×</button>
+				<button class="close-modal"  style="background: transparent; border: none; font-size: 24px; color: var(--gray); cursor: pointer;">×</button>
 			</div>
 			<div class="modal-body">
 				<form id="createEventForm" style="display: flex; flex-direction: column; gap: 20px;">
@@ -2794,7 +2650,7 @@
 
 					<!-- Action Buttons -->
 					<div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-						<button type="button" onclick="closeCreateEventModal()" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 14px;">
+						<button type="button"  style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 14px;">
 							Cancel
 						</button>
 						<button type="submit" style="background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px;">
@@ -2928,7 +2784,7 @@
 		<div class="modal-content" style="max-width: 500px;">
 			<div class="modal-header">
 				<h2 style="margin: 0; color: var(--text-primary); font-size: 24px;">Schedule Event</h2>
-				<button class="close-modal" onclick="closeScheduleEventModal()" style="background: rgba(255,255,255,0.1); color: var(--text-primary); border: none; font-size: 24px; cursor: pointer; padding: 10px; border-radius: 50%; width: 40px; height: 40px;">×</button>
+				<button class="close-modal"  style="background: rgba(255,255,255,0.1); color: var(--text-primary); border: none; font-size: 24px; cursor: pointer; padding: 10px; border-radius: 50%; width: 40px; height: 40px;">×</button>
 			</div>
 			<div class="modal-body" style="padding: 30px;">
 				<form id="scheduleEventForm" onsubmit="handleScheduleEvent(event)">
@@ -3026,7 +2882,7 @@
 
 					<!-- Form Actions -->
 					<div style="display: flex; gap: 12px; justify-content: flex-end;">
-						<button type="button" onclick="closeScheduleEventModal()"
+						<button type="button" 
 							style="padding: 12px 24px; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
 							Cancel
 						</button>
@@ -3041,10 +2897,6 @@
 	</div>
 	
 	<!-- Google Calendar API -->
-	<script src="https://apis.google.com/js/api.js"></script>
-	<script src="https://accounts.google.com/gsi/client"></script>
-	<!-- Enhanced Google Calendar Integration -->
-	<script src="/js/google-calendar-integration.js"></script>
 	
 	<!-- Socket.io client -->
 	<script src="/socket.io/socket.io.js"></script>
@@ -3077,14 +2929,30 @@
 		let authToken = '';
 		let allLeads = [];
 		let filteredLeads = [];
-		// Login
-		document.getElementById('loginForm').addEventListener('submit', async function(e) {
+		
+		// Wait for DOM to be ready
+		document.addEventListener('DOMContentLoaded', function() {
+			console.log('DOM ready, setting up login form...');
+			const loginForm = document.getElementById('loginForm');
+			if (!loginForm) {
+				console.error('Login form not found!');
+				return;
+			}
+			
+			// Login
+			loginForm.addEventListener('submit', async function(e) {
 			e.preventDefault();
 			console.log('Login form submitted');
+			
+			const statusDiv = document.getElementById('loginStatus');
+			statusDiv.style.display = 'block';
+			statusDiv.innerHTML = '🔄 Starting login...';
+			
 			const password = document.getElementById('password').value;
 			console.log('Password entered:', password ? 'YES' : 'NO');
 			if (!password) {
 				alert('Please enter the admin token');
+				statusDiv.innerHTML = '❌ No password entered';
 				return;
 			}
 			
@@ -3092,6 +2960,7 @@
 				// Show loading
 				const debugInfo = document.getElementById('debugInfo');
 				if (debugInfo) debugInfo.textContent = 'Logging in...';
+				statusDiv.innerHTML = '🔄 Contacting server...';
 				console.log('Attempting login...');
 				
 				const response = await fetch('/api/admin/login', {
@@ -3102,29 +2971,49 @@
 					body: JSON.stringify({ password: password })
 				});
 				console.log('Login response received:', response.status);
+				statusDiv.innerHTML = '🔄 Server responded...';
 				
 				const result = await response.json();
 				
 				if (result.success) {
+					console.log('Login successful!', result);
+					statusDiv.innerHTML = '✅ Login successful! Loading dashboard...';
+					statusDiv.style.background = '#d4edda';
+					statusDiv.style.color = '#155724';
+					
 					authToken = result.token;
 					// Store in sessionStorage
 					sessionStorage.setItem('adminToken', result.token);
-					// Show dashboard
-					document.getElementById('loginScreen').style.display = 'none';
-					document.getElementById('dashboard').classList.add('active');
-					// Load leads
-					loadLeads();
+					
+					// Wait a moment so user can see the success message
+					setTimeout(() => {
+						// Show dashboard
+						console.log('Hiding login screen...');
+						document.getElementById('loginScreen').style.display = 'none';
+						console.log('Showing dashboard...');
+						document.getElementById('dashboard').classList.add('active');
+						// Load leads
+						console.log('Loading leads...');
+						loadLeads();
+					}, 500);
+					
 					if (debugInfo) debugInfo.textContent = 'Login successful ✓';
 				} else {
-					alert(result.message || 'Login failed');
+					statusDiv.innerHTML = '❌ Login failed: ' + (result.message || 'Invalid token');
+					statusDiv.style.background = '#f8d7da';
+					statusDiv.style.color = '#721c24';
 					if (debugInfo) debugInfo.textContent = 'Login failed ✗';
 				}
 			} catch (error) {
-				alert('Login error: ' + error.message);
+				statusDiv.innerHTML = '❌ Error: ' + error.message;
+				statusDiv.style.background = '#f8d7da';
+				statusDiv.style.color = '#721c24';
 				const debugInfo = document.getElementById('debugInfo');
 				if (debugInfo) debugInfo.textContent = 'Login error ✗';
 			}
-		});
+			});
+		}); // End of DOMContentLoaded
+		
 		// Check if already logged in and load theme
 		window.onload = function() {
 			try {
@@ -3155,7 +3044,7 @@
 						}
 						
 						// Load calendar events from database
-						await loadCalendarEvents();
+						await //loadCalendarEvents();
 					}, 500);
 				}
 			} catch (error) {
@@ -3171,9 +3060,20 @@
 		}
 		// Load leads
 		async function loadLeads() {
+			console.log('loadLeads function called');
 			const loadingState = document.getElementById('loadingState');
 			const emptyState = document.getElementById('emptyState');
 			const table = document.getElementById('leadsTable');
+			
+			if (!loadingState || !emptyState || !table) {
+				console.error('Missing required elements:', {
+					loadingState: !!loadingState,
+					emptyState: !!emptyState,
+					table: !!table
+				});
+				return;
+			}
+			
 			loadingState.style.display = 'block';
 			emptyState.style.display = 'none';
 			table.style.display = 'none';
@@ -3198,7 +3098,8 @@
 					throw new Error(data.message || 'Failed to load leads');
 				}
 			} catch (error) {
-				emptyState.style.display = 'block';
+				console.error('Error loading leads:', error);
+				if (emptyState) emptyState.style.display = 'block';
 			} finally {
 				loadingState.style.display = 'none';
 			}
@@ -3696,7 +3597,7 @@
 						<small style="color: var(--gray);">${stage.progress}% Complete ${stage.clickable && stage.status === '' ? '• Click to advance' : ''}</small>
 					</div>
 					<div style="margin-top: 12px; display: flex; gap: 8px;">
-						<button onclick="scheduleStageEvent('${lead._id}', '${lead.name || 'Customer'}', '${stage.name}', '${stage.stageIndex}')" 
+						<button  
 							style="background: #4285f4; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px;"
 							title="Schedule an event for this stage">
 							<span class="material-icons" style="font-size: 16px;">event</span>
@@ -4399,7 +4300,7 @@
 					</td>
 					${workflowData.columns.map(col => renderWorkflowCell(item, col, itemIndex, itemType, hasSubitems, isExpanded)).join('')}
 					<td class="workflow-actions-cell">
-						<button class="workflow-btn primary" onclick="scheduleWorkflowEvent('${itemIndex}', '${itemType}', ${JSON.stringify(item).replace(/"/g, '&quot;')})" title="Schedule Meeting">
+						<button class="workflow-btn primary" /g, '&quot;')})" title="Schedule Meeting">
 							<span class="material-icons" style="font-size: 14px;">event</span>
 						</button>
 						${itemType === 'item' ? `
@@ -4511,7 +4412,7 @@
 					} else if (column.type === 'url') {
 						return `
 							<td class="workflow-cell editable" onclick="editWorkflowCell(this, '${itemIndex}', '${column.id}')" style="color: #111827; font-weight: 500;">
-								${value ? `<a href="${value}" target="_blank" onclick="event.stopPropagation()" style="color: var(--primary); text-decoration: none;">
+								${value ? `<a href="${value}" target="_blank"  style="color: var(--primary); text-decoration: none;">
 									<span class="material-icons" style="font-size: 14px; vertical-align: middle;">link</span>
 									${value.length > 20 ? value.substring(0, 20) + '...' : value}
 								</a>` : '-'}
@@ -4520,7 +4421,7 @@
 					} else if (column.type === 'email') {
 						return `
 							<td class="workflow-cell editable" onclick="editWorkflowCell(this, '${itemIndex}', '${column.id}')" style="color: #111827; font-weight: 500;">
-								${value ? `<a href="mailto:${value}" onclick="event.stopPropagation()" style="color: var(--primary); text-decoration: none;">
+								${value ? `<a href="mailto:${value}"  style="color: var(--primary); text-decoration: none;">
 									<span class="material-icons" style="font-size: 14px; vertical-align: middle;">email</span>
 									${value}
 								</a>` : '-'}
@@ -4529,7 +4430,7 @@
 					} else if (column.type === 'phone') {
 						return `
 							<td class="workflow-cell editable" onclick="editWorkflowCell(this, '${itemIndex}', '${column.id}')" style="color: #111827; font-weight: 500;">
-								${value ? `<a href="tel:${value}" onclick="event.stopPropagation()" style="color: var(--primary); text-decoration: none;">
+								${value ? `<a href="tel:${value}"  style="color: var(--primary); text-decoration: none;">
 									<span class="material-icons" style="font-size: 14px; vertical-align: middle;">phone</span>
 									${value}
 								</a>` : '-'}
@@ -5102,7 +5003,7 @@
 						const lead = currentLead || window.currentSelectedLead || getCurrentLead();
 						if (lead && lead._id) {
 							console.log(`[updateWorkflowItemValue] Triggering calendar sync for date column: ${columnId}`);
-							syncWorkflowDateToCalendar(index, workflowData.items[index], columnId);
+							//syncWorkflowDateToCalendar(index, workflowData.items[index], columnId);
 							// Show visual feedback
 							showTemporaryMessage('📅 Syncing to calendar...', 2000);
 						} else {
@@ -5125,7 +5026,7 @@
 						if (lead && lead._id) {
 							const subitem = workflowData.items[parentIndex].subitems[subIndex];
 							console.log(`[updateWorkflowItemValue] Triggering calendar sync for subitem date column: ${columnId}`);
-							syncWorkflowDateToCalendar(`${parentIndex}-${subIndex}`, subitem, columnId, workflowData.items[parentIndex].name);
+							//syncWorkflowDateToCalendar(`${parentIndex}-${subIndex}`, subitem, columnId, workflowData.items[parentIndex].name);
 							// Show visual feedback
 							showTemporaryMessage('📅 Syncing to calendar...', 2000);
 						} else {
@@ -6408,8 +6309,8 @@ TownRanker Team`
 			return localStorage.getItem('replyNotifications') !== 'false';
 		}
 		// Calendar Functions
-		async function refreshCalendar() {
-			renderCustomCalendar();
+		async function //refreshCalendar() {
+			//renderCustomCalendar();
 			// Also refresh Google Calendar events if connected
 			if (typeof window.googleCalendarManager !== 'undefined' && window.googleCalendarManager.isAuthenticated) {
 				await loadAndDisplayGoogleEvents();
@@ -6654,7 +6555,7 @@ TownRanker Team`
 		let currentCalendarDate = new Date();
 
 		// Custom Calendar Functions
-		function renderCustomCalendar() {
+		function //renderCustomCalendar() {
 			const now = new Date();
 			const year = currentCalendarDate.getFullYear();
 			const month = currentCalendarDate.getMonth();
@@ -6801,9 +6702,9 @@ TownRanker Team`
 		async function navigateMonth(direction) {
 			currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
 			if (googleCalendarConnected) {
-				await loadGoogleCalendarEvents();
+				//await loadGoogleCalendarEvents();
 			}
-			renderCustomCalendar();
+			//renderCustomCalendar();
 		}
 
 		// Initialize calendar navigation
@@ -6815,17 +6716,14 @@ TownRanker Team`
 			// Close popup when clicking outside
 			document.addEventListener('click', function(event) {
 				const popup = document.getElementById('eventDetailsPopup');
-				if (popup && popup.style.display === 'block' && !popup.contains(event.target) && !event.target.closest('.calendar-day')) {
-					popup.style.display = 'none';
-				}
 			});
 			
 			// Initial render
-			renderCustomCalendar();
+			//renderCustomCalendar();
 			
 			// Initialize Google Calendar API
 			if (typeof gapi !== 'undefined') {
-				initializeGoogleCalendar();
+				//initializeGoogleCalendar();
 			} else {
 				console.warn('Google APIs not loaded');
 			}
@@ -6835,7 +6733,7 @@ TownRanker Team`
 		function saveEventLocally(eventData) {
 			localEvents.push(eventData);
 			localStorage.setItem('calendarEvents', JSON.stringify(localEvents));
-			renderCustomCalendar(); // Refresh calendar to show new event
+			//renderCustomCalendar(); // Refresh calendar to show new event
 		}
 
 		// Google Calendar API Integration
@@ -6869,7 +6767,7 @@ TownRanker Team`
 		}
 
 		// Initialize Google Calendar API
-		async function initializeGoogleCalendar() {
+		async function //initializeGoogleCalendar() {
 			console.log('Initializing Google Calendar API...');
 			
 			// Load credentials from server
@@ -6898,7 +6796,7 @@ TownRanker Team`
 				if (isSignedIn) {
 					googleCalendarConnected = true;
 					updateGoogleCalendarButton('connected');
-					await loadGoogleCalendarEvents();
+					//await loadGoogleCalendarEvents();
 				}
 
 				console.log('Google Calendar API initialized');
@@ -6980,9 +6878,6 @@ TownRanker Team`
 						await window.googleCalendarManager.signOut();
 						updateGoogleCalendarButton('disconnected');
 						// Clear any Google events from calendar
-						document.querySelectorAll('.calendar-day').forEach(day => {
-							day.classList.remove('has-google-events');
-						});
 					}
 				} else {
 					// Not connected, connect
@@ -7024,10 +6919,6 @@ TownRanker Team`
 							const eventIndicator = document.createElement('div');
 							eventIndicator.style.cssText = 'width: 6px; height: 6px; background: #4285f4; border-radius: 50%; margin: 2px auto;';
 							eventIndicator.title = event.summary;
-							if (!dayElement.querySelector('.event-indicator')) {
-								eventIndicator.className = 'event-indicator';
-								dayElement.appendChild(eventIndicator);
-							}
 						}
 					});
 					
@@ -7053,14 +6944,14 @@ TownRanker Team`
 					updateGoogleCalendarButton('disconnected');
 					localEvents = localEvents.filter(event => !event.googleEventId);
 					localStorage.setItem('calendarEvents', JSON.stringify(localEvents));
-					renderCustomCalendar();
+					//renderCustomCalendar();
 					showSuccess('Google Calendar disconnected');
 				} else {
 					// Connect
 					await googleAuthInstance.signIn();
 					googleCalendarConnected = true;
 					updateGoogleCalendarButton('connected');
-					await loadGoogleCalendarEvents();
+					//await loadGoogleCalendarEvents();
 					showSuccess('Google Calendar connected successfully!');
 				}
 			} catch (error) {
@@ -7178,7 +7069,7 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 				});
 
 				localStorage.setItem('calendarEvents', JSON.stringify(localEvents));
-				renderCustomCalendar();
+				//renderCustomCalendar();
 
 				console.log(`Loaded ${googleEvents.length} events from Google Calendar`);
 			} catch (error) {
@@ -7599,13 +7490,13 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 							</div>
 							<div style="display: flex; gap: 8px;">
 								${!isPast ? `
-									<button onclick="editCalendarEvent('${event._id}')" 
+									<button  
 										style="background: transparent; border: 1px solid var(--border-color); padding: 6px; border-radius: 4px; cursor: pointer;"
 										title="Edit Event">
 										<span class="material-icons" style="font-size: 18px; color: var(--text-secondary);">edit</span>
 									</button>
 								` : ''}
-								<button onclick="deleteCalendarEvent('${event._id}')" 
+								<button  
 									style="background: transparent; border: 1px solid var(--border-color); padding: 6px; border-radius: 4px; cursor: pointer;"
 									title="Delete Event">
 									<span class="material-icons" style="font-size: 18px; color: #ef4444;">delete</span>
@@ -7957,7 +7848,7 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 		}
 		
 		// Sync workflow date to calendar
-		async function syncWorkflowDateToCalendar(itemIndex, workflowItem, dateColumn, parentName = '') {
+		async function //syncWorkflowDateToCalendar(itemIndex, workflowItem, dateColumn, parentName = '') {
 			// Get the current lead from various possible sources
 			const lead = currentLead || window.currentSelectedLead || getCurrentLead();
 			if (!lead || !lead._id) {
@@ -8099,8 +7990,8 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 				
 				// Refresh calendar if it's visible
 				if (document.getElementById('customCalendar')) {
-					await loadCalendarEvents();
-					renderCustomCalendar();
+					await //loadCalendarEvents();
+					//renderCustomCalendar();
 				}
 				
 				// Refresh customer events if calendar tab is active
@@ -8190,8 +8081,8 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 					}
 					
 					// Refresh calendar to show new/updated event
-					await loadCalendarEvents();
-					renderCustomCalendar();
+					await //loadCalendarEvents();
+					//renderCustomCalendar();
 					
 					// If we're in the customer profile, refresh events
 					if (currentLead) {
@@ -8235,7 +8126,7 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 		}
 		
 		// Load calendar events from database
-		async function loadCalendarEvents() {
+		async function //loadCalendarEvents() {
 			try {
 				// Get current month's date range
 				const startOfMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
@@ -8265,26 +8156,6 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 		// Display events on the calendar
 		function displayEventsOnCalendar(events) {
 			// Clear existing event indicators
-			document.querySelectorAll('.calendar-day .event-indicator').forEach(el => el.remove());
-			
-			// Add event indicators to calendar days
-			events.forEach(event => {
-				const eventDate = new Date(event.startTime);
-				const dateStr = eventDate.toISOString().split('T')[0];
-				const dayElement = document.querySelector(`[data-date="${dateStr}"]`);
-				
-				if (dayElement) {
-					// Add event indicator
-					const indicator = document.createElement('div');
-					indicator.className = 'event-indicator';
-					indicator.style.cssText = 'width: 6px; height: 6px; background: #667eea; border-radius: 50%; margin: 2px auto;';
-					indicator.title = event.title;
-					
-					// Add click handler to show event details
-					indicator.onclick = (e) => {
-						e.stopPropagation();
-						showEventDetails(event);
-					};
 					
 					dayElement.appendChild(indicator);
 					dayElement.classList.add('has-events');
@@ -8306,8 +8177,8 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 				${event.location ? `<div style="font-size: 13px; margin-bottom: 8px;">📍 ${event.location}</div>` : ''}
 				${event.description ? `<div style="font-size: 13px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color);">${event.description.replace(/\n/g, '<br>')}</div>` : ''}
 				<div style="margin-top: 15px; display: flex; gap: 8px;">
-					<button onclick="editCalendarEvent('${event._id}')" style="padding: 6px 12px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Edit</button>
-					<button onclick="deleteCalendarEvent('${event._id}')" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Delete</button>
+					<button  style="padding: 6px 12px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Edit</button>
+					<button  style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Delete</button>
 				</div>
 			`;
 			
@@ -8390,8 +8261,8 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 						popup.style.display = 'none';
 					}
 					// Refresh calendar and customer events list
-					await loadCalendarEvents();
-					renderCustomCalendar();
+					await //loadCalendarEvents();
+					//renderCustomCalendar();
 					// If we're in the customer profile, refresh events
 					if (currentLead) {
 						await loadCustomerEvents(currentLead._id);
@@ -8677,7 +8548,7 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 									
 									// Refresh the calendar view
 									if (typeof renderCustomCalendar === 'function') {
-										renderCustomCalendar();
+										//renderCustomCalendar();
 									}
 									return;
 								} catch (authError) {
@@ -8693,7 +8564,7 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 								
 								// Refresh the calendar view
 								if (typeof renderCustomCalendar === 'function') {
-									renderCustomCalendar();
+									//renderCustomCalendar();
 								}
 								return;
 							} catch (createError) {
@@ -8749,7 +8620,7 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 						
 						// Clear any Google events from local calendar
 						if (typeof renderCustomCalendar === 'function') {
-							renderCustomCalendar();
+							//renderCustomCalendar();
 						}
 					}
 				} else {
@@ -8761,10 +8632,10 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 						
 						// Load events and refresh calendar
 						if (typeof loadGoogleCalendarEvents === 'function') {
-							await loadGoogleCalendarEvents();
+							//await loadGoogleCalendarEvents();
 						}
 						if (typeof renderCustomCalendar === 'function') {
-							renderCustomCalendar();
+							//renderCustomCalendar();
 						}
 					} catch (authError) {
 						console.error('Authentication error:', authError);
@@ -8803,7 +8674,7 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 				
 				// Call the original refresh function
 				if (typeof renderCustomCalendar === 'function') {
-					renderCustomCalendar();
+					//renderCustomCalendar();
 				}
 				
 				showSuccess('Calendar refreshed successfully!');
@@ -8813,7 +8684,7 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 				
 				// Fallback to basic refresh
 				if (typeof renderCustomCalendar === 'function') {
-					renderCustomCalendar();
+					//renderCustomCalendar();
 				}
 			}
 		}
