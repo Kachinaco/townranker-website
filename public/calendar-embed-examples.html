@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Calendar Embed Options - TownRanker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .option {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .option h2 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .demo {
+            border: 2px dashed #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            background: #fafbff;
+            border-radius: 4px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Google Calendar Embed Options for TownRanker</h1>
+
+    <!-- Option 1: Simple Appointment Link -->
+    <div class="option">
+        <h2>Option 1: Appointment Booking Link (Currently Active)</h2>
+        <p>This is what you're currently using - a simple link to Google Calendar appointments.</p>
+        <div class="code-block">
+&lt;a href="https://calendar.app.google/A5f973NtuW9gW67s5" target="_blank"&gt;
+    Schedule an Appointment
+&lt;/a&gt;
+        </div>
+        <div class="demo">
+            <a href="https://calendar.app.google/A5f973NtuW9gW67s5" target="_blank">
+                <button>Schedule an Appointment</button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Option 2: Basic Calendar Embed -->
+    <div class="option">
+        <h2>Option 2: Basic Calendar Embed (iframe)</h2>
+        <p>Replace YOUR_CALENDAR_ID with your actual Google Calendar ID (usually your email).</p>
+        <div class="code-block">
+&lt;iframe 
+    src="https://calendar.google.com/calendar/embed?src=YOUR_CALENDAR_ID%40gmail.com&ctz=America%2FPhoenix" 
+    style="border: 0" 
+    width="800" 
+    height="600" 
+    frameborder="0" 
+    scrolling="no"&gt;
+&lt;/iframe&gt;
+        </div>
+        <div class="demo">
+            <p><strong>Demo:</strong> To see this working, you need to replace YOUR_CALENDAR_ID with your actual calendar ID.</p>
+            <p>Steps to get your calendar ID:</p>
+            <ol>
+                <li>Go to Google Calendar settings</li>
+                <li>Click on your calendar</li>
+                <li>Find "Calendar ID" in the integration section</li>
+                <li>It will look like: rank@townranker.com or a long string ending in @group.calendar.google.com</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Option 3: Customized Calendar Embed -->
+    <div class="option">
+        <h2>Option 3: Customized Calendar Embed</h2>
+        <p>A more stylish embed with custom colors matching TownRanker's theme.</p>
+        <div class="code-block">
+&lt;iframe 
+    src="https://calendar.google.com/calendar/embed?
+    height=600&amp;
+    wkst=1&amp;
+    bgcolor=%23ffffff&amp;
+    ctz=America%2FPhoenix&amp;
+    showTitle=1&amp;
+    showPrint=0&amp;
+    showCalendars=0&amp;
+    showTz=1&amp;
+    src=YOUR_CALENDAR_ID%40gmail.com&amp;
+    color=%23667eea" 
+    style="border: solid 1px #777" 
+    width="800" 
+    height="600" 
+    frameborder="0" 
+    scrolling="no"&gt;
+&lt;/iframe&gt;
+        </div>
+    </div>
+
+    <!-- Option 4: Google Calendar API Integration -->
+    <div class="option">
+        <h2>Option 4: Google Calendar API Integration</h2>
+        <p>Advanced integration using the Google Calendar API with your existing credentials.</p>
+        <div class="code-block">
+&lt;!-- Include Google API --&gt;
+&lt;script src="https://apis.google.com/js/api.js"&gt;&lt;/script&gt;
+
+&lt;div id="calendar-container"&gt;&lt;/div&gt;
+
+&lt;script&gt;
+// Your existing API credentials
+const CLIENT_ID = '410008002816-pja5c9estqiloavso5dinnc7ij2squ45.apps.googleusercontent.com';
+const API_KEY = 'AIzaSyAN8TZL-pbR-VRbgvjwVnjLJf9-SOGJABo';
+const CALENDAR_ID = 'rank@townranker.com'; // Replace with your calendar ID
+
+// Discovery doc for Calendar API
+const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
+
+// Authorization scopes
+const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
+
+function initializeGapiClient() {
+    gapi.client.init({
+        apiKey: API_KEY,
+        discoveryDocs: [DISCOVERY_DOC],
+    }).then(() => {
+        // Load calendar events
+        loadCalendarEvents();
+    });
+}
+
+function loadCalendarEvents() {
+    gapi.client.calendar.events.list({
+        'calendarId': CALENDAR_ID,
+        'timeMin': (new Date()).toISOString(),
+        'showDeleted': false,
+        'singleEvents': true,
+        'maxResults': 10,
+        'orderBy': 'startTime'
+    }).then(response => {
+        const events = response.result.items;
+        displayEvents(events);
+    });
+}
+
+function displayEvents(events) {
+    const container = document.getElementById('calendar-container');
+    if (events.length > 0) {
+        let html = '&lt;h3&gt;Upcoming Events&lt;/h3&gt;&lt;ul&gt;';
+        events.forEach(event => {
+            const when = event.start.dateTime || event.start.date;
+            html += `&lt;li&gt;${event.summary} - ${when}&lt;/li&gt;`;
+        });
+        html += '&lt;/ul&gt;';
+        container.innerHTML = html;
+    } else {
+        container.innerHTML = '&lt;p&gt;No upcoming events found.&lt;/p&gt;';
+    }
+}
+
+// Load the API client
+gapi.load('client', initializeGapiClient);
+&lt;/script&gt;
+        </div>
+    </div>
+
+    <!-- Option 5: Responsive Calendar Widget -->
+    <div class="option">
+        <h2>Option 5: Responsive Calendar Widget</h2>
+        <p>A responsive calendar that adjusts to different screen sizes.</p>
+        <div class="code-block">
+&lt;style&gt;
+.responsive-calendar {
+    position: relative;
+    padding-bottom: 75%;
+    height: 0;
+    overflow: hidden;
+}
+.responsive-calendar iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+}
+&lt;/style&gt;
+
+&lt;div class="responsive-calendar"&gt;
+    &lt;iframe 
+        src="https://calendar.google.com/calendar/embed?src=YOUR_CALENDAR_ID%40gmail.com&ctz=America%2FPhoenix"
+        frameborder="0" 
+        scrolling="no"&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+        </div>
+    </div>
+
+    <!-- Option 6: Appointment Scheduler Embed -->
+    <div class="option">
+        <h2>Option 6: Google Appointment Scheduler Embed</h2>
+        <p>Embed the appointment scheduling page directly in your site.</p>
+        <div class="code-block">
+&lt;iframe 
+    src="https://calendar.app.google/A5f973NtuW9gW67s5" 
+    width="100%" 
+    height="600" 
+    frameborder="0"&gt;
+&lt;/iframe&gt;
+        </div>
+        <div class="demo">
+            <p><strong>Note:</strong> Google Appointment pages may not always work in iframes due to security policies. Test this option first.</p>
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="option" style="background: #f0f4ff;">
+        <h2>📝 Implementation Instructions</h2>
+        <ol>
+            <li><strong>Get Your Calendar ID:</strong>
+                <ul>
+                    <li>Go to Google Calendar</li>
+                    <li>Click Settings → Settings</li>
+                    <li>Select your calendar</li>
+                    <li>Scroll to "Integrate calendar"</li>
+                    <li>Copy your Calendar ID</li>
+                </ul>
+            </li>
+            <li><strong>Choose Your Embed Style:</strong>
+                <ul>
+                    <li>Option 1-2: Simple, no authentication needed</li>
+                    <li>Option 3: Customizable appearance</li>
+                    <li>Option 4: Full API integration (most flexible)</li>
+                    <li>Option 5: Mobile-friendly</li>
+                </ul>
+            </li>
+            <li><strong>Customize Parameters:</strong>
+                <ul>
+                    <li><code>bgcolor</code>: Background color</li>
+                    <li><code>color</code>: Calendar color theme</li>
+                    <li><code>showTitle</code>: Show/hide calendar title</li>
+                    <li><code>showPrint</code>: Show/hide print button</li>
+                    <li><code>showCalendars</code>: Show/hide calendar list</li>
+                    <li><code>showTz</code>: Show/hide timezone</li>
+                    <li><code>mode</code>: WEEK, MONTH, or AGENDA</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <!-- Testing Area -->
+    <div class="option" style="background: #fff9e6;">
+        <h2>🧪 Test Your Calendar Embed</h2>
+        <p>Enter your Calendar ID to test the embed:</p>
+        <input type="text" id="calendarId" placeholder="your-email@gmail.com or calendar ID" style="width: 300px; padding: 8px; margin: 10px 0;">
+        <button onclick="testEmbed()">Test Embed</button>
+        <div id="testArea" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        function testEmbed() {
+            const calendarId = document.getElementById('calendarId').value;
+            if (!calendarId) {
+                alert('Please enter a Calendar ID');
+                return;
+            }
+            
+            const testArea = document.getElementById('testArea');
+            testArea.innerHTML = `
+                <iframe 
+                    src="https://calendar.google.com/calendar/embed?src=${encodeURIComponent(calendarId)}&ctz=America%2FPhoenix" 
+                    style="border: 2px solid #667eea; border-radius: 8px;" 
+                    width="100%" 
+                    height="400" 
+                    frameborder="0" 
+                    scrolling="no">
+                </iframe>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -1456,6 +1456,20 @@
 				font-size: 16px !important;
 				transform: translateZ(0);
 			}
+			/* Calendar responsive styles */
+			.calendar-embed-container {
+				padding: 15px !important;
+				margin-top: 20px !important;
+			}
+			.calendar-embed-container h3 {
+				font-size: 18px !important;
+			}
+			.calendar-embed-container #calendarIframe {
+				height: 400px !important;
+			}
+			.calendar-embed-container .material-icons {
+				font-size: 16px !important;
+			}
 		}
 		.conversation-status {
 			font-size: 12px;
@@ -2267,6 +2281,113 @@
 				</div>
 			</div>
 		</div>
+		
+		<!-- Interactive Google Calendar -->
+		<div class="calendar-embed-container" style="background: var(--bg-secondary); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); margin-top: 30px;">
+			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+				<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; color: var(--text-primary);">
+					<span class="material-icons" style="color: var(--primary);">calendar_month</span>
+					Schedule & Appointments
+				</h3>
+				<div style="display: flex; gap: 10px;">
+					<!-- Auth buttons -->
+					<button id="authorize_button" onclick="handleAuthClick()" 
+						style="background: #4285f4; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+						<span class="material-icons" style="font-size: 18px;">login</span>
+						Connect Calendar
+					</button>
+					<button id="signout_button" onclick="handleSignoutClick()" 
+						style="display: none; background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;">
+						Sign Out
+					</button>
+					<button onclick="openEventModal()" 
+						id="create_event_btn"
+						style="display: none; background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; display: none; align-items: center; gap: 8px;">
+						<span class="material-icons" style="font-size: 18px;">add_circle</span>
+						New Event
+					</button>
+					<a href="https://calendar.app.google/A5f973NtuW9gW67s5" target="_blank" 
+						style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); text-decoration: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+						<span class="material-icons" style="font-size: 18px;">open_in_new</span>
+						Google Calendar
+					</a>
+					<button onclick="loadCalendarEvents()" 
+						style="background: transparent; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; cursor: pointer; color: var(--text-secondary);" 
+						title="Refresh Calendar">
+						<span class="material-icons" style="font-size: 18px;">refresh</span>
+					</button>
+				</div>
+			</div>
+			
+			<!-- Interactive Calendar Container -->
+			<div id="interactiveCalendar" style="display: none; min-height: 400px;">
+				<div id="calendarEventsList" style="background: white; border-radius: 8px; padding: 20px; min-height: 400px; max-height: 600px; overflow-y: auto;">
+					<!-- Events will be loaded here -->
+				</div>
+			</div>
+			
+			<!-- Fallback iframe -->
+			<div id="calendarFallback" style="position: relative; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+				<iframe id="calendarIframe"
+					src="https://calendar.google.com/calendar/embed?height=600&wkst=1&bgcolor=%23ffffff&ctz=America%2FPhoenix&showTitle=0&showPrint=0&showCalendars=0&showTz=0&mode=WEEK&src=rank%40townranker.com&color=%236366f1" 
+					style="border: 0; width: 100%; height: 600px;" 
+					frameborder="0" 
+					scrolling="no">
+				</iframe>
+			</div>
+			
+			<div style="margin-top: 15px; padding: 12px; background: var(--bg-primary); border-radius: 6px; display: flex; align-items: center; gap: 10px;">
+				<span class="material-icons" style="color: var(--primary); font-size: 20px;">info</span>
+				<p style="margin: 0; color: var(--text-secondary); font-size: 14px;">
+					Connect your Google Calendar to create, edit, and manage events directly. Click "Connect Calendar" to enable interactive features.
+				</p>
+			</div>
+		</div>
+		
+		<!-- Event Modal -->
+		<div id="eventModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999;">
+			<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+					<h2 id="modalTitle" style="margin: 0; color: #1f2937;">Create New Event</h2>
+					<button onclick="closeEventModal()" style="background: none; border: none; cursor: pointer; font-size: 24px; color: #6b7280;">&times;</button>
+				</div>
+				<form id="eventForm" onsubmit="event.preventDefault();">
+					<div style="margin-bottom: 15px;">
+						<label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500;">Event Title *</label>
+						<input type="text" name="summary" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+					</div>
+					<div style="margin-bottom: 15px;">
+						<label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500;">Location</label>
+						<input type="text" name="location" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+					</div>
+					<div style="margin-bottom: 15px;">
+						<label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500;">Description</label>
+						<textarea name="description" rows="3" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; resize: vertical;"></textarea>
+					</div>
+					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+						<div>
+							<label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500;">Start Date & Time *</label>
+							<input type="datetime-local" name="startDateTime" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+						</div>
+						<div>
+							<label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500;">End Date & Time *</label>
+							<input type="datetime-local" name="endDateTime" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+						</div>
+					</div>
+					<div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+						<button type="button" onclick="closeEventModal()" 
+							style="background: transparent; border: 1px solid #d1d5db; color: #6b7280; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px;">
+							Cancel
+						</button>
+						<button type="submit" id="submitEventBtn" onclick="createEvent()" 
+							style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px;">
+							Create Event
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		
 		<!-- Google Calendar - HIDDEN -->
 		<div class="calendar-container" style="display: none !important;">
 			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -8830,5 +8951,42 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 		window.enhancedRefreshCalendar = enhancedRefreshCalendar;
 
 	</script>
+	
+	<!-- Server-side Calendar Script (works in private browser) -->
+	<script src="js/calendar-server.js"></script>
+	
+	<script>
+	// Update the showCalendarInterface function to work with the UI
+	function showCalendarInterface() {
+		const container = document.getElementById('interactiveCalendar');
+		const fallback = document.getElementById('calendarFallback');
+		const createBtn = document.getElementById('create_event_btn');
+		
+		if (container && fallback) {
+			container.style.display = 'block';
+			fallback.style.display = 'none';
+			if (createBtn) {
+				createBtn.style.display = 'flex';
+			}
+		}
+		loadCalendarEvents();
+	}
+
+	// Update hideCalendarInterface to show iframe again
+	function hideCalendarInterface() {
+		const container = document.getElementById('interactiveCalendar');
+		const fallback = document.getElementById('calendarFallback');
+		const createBtn = document.getElementById('create_event_btn');
+		
+		if (container && fallback) {
+			container.style.display = 'none';
+			fallback.style.display = 'block';
+			if (createBtn) {
+				createBtn.style.display = 'none';
+			}
+		}
+	}
+	</script>
+	
 </body>
 </html>

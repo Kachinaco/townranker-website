@@ -28,6 +28,7 @@ Crawl-delay: 1
 
 # Sitemap location
 Sitemap: https://townranker.com/sitemap.xml
+Sitemap: https://www.townranker.com/sitemap.xml
 
 # Block bad bots
 User-agent: AhrefsBot
