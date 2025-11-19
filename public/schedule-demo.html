@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Schedule - TownRanker</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Import Maps for ES Modules -->
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom": "https://esm.sh/react-dom@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "lucide-react": "https://esm.sh/lucide-react@0.263.1",
+        "htm": "https://esm.sh/htm@3.1.1"
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    #root {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Custom scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="module">
+    import React, { useState } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import Schedule from './components/Schedule.js';
+
+    // Sample employee data
+    const initialEmployees = [
+      {
+        id: 'emp-1',
+        name: 'Sarah Johnson',
+        role: 'Manager',
+        avatar: 'https://i.pravatar.cc/150?img=1'
+      },
+      {
+        id: 'emp-2',
+        name: 'Mike Chen',
+        role: 'Server',
+        avatar: 'https://i.pravatar.cc/150?img=2'
+      },
+      {
+        id: 'emp-3',
+        name: 'Emily Davis',
+        role: 'Cook',
+        avatar: 'https://i.pravatar.cc/150?img=3'
+      },
+      {
+        id: 'emp-4',
+        name: 'James Wilson',
+        role: 'Bartender',
+        avatar: 'https://i.pravatar.cc/150?img=4'
+      },
+      {
+        id: 'emp-5',
+        name: 'Lisa Anderson',
+        role: 'Host',
+        avatar: 'https://i.pravatar.cc/150?img=5'
+      },
+      {
+        id: 'emp-6',
+        name: 'Tom Martinez',
+        role: 'Busser',
+        avatar: 'https://i.pravatar.cc/150?img=6'
+      }
+    ];
+
+    // Sample shift data
+    const getInitialShifts = () => {
+      const today = new Date();
+      const shifts = [];
+
+      // Generate some sample shifts for the current week
+      const employees = initialEmployees;
+
+      // Sarah (Manager) - weekdays morning
+      for (let i = 1; i <= 5; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - today.getDay() + i);
+        shifts.push({
+          id: `shift-mgr-${i}`,
+          employeeId: 'emp-1',
+          employeeName: 'Sarah Johnson',
+          date: date.toISOString().split('T')[0],
+          startTime: '08:00',
+          endTime: '16:00',
+          role: 'Manager'
+        });
+      }
+
+      // Mike (Server) - alternating days
+      [1, 3, 5].forEach((day, idx) => {
+        const date = new Date(today);
+        date.setDate(today.getDate() - today.getDay() + day);
+        shifts.push({
+          id: `shift-srv-${idx}`,
+          employeeId: 'emp-2',
+          employeeName: 'Mike Chen',
+          date: date.toISOString().split('T')[0],
+          startTime: '11:00',
+          endTime: '19:00',
+          role: 'Server'
+        });
+      });
+
+      // Emily (Cook) - weekdays
+      for (let i = 1; i <= 5; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - today.getDay() + i);
+        shifts.push({
+          id: `shift-cook-${i}`,
+          employeeId: 'emp-3',
+          employeeName: 'Emily Davis',
+          date: date.toISOString().split('T')[0],
+          startTime: '10:00',
+          endTime: '18:00',
+          role: 'Cook'
+        });
+      }
+
+      // James (Bartender) - evening shifts
+      [2, 4, 5, 6].forEach((day, idx) => {
+        const date = new Date(today);
+        date.setDate(today.getDate() - today.getDay() + day);
+        shifts.push({
+          id: `shift-bar-${idx}`,
+          employeeId: 'emp-4',
+          employeeName: 'James Wilson',
+          date: date.toISOString().split('T')[0],
+          startTime: '17:00',
+          endTime: '23:00',
+          role: 'Bartender'
+        });
+      });
+
+      return shifts;
+    };
+
+    // App Component
+    function App() {
+      const [employees] = useState(initialEmployees);
+      const [shifts, setShifts] = useState(getInitialShifts());
+
+      const handleAddShift = (newShift) => {
+        setShifts([...shifts, newShift]);
+        console.log('Shift added:', newShift);
+      };
+
+      const handleUpdateShift = (shiftId, updates) => {
+        setShifts(shifts.map(shift =>
+          shift.id === shiftId ? { ...shift, ...updates } : shift
+        ));
+        console.log('Shift updated:', shiftId, updates);
+      };
+
+      const handleDeleteShift = (shiftId) => {
+        setShifts(shifts.filter(shift => shift.id !== shiftId));
+        console.log('Shift deleted:', shiftId);
+      };
+
+      return React.createElement(Schedule, {
+        employees,
+        shifts,
+        onAddShift: handleAddShift,
+        onUpdateShift: handleUpdateShift,
+        onDeleteShift: handleDeleteShift
+      });
+    }
+
+    // Render the app
+    const root = createRoot(document.getElementById('root'));
+    root.render(React.createElement(App));
+  </script>
+</body>
+</html>

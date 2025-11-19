@@ -173,6 +173,16 @@ class FrontendErrorHandler {
 
         this.logError(networkError);
 
+        // Don't show popups on the landing page - only log to console
+        const isLandingPage = window.location.pathname === '/' ||
+                             window.location.pathname === '/index.html' ||
+                             !document.getElementById('dashboard');
+
+        if (isLandingPage) {
+            console.warn('[Silent] Network error on landing page:', url, error.message);
+            return; // Don't show popup on landing page
+        }
+
         // Determine appropriate user message
         let userMessage = 'Network error occurred. Please check your connection.';
         let severity = 'error';

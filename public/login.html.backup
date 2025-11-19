@@ -195,6 +195,65 @@
 			cursor: pointer;
 			transition: all 0.3s ease;
 		}
+		.calendar-status-group {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-end;
+			gap: 4px;
+		}
+		.calendar-status-badge {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			padding: 4px 12px;
+			border-radius: 999px;
+			font-size: 0.85rem;
+			font-weight: 600;
+			background: var(--gray-100);
+			color: var(--gray-700);
+		}
+		.calendar-status-badge::before {
+			content: '';
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background: #9ca3af;
+		}
+		.calendar-status-badge[data-status="connected"] {
+			background: #dcfce7;
+			color: #15803d;
+		}
+		.calendar-status-badge[data-status="connected"]::before {
+			background: #22c55e;
+		}
+		.calendar-status-badge[data-status="disconnected"],
+		.calendar-status-badge[data-status="error"] {
+			background: #fee2e2;
+			color: #b91c1c;
+		}
+		.calendar-status-badge[data-status="disconnected"]::before,
+		.calendar-status-badge[data-status="error"]::before {
+			background: #ef4444;
+		}
+		.calendar-status-badge[data-status="pending"] {
+			background: #fef9c3;
+			color: #a16207;
+		}
+		.calendar-status-badge[data-status="pending"]::before {
+			background: #facc15;
+		}
+		.calendar-status-badge[data-status="loading"]::before {
+			animation: pulse 1.2s infinite;
+		}
+		.calendar-status-hint {
+			font-size: 0.75rem;
+			color: var(--text-secondary);
+		}
+		@keyframes pulse {
+			0% { opacity: 0.4; }
+			50% { opacity: 1; }
+			100% { opacity: 0.4; }
+		}
 		.btn-primary {
 			background: var(--primary);
 			color: white;
@@ -1456,6 +1515,20 @@
 				font-size: 16px !important;
 				transform: translateZ(0);
 			}
+			/* Calendar responsive styles */
+			.calendar-embed-container {
+				padding: 15px !important;
+				margin-top: 20px !important;
+			}
+			.calendar-embed-container h3 {
+				font-size: 18px !important;
+			}
+			.calendar-embed-container #calendarIframe {
+				height: 400px !important;
+			}
+			.calendar-embed-container .material-icons {
+				font-size: 16px !important;
+			}
 		}
 		.conversation-status {
 			font-size: 12px;
@@ -2202,6 +2275,22 @@
 			}
 		}
 	</style>
+
+	<!-- Tailwind CSS for Schedule Component -->
+	<script src="https://cdn.tailwindcss.com"></script>
+
+	<!-- Import Maps for React Schedule Component -->
+	<script type="importmap">
+		{
+			"imports": {
+				"react": "https://esm.sh/react@18.2.0",
+				"react-dom": "https://esm.sh/react-dom@18.2.0",
+				"react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+				"lucide-react": "https://esm.sh/lucide-react@latest",
+				"htm": "https://esm.sh/htm@3.1.1"
+			}
+		}
+	</script>
 </head>
 <body>
 	<!-- Login Screen -->
@@ -2267,8 +2356,58 @@
 				</div>
 			</div>
 		</div>
-		<!-- Google Calendar -->
-		<div class="calendar-container" style="margin: 30px 0; background: var(--bg-secondary); border-radius: 12px; padding: 20px; box-shadow: var(--shadow);">
+		
+		<!-- Employee Schedule Component -->
+		<div id="schedule-container" style="margin-top: 30px; height: calc(100vh - 200px); min-height: 600px; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow);">
+			<!-- React Schedule Component will mount here -->
+		</div>
+                <!-- Employee Schedule Component -->
+                <div id="schedule-container" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mt-8 h-[600px]">
+                        <!-- React Schedule Component will mount here -->
+                </div>
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+					<h2 id="modalTitle" style="margin: 0; color: #1f2937;">Create New Event</h2>
+					<button onclick="closeEventModal()" style="background: none; border: none; cursor: pointer; font-size: 24px; color: #6b7280;">&times;</button>
+				</div>
+				<form id="eventForm" onsubmit="event.preventDefault();">
+					<div style="margin-bottom: 15px;">
+						<label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500;">Event Title *</label>
+						<input type="text" name="summary" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+					</div>
+					<div style="margin-bottom: 15px;">
+						<label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500;">Location</label>
+						<input type="text" name="location" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+					</div>
+					<div style="margin-bottom: 15px;">
+						<label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500;">Description</label>
+						<textarea name="description" rows="3" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; resize: vertical;"></textarea>
+					</div>
+					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+						<div>
+							<label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500;">Start Date & Time *</label>
+							<input type="datetime-local" name="startDateTime" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+						</div>
+						<div>
+							<label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500;">End Date & Time *</label>
+							<input type="datetime-local" name="endDateTime" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+						</div>
+					</div>
+					<div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+						<button type="button" onclick="closeEventModal()" 
+							style="background: transparent; border: 1px solid #d1d5db; color: #6b7280; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px;">
+							Cancel
+						</button>
+						<button type="submit" id="submitEventBtn" onclick="createEvent()" 
+							style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px;">
+							Create Event
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		
+		<!-- Google Calendar - HIDDEN -->
+		<div class="calendar-container" style="display: none !important;">
 			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
 				<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; color: var(--text-primary);">
 					<span class="material-icons" style="color: var(--primary);">calendar_month</span>
@@ -8830,5 +8969,877 @@ For now, events will open Google Calendar in your browser for manual creation.`)
 		window.enhancedRefreshCalendar = enhancedRefreshCalendar;
 
 	</script>
+	
+	<!-- Server-side Calendar Script (works in private browser) -->
+	<script src="js/calendar-server.js"></script>
+	
+	<script>
+	const baseShowCalendarInterface = window.showCalendarInterface;
+	window.showCalendarInterface = function enhancedShowCalendarInterface() {
+		if (typeof baseShowCalendarInterface === 'function') {
+			baseShowCalendarInterface();
+		}
+		const container = document.getElementById('interactiveCalendar');
+		const fallback = document.getElementById('calendarFallback');
+		const createBtn = document.getElementById('create_event_btn');
+		
+		if (container && fallback) {
+			container.style.display = 'block';
+			fallback.style.display = 'none';
+			if (createBtn) {
+				createBtn.style.display = 'flex';
+			}
+		}
+	};
+
+	const baseHideCalendarInterface = window.hideCalendarInterface;
+	window.hideCalendarInterface = function enhancedHideCalendarInterface() {
+		if (typeof baseHideCalendarInterface === 'function') {
+			baseHideCalendarInterface();
+		}
+		const container = document.getElementById('interactiveCalendar');
+		const fallback = document.getElementById('calendarFallback');
+		const createBtn = document.getElementById('create_event_btn');
+		
+		if (container && fallback) {
+			container.style.display = 'none';
+			fallback.style.display = 'block';
+			if (createBtn) {
+				createBtn.style.display = 'none';
+			}
+		}
+	};
+	</script>
+
+	<!-- Employee Schedule Component Initialization -->
+	<script type="module">
+		import React, { useState, useEffect, useMemo, createElement } from 'react';
+		import { createRoot } from 'react-dom/client';
+import { ChevronLeft, ChevronRight, Calendar, Plus, X, Sparkles, DollarSign, Clock } from 'lucide-react';
+import htm from 'htm';
+
+const ROLE_COLORS = {
+  "Manager": "bg-purple-500",
+  "Server": "bg-blue-500",
+  "Cook": "bg-orange-500",
+  "Bartender": "bg-green-500",
+  "Host": "bg-pink-500",
+  "Busser": "bg-yellow-500",
+  "Default": "bg-slate-500"
+};
+
+const HOURLY_RATES = {
+  "Manager": 25,
+  "Server": 12,
+  "Cook": 18,
+  "Bartender": 15,
+  "Host": 13,
+  "Busser": 11,
+  "Default": 15
+};
+
+const html = htm.bind(createElement);
+
+function Schedule({ employees = [], shifts = [], onAddShift, onUpdateShift, onDeleteShift }) {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [selectedCell, setSelectedCell] = useState(null);
+  const [newShift, setNewShift] = useState({
+    employeeId: '',
+    date: '',
+    startTime: '09:00',
+    endTime: '17:00',
+    role: ''
+  });
+  const [aiRequirements, setAIRequirements] = useState('');
+
+  // Calculate week dates
+  const weekDates = useMemo(() => {
+    const dates = [];
+    const startOfWeek = new Date(currentDate);
+    const day = startOfWeek.getDay();
+    const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1); // Start on Monday
+    startOfWeek.setDate(diff);
+
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
+      dates.push(date);
+    }
+    return dates;
+  }, [currentDate]);
+
+  // Format date for display
+  const formatDate = (date) => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const day = days[date.getDay()];
+    const dateNum = date.getDate();
+    return { day, dateNum };
+  };
+
+  // Format date to YYYY-MM-DD
+  const toDateString = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+
+  // Get shifts for a specific employee and date
+  const getShiftsForCell = (employeeId, date) => {
+    const dateStr = toDateString(date);
+    return shifts.filter(
+      shift => shift.employeeId === employeeId && shift.date === dateStr
+    );
+  };
+
+  // Calculate total hours for a shift
+  const calculateHours = (startTime, endTime) => {
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
+    const start = startHour + startMin / 60;
+    const end = endHour + endMin / 60;
+    return end - start;
+  };
+
+  // Calculate metrics for the week
+  const weekMetrics = useMemo(() => {
+    let totalHours = 0;
+    let totalCost = 0;
+
+    weekDates.forEach(date => {
+      const dateStr = toDateString(date);
+      const dayShifts = shifts.filter(shift => shift.date === dateStr);
+
+      dayShifts.forEach(shift => {
+        const hours = calculateHours(shift.startTime, shift.endTime);
+        const rate = HOURLY_RATES[shift.role] || HOURLY_RATES.Default;
+        totalHours += hours;
+        totalCost += hours * rate;
+      });
+    });
+
+    return { totalHours, totalCost };
+  }, [shifts, weekDates]);
+
+  // Navigate to previous week
+  const previousWeek = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() - 7);
+    setCurrentDate(newDate);
+  };
+
+  // Navigate to next week
+  const nextWeek = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + 7);
+    setCurrentDate(newDate);
+  };
+
+  // Navigate to today
+  const goToToday = () => {
+    setCurrentDate(new Date());
+  };
+
+  // Handle cell click to add shift
+  const handleCellClick = (employee, date) => {
+    const dateStr = toDateString(date);
+    setSelectedCell({ employee, date: dateStr });
+    setNewShift({
+      employeeId: employee.id,
+      date: dateStr,
+      startTime: '09:00',
+      endTime: '17:00',
+      role: employee.role
+    });
+    setShowAddModal(true);
+  };
+
+  // Handle add shift
+  const handleAddShift = () => {
+    if (!newShift.employeeId || !newShift.date || !newShift.startTime || !newShift.endTime) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    const employee = employees.find(e => e.id === newShift.employeeId);
+    const shift = {
+      id: `shift-${Date.now()}`,
+      employeeId: newShift.employeeId,
+      employeeName: employee?.name || '',
+      date: newShift.date,
+      startTime: newShift.startTime,
+      endTime: newShift.endTime,
+      role: newShift.role
+    };
+
+    if (onAddShift) {
+      onAddShift(shift);
+    }
+
+    setShowAddModal(false);
+    setNewShift({
+      employeeId: '',
+      date: '',
+      startTime: '09:00',
+      endTime: '17:00',
+      role: ''
+    });
+  };
+
+  // Handle AI auto-schedule
+  const handleAISchedule = () => {
+    // Mock implementation - replace with actual AI logic
+    console.log('AI Schedule Requirements:', aiRequirements);
+
+    // Generate mock schedule
+    const generatedShifts = [];
+    employees.forEach((employee, empIndex) => {
+      weekDates.forEach((date, dateIndex) => {
+        // Generate shifts for alternating days
+        if ((empIndex + dateIndex) % 2 === 0) {
+          generatedShifts.push({
+            id: `ai-shift-${Date.now()}-${empIndex}-${dateIndex}`,
+            employeeId: employee.id,
+            employeeName: employee.name,
+            date: toDateString(date),
+            startTime: empIndex % 2 === 0 ? '09:00' : '14:00',
+            endTime: empIndex % 2 === 0 ? '17:00' : '22:00',
+            role: employee.role
+          });
+        }
+      });
+    });
+
+    // Call onAddShift for each generated shift
+    if (onAddShift) {
+      generatedShifts.forEach(shift => onAddShift(shift));
+    }
+
+    setShowAIModal(false);
+    setAIRequirements('');
+  };
+
+  // Get role color
+  const getRoleColor = (role) => {
+    return ROLE_COLORS[role] || ROLE_COLORS.Default;
+  };
+
+  // Check if date is today
+  const isToday = (date) => {
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  };
+
+  return html`
+    <div className="w-full h-screen flex flex-col bg-slate-50">
+      <div className="bg-white border-b border-slate-200 px-6 py-4">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-bold text-slate-900">Employee Schedule</h1>
+
+          <button
+            onClick=${() => setShowAIModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            ${createElement(Sparkles, { size: 18 })}
+            AI Auto-Schedule
+          </button>
+        </div>
+
+        <div className="flex gap-4">
+          <div className="flex-1 bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <div className="flex items-center gap-2 text-blue-700 mb-1">
+              <${Clock} size=${18} />
+              <span className="text-sm font-medium">Total Hours</span>
+            </div>
+            <div className="text-2xl font-bold text-blue-900">
+              ${weekMetrics.totalHours.toFixed(1)}h
+            </div>
+          </div>
+
+          <div className="flex-1 bg-green-50 rounded-lg p-4 border border-green-200">
+            <div className="flex items-center gap-2 text-green-700 mb-1">
+              <${DollarSign} size=${18} />
+              <span className="text-sm font-medium">Estimated Cost</span>
+            </div>
+            <div className="text-2xl font-bold text-green-900">
+              $${weekMetrics.totalCost.toFixed(2)}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <button
+            onClick=${previousWeek}
+            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            title="Previous Week"
+          >
+            <${ChevronLeft} size=${20} className="text-slate-600" />
+          </button>
+
+          <button
+            onClick=${goToToday}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          >
+            Today
+          </button>
+
+          <button
+            onClick=${nextWeek}
+            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            title="Next Week"
+          >
+            <${ChevronRight} size=${20} className="text-slate-600" />
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 text-slate-700">
+          <${Calendar} size=${18} />
+          <span className="font-medium">
+            ${weekDates[0]?.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} - ${weekDates[6]?.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-auto">
+        <div className="inline-block min-w-full">
+          <div className="grid" style=${{ gridTemplateColumns: '250px repeat(7, 150px)' }}>
+            <div className="sticky top-0 z-20 bg-slate-100 border-b-2 border-slate-300 px-4 py-3">
+              <span className="font-semibold text-slate-700">Employee</span>
+            </div>
+
+            ${weekDates.map((date, idx) => {
+              const { day, dateNum } = formatDate(date);
+              const today = isToday(date);
+
+              return html`
+                <div
+                  key=${idx}
+                  className=${`sticky top-0 z-20 border-b-2 border-slate-300 px-3 py-3 text-center ${
+                    today ? 'bg-blue-100 border-blue-400' : 'bg-slate-100'
+                  }`}
+                >
+                  <div className=${`font-semibold ${today ? 'text-blue-700' : 'text-slate-700'}`}>
+                    ${day}
+                  </div>
+                  <div className=${`text-lg ${today ? 'text-blue-900' : 'text-slate-900'}`}>
+                    ${dateNum}
+                  </div>
+                </div>
+              `;
+            })}
+
+            ${employees.map((employee, empIdx) => [
+              html`<div key=${`${employee.id}-info`} className="sticky left-0 z-10 bg-white border-b border-r-2 border-slate-200 px-4 py-4">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src=${employee.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(employee.name)}&background=6366f1&color=fff`}
+                      alt=${employee.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div>
+                      <div className="font-medium text-slate-900">${employee.name}</div>
+                      <div className="text-sm text-slate-600">${employee.role}</div>
+                    </div>
+                  </div>
+                </div>`,
+              ...weekDates.map((date, dateIdx) => {
+                  const cellShifts = getShiftsForCell(employee.id, date);
+                  const today = isToday(date);
+
+                  return html`
+                    <div
+                      key=${`${employee.id}-${dateIdx}`}
+                      onClick=${() => handleCellClick(employee, date)}
+                      className=${`border-b border-slate-200 p-2 min-h-[80px] cursor-pointer transition-colors ${
+                        today ? 'bg-blue-50 hover:bg-blue-100' : 'bg-white hover:bg-slate-50'
+                      }`}
+                    >
+                      ${cellShifts.length === 0 ? html`
+                        <div className="flex items-center justify-center h-full opacity-0 hover:opacity-100 transition-opacity">
+                          <${Plus} size=${20} className="text-slate-400" />
+                        </div>
+                      ` : html`
+                        <div className="space-y-2">
+                          ${cellShifts.map(shift => html`
+                            <div
+                              key=${shift.id}
+                              className=${`${getRoleColor(shift.role)} text-white rounded-md px-2 py-1 text-xs font-medium`}
+                              onClick=${(e) => e.stopPropagation()}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span>${shift.startTime} - ${shift.endTime}</span>
+                                <button
+                                  onClick=${(e) => {
+                                    e.stopPropagation();
+                                    if (onDeleteShift) onDeleteShift(shift.id);
+                                  }}
+                                  className="opacity-70 hover:opacity-100"
+                                >
+                                  <${X} size=${14} />
+                                </button>
+                              </div>
+                              <div className="text-xs opacity-90 mt-1">
+                                ${shift.role}
+                              </div>
+                            </div>
+                          `)}
+                        </div>
+                      `}
+                    </div>
+                  `;
+                })
+            ])}
+          </div>
+        </div>
+      </div>
+
+      ${showAddModal && html`
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-slate-900">Add Shift</h2>
+              <button
+                onClick=${() => setShowAddModal(false)}
+                className="p-1 hover:bg-slate-100 rounded"
+              >
+                <${X} size=${20} className="text-slate-600" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Employee
+                </label>
+                <select
+                  value=${newShift.employeeId}
+                  onChange=${(e) => {
+                    const emp = employees.find(e => e.id === e.target.value);
+                    setNewShift({ ...newShift, employeeId: e.target.value, role: emp?.role || '' });
+                  }}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Employee</option>
+                  ${employees.map(emp => html`
+                    <option key=${emp.id} value=${emp.id}>
+                      ${emp.name} - ${emp.role}
+                    </option>
+                  `)}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  value=${newShift.date}
+                  onChange=${(e) => setNewShift({ ...newShift, date: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Start Time
+                  </label>
+                  <input
+                    type="time"
+                    value=${newShift.startTime}
+                    onChange=${(e) => setNewShift({ ...newShift, startTime: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    End Time
+                  </label>
+                  <input
+                    type="time"
+                    value=${newShift.endTime}
+                    onChange=${(e) => setNewShift({ ...newShift, endTime: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Role
+                </label>
+                <select
+                  value=${newShift.role}
+                  onChange=${(e) => setNewShift({ ...newShift, role: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Role</option>
+                  ${Object.keys(ROLE_COLORS).filter(r => r !== 'Default').map(role => html`
+                    <option key=${role} value=${role}>${role}</option>
+                  `)}
+                </select>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick=${() => setShowAddModal(false)}
+                  className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick=${handleAddShift}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Add Shift
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `}
+
+      ${showAIModal && html`
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <${Sparkles} className="text-purple-600" size=${24} />
+                AI Auto-Schedule
+              </h2>
+              <button
+                onClick=${() => setShowAIModal(false)}
+                className="p-1 hover:bg-slate-100 rounded"
+              >
+                <${X} size=${20} className="text-slate-600" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Describe your scheduling requirements:
+                </label>
+                <textarea
+                  value=${aiRequirements}
+                  onChange=${(e) => setAIRequirements(e.target.value)}
+                  placeholder="E.g., Need 2 servers for lunch shifts, 1 manager always on duty, avoid back-to-back shifts..."
+                  rows=${6}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                />
+              </div>
+
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <p className="text-sm text-purple-800">
+                  <strong>AI will consider:</strong> Employee availability, labor laws, role requirements,
+                  and cost optimization when generating the schedule.
+                </p>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick=${() => setShowAIModal(false)}
+                  className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick=${handleAISchedule}
+                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  <${Sparkles} size=${18} />
+                  Generate Schedule
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+		// Sample employee data - replace with your actual data source
+		const sampleEmployees = [
+			{
+				id: 'emp-1',
+				name: 'Sarah Johnson',
+				role: 'Manager',
+				avatar: 'https://i.pravatar.cc/150?img=1'
+			},
+			{
+				id: 'emp-2',
+				name: 'Mike Chen',
+				role: 'Server',
+				avatar: 'https://i.pravatar.cc/150?img=2'
+			},
+			{
+				id: 'emp-3',
+				name: 'Emily Davis',
+				role: 'Cook',
+				avatar: 'https://i.pravatar.cc/150?img=3'
+			},
+			{
+				id: 'emp-4',
+				name: 'James Wilson',
+				role: 'Bartender',
+				avatar: 'https://i.pravatar.cc/150?img=4'
+			},
+			{
+				id: 'emp-5',
+				name: 'Lisa Anderson',
+				role: 'Host',
+				avatar: 'https://i.pravatar.cc/150?img=5'
+			},
+			{
+				id: 'emp-6',
+				name: 'Tom Martinez',
+				role: 'Busser',
+				avatar: 'https://i.pravatar.cc/150?img=6'
+			}
+		];
+
+		// Generate sample shifts for the current week
+		function generateSampleShifts() {
+			const today = new Date();
+			const shifts = [];
+
+			// Sarah (Manager) - weekdays morning
+			for (let i = 1; i <= 5; i++) {
+				const date = new Date(today);
+				date.setDate(today.getDate() - today.getDay() + i);
+				shifts.push({
+					id: `shift-mgr-${i}`,
+					employeeId: 'emp-1',
+					employeeName: 'Sarah Johnson',
+					date: date.toISOString().split('T')[0],
+					startTime: '08:00',
+					endTime: '16:00',
+					role: 'Manager'
+				});
+			}
+
+			// Mike (Server) - alternating days
+			[1, 3, 5].forEach((day, idx) => {
+				const date = new Date(today);
+				date.setDate(today.getDate() - today.getDay() + day);
+				shifts.push({
+					id: `shift-srv-${idx}`,
+					employeeId: 'emp-2',
+					employeeName: 'Mike Chen',
+					date: date.toISOString().split('T')[0],
+					startTime: '11:00',
+					endTime: '19:00',
+					role: 'Server'
+				});
+			});
+
+			// Emily (Cook) - weekdays
+			for (let i = 1; i <= 5; i++) {
+				const date = new Date(today);
+				date.setDate(today.getDate() - today.getDay() + i);
+				shifts.push({
+					id: `shift-cook-${i}`,
+					employeeId: 'emp-3',
+					employeeName: 'Emily Davis',
+					date: date.toISOString().split('T')[0],
+					startTime: '10:00',
+					endTime: '18:00',
+					role: 'Cook'
+				});
+			}
+
+			// James (Bartender) - evening shifts
+			[2, 4, 5, 6].forEach((day, idx) => {
+				const date = new Date(today);
+				date.setDate(today.getDate() - today.getDay() + day);
+				shifts.push({
+					id: `shift-bar-${idx}`,
+					employeeId: 'emp-4',
+					employeeName: 'James Wilson',
+					date: date.toISOString().split('T')[0],
+					startTime: '17:00',
+					endTime: '23:00',
+					role: 'Bartender'
+				});
+			});
+
+			return shifts;
+		}
+
+		// App Component
+                // Error Boundary Component
+                class ErrorBoundary extends React.Component {
+                    constructor(props) {
+                        super(props);
+                        this.state = { hasError: false, error: null, errorInfo: null };
+                    }
+
+                    static getDerivedStateFromError(error) {
+                        return { hasError: true, error };
+                    }
+
+                    componentDidCatch(error, errorInfo) {
+                        console.error("Schedule Component Error:", error, errorInfo);
+                        this.setState({ errorInfo });
+                    }
+
+                    render() {
+                        if (this.state.hasError) {
+                            return React.createElement("div", { style: { padding: "20px", border: "1px solid red", borderRadius: "8px", background: "#fff0f0", color: "#d8000c" } },
+                                React.createElement("h3", { style: { marginTop: 0 } }, "Something went wrong loading the schedule."),
+                                React.createElement("pre", { style: { whiteSpace: "pre-wrap", fontSize: "12px" } }, this.state.error && this.state.error.toString())
+                            );
+                        }
+                        return this.props.children;
+                    }
+                }
+
+		function ScheduleApp() {
+			const [employees, setEmployees] = useState([]);
+			const [shifts, setShifts] = useState([]);
+
+useEffect(() => {
+    // Use sample data since APIs are not implemented yet
+    console.log("Loading sample data...");
+    setEmployees(sampleEmployees);
+    setShifts(generateSampleShifts());
+}, []);
+
+			const handleAddShift = async (newShift) => {
+				// TODO: Replace with API call to save shift
+				// const response = await fetch('/api/shifts', {
+				//   method: 'POST',
+				//   headers: { 'Content-Type': 'application/json' },
+				//   body: JSON.stringify(newShift)
+				// });
+				// if (response.ok) {
+				//   const savedShift = await response.json();
+				//   setShifts([...shifts, savedShift]);
+				// }
+
+				// For now, just add to local state
+				setShifts([...shifts, newShift]);
+				console.log('Shift added:', newShift);
+			};
+
+			const handleUpdateShift = async (shiftId, updates) => {
+				// TODO: Replace with API call
+				setShifts(shifts.map(shift =>
+					shift.id === shiftId ? { ...shift, ...updates } : shift
+				));
+				console.log('Shift updated:', shiftId, updates);
+			};
+
+			const handleDeleteShift = async (shiftId) => {
+				// TODO: Replace with API call
+				// await fetch(`/api/shifts/${shiftId}`, { method: 'DELETE' });
+
+				// For now, just remove from local state
+				setShifts(shifts.filter(shift => shift.id !== shiftId));
+				console.log('Shift deleted:', shiftId);
+			};
+
+                        return React.createElement(ErrorBoundary, null,
+                                React.createElement(Schedule, {
+                                        employees,
+                                        shifts,
+                                        onAddShift: handleAddShift,
+                                        onUpdateShift: handleUpdateShift,
+                                        onDeleteShift: handleDeleteShift
+                                })
+                        );
+		}
+
+		// Initialize the Schedule component when dashboard is loaded
+		function initScheduleComponent() {
+			console.log('[Schedule] Attempting to initialize...');
+			const container = document.getElementById('schedule-container');
+			console.log('[Schedule] Container found:', container);
+
+			if (container && !container.hasAttribute('data-initialized')) {
+				console.log('[Schedule] Container not initialized yet, proceeding...');
+				container.setAttribute('data-initialized', 'true');
+				const root = createRoot(container);
+				console.log('[Schedule] Root created, rendering app...');
+				root.render(React.createElement(ScheduleApp));
+				console.log('[Schedule] ✅ Component initialized successfully');
+			} else {
+				console.log('[Schedule] ⚠️ Already initialized or container not found');
+			}
+		}
+
+		// Wait for dashboard to be visible
+		const observer = new MutationObserver((mutations) => {
+			console.log('[Schedule] Dashboard visibility changed');
+			const dashboard = document.getElementById('dashboard');
+			if (dashboard && dashboard.style.display !== 'none') {
+				console.log('[Schedule] Dashboard is visible, initializing...');
+				initScheduleComponent();
+			}
+		});
+
+		// Start observing when DOM is ready
+		console.log('[Schedule] Script loaded, readyState:', document.readyState);
+		if (document.readyState === 'loading') {
+			console.log('[Schedule] Waiting for DOMContentLoaded...');
+			document.addEventListener('DOMContentLoaded', () => {
+				console.log('[Schedule] DOM loaded');
+				const dashboard = document.getElementById('dashboard');
+				if (dashboard) {
+					console.log('[Schedule] Dashboard found, display:', dashboard.style.display);
+					// Initialize immediately if dashboard is visible
+					if (dashboard.style.display !== 'none') {
+						console.log('[Schedule] Dashboard visible, initializing now');
+						initScheduleComponent();
+					} else {
+						console.log('[Schedule] Dashboard hidden, setting up observer');
+					}
+					// Also observe for changes
+					observer.observe(dashboard, { attributes: true, attributeFilter: ['style'] });
+				} else {
+					console.error('[Schedule] ❌ Dashboard element not found!');
+				}
+			});
+		} else {
+			console.log('[Schedule] DOM already loaded');
+			const dashboard = document.getElementById('dashboard');
+			if (dashboard) {
+				console.log('[Schedule] Dashboard found, display:', dashboard.style.display);
+				if (dashboard.style.display !== 'none') {
+					console.log('[Schedule] Dashboard visible, initializing now');
+					initScheduleComponent();
+				} else {
+					console.log('[Schedule] Dashboard hidden, setting up observer');
+				}
+				observer.observe(dashboard, { attributes: true, attributeFilter: ['style'] });
+			} else {
+				console.error('[Schedule] ❌ Dashboard element not found!');
+			}
+		}
+	</script>
+
+    <script>
+        // Fallback to detect module loading failures
+        setTimeout(() => {
+            const container = document.getElementById("schedule-container");
+            if (container && !container.hasAttribute("data-initialized")) {
+                console.error("Module loading timed out");
+                container.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #ef4444; font-family: system-ui;">
+                        <h3 style="margin-bottom: 10px;">Unable to load Schedule</h3>
+                        <p>The interactive component failed to initialize.</p>
+                        <p style="font-size: 0.9em; color: #666;">This might be due to a network issue or browser incompatibility.</p>
+                        <button onclick="window.location.reload()" style="margin-top: 15px; padding: 8px 16px; background: #6366f1; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            Reload Page
+                        </button>
+                    </div>
+                `;
+            }
+        }, 3000);
+    </script>
 </body>
 </html>

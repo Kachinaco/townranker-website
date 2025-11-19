@@ -1,0 +1,16 @@
+# Enable serving .jsx files as JavaScript modules
+AddType text/javascript .jsx
+AddType text/javascript .js
+
+# Enable CORS for ES modules (if needed)
+<IfModule mod_headers.c>
+  <FilesMatch "\.(jsx?|mjs)$">
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
+</IfModule>
+
+# Enable gzip compression for JS files
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE application/javascript
+</IfModule>

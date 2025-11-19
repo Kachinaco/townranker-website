@@ -1,0 +1,276 @@
+[2025-10-25T18:41:49.698Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-10-25T18:41:53.042Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at IPCTransport.setMetrics (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:61:14)
+    at Timeout._onTimeout (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/services/metrics.js:75:28)
+    at listOnTimeout (node:internal/timers:581:17)
+    at process.processTimers (node:internal/timers:519:7)
+
+[2025-10-25T18:41:53.044Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.045Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:958:11)
+    at Socket._write (node:net:970:8)
+    at writeOrBuffer (node:internal/streams/writable:572:12)
+    at _write (node:internal/streams/writable:501:10)
+    at Writable.write (node:internal/streams/writable:510:10)
+    at console.value (node:internal/console/constructor:303:16)
+    at console.warn (node:internal/console/constructor:383:26)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:116:21)
+
+[2025-10-25T18:41:53.047Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.048Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.050Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:958:11)
+    at Socket._write (node:net:970:8)
+    at writeOrBuffer (node:internal/streams/writable:572:12)
+    at _write (node:internal/streams/writable:501:10)
+    at Writable.write (node:internal/streams/writable:510:10)
+    at console.value (node:internal/console/constructor:303:16)
+    at console.warn (node:internal/console/constructor:383:26)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:116:21)
+
+[2025-10-25T18:41:53.051Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.053Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.054Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.055Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:958:11)
+    at Socket._write (node:net:970:8)
+    at writeOrBuffer (node:internal/streams/writable:572:12)
+    at _write (node:internal/streams/writable:501:10)
+    at Writable.write (node:internal/streams/writable:510:10)
+    at console.value (node:internal/console/constructor:303:16)
+    at console.warn (node:internal/console/constructor:383:26)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:116:21)
+
+[2025-10-25T18:41:53.056Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.058Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.059Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.063Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.066Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:958:11)
+    at Socket._write (node:net:970:8)
+    at writeOrBuffer (node:internal/streams/writable:572:12)
+    at _write (node:internal/streams/writable:501:10)
+    at Writable.write (node:internal/streams/writable:510:10)
+    at console.value (node:internal/console/constructor:303:16)
+    at console.warn (node:internal/console/constructor:383:26)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:116:21)
+
+[2025-10-25T18:41:53.072Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.077Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.079Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.084Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.090Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at target._send (node:internal/child_process:878:20)
+    at target.send (node:internal/child_process:751:19)
+    at IPCTransport.send (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/transports/IPCTransport.js:84:21)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:129:62)
+    at process.emit (node:events:536:35)
+    at process._fatalException (node:internal/process/execution:188:25)
+
+[2025-10-25T18:41:53.095Z] UNCAUGHT EXCEPTION: Error - write EPIPE
+Error: write EPIPE
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:958:11)
+    at Socket._write (node:net:970:8)
+    at writeOrBuffer (node:internal/streams/writable:572:12)
+    at _write (node:internal/streams/writable:501:10)
+    at Writable.write (node:internal/streams/writable:510:10)
+    at console.value (node:internal/console/constructor:303:16)
+    at console.warn (node:internal/console/constructor:383:26)
+    at NotifyFeature.onUncaughtException (/usr/lib/node_modules/pm2/node_modules/@pm2/io/build/main/features/notify.js:116:21)
+
+[2025-10-30T23:12:25.255Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-10-31T05:28:25.724Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-10-31T11:48:35.842Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-10-31T13:21:28.670Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-10-31T13:29:26.325Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-02T12:39:34.977Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-02T22:56:02.665Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-03T00:22:21.063Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-05T08:11:36.420Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-05T09:53:48.704Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-05T23:43:31.656Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-06T02:40:35.701Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-06T15:03:54.730Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-07T02:51:51.141Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-07T03:27:12.857Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-09T19:13:33.969Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-09T19:13:34.430Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-09T19:13:34.817Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-10T20:38:38.391Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-10T22:46:31.924Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-10T22:46:35.463Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-11T20:54:24.993Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-12T16:31:04.439Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-13T08:59:30.064Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-13T21:12:52.461Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-14T02:29:43.007Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-14T19:04:10.553Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-15T10:10:05.845Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-15T22:54:43.194Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-15T22:54:45.850Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-18T07:34:26.397Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+
+[2025-11-18T19:17:07.917Z] UNHANDLED REJECTION: TypeError: Cannot read properties of undefined (reading 'includes')
+

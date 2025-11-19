@@ -215,11 +215,24 @@
         
         .cta-button {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--white);
+            color: var(--white) !important;
             padding: 12px 28px;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(37, 99, 235, 0.3);
+            color: var(--white) !important;
+        }
+
+        .cta-button::after {
+            display: none !important;
         }
         
         /* Hero Section */
