@@ -2852,7 +2852,7 @@ async function syncToNodejsMonitor(townrankerConfig) {
         };
 
         // Keep other settings
-        nodejsConfig.serpApiKey = nodejsConfig.serpApiKey || '***REMOVED***';
+        nodejsConfig.serpApiKey = nodejsConfig.serpApiKey || process.env.SERPAPI_KEY || '';
         nodejsConfig.location = nodejsConfig.location || 'Phoenix, Arizona, United States';
         nodejsConfig.timezone = nodejsConfig.timezone || 'America/Phoenix';
         nodejsConfig.timezoneAbbr = nodejsConfig.timezoneAbbr || 'MST';
@@ -3240,7 +3240,7 @@ app.post('/api/reddit-monitors', authenticateAdmin, async (req, res) => {
             businessName: businessName || name,
             createdAt: new Date().toISOString(),
             lastUpdated: new Date().toISOString(),
-            serpApiKey: '***REMOVED***',
+            serpApiKey: process.env.SERPAPI_KEY || '',
             location: 'Phoenix, Arizona, United States',
             timezone: 'America/Phoenix',
             timezoneAbbr: 'MST',
