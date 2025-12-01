@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - TownRanker</title>
+    <meta name="description" content="Sign up for TownRanker and start dominating your local search results. Free SEO analysis included.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        google: {
+                            blue: '#4285F4',
+                            red: '#EA4335',
+                            yellow: '#FBBC05',
+                            green: '#34A853',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8faff;
+        }
+
+        .input-field {
+            transition: all 0.2s ease-in-out;
+            border: 1px solid #dadce0;
+        }
+        .input-field:focus {
+            border-color: #4285F4;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.15);
+            outline: none;
+        }
+
+        .left-panel {
+            background: linear-gradient(135deg, #4285F4 0%, #1a56db 100%);
+        }
+
+        .btn-submit {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4);
+        }
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Floating animation for decorative elements */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen w-full flex overflow-hidden bg-white">
+
+    <!-- Left Side: Visuals & Benefits -->
+    <div class="hidden lg:flex w-5/12 left-panel text-white flex-col justify-between p-12 relative overflow-hidden">
+        <!-- Decorative Background Elements -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+            <div class="absolute -top-24 -left-24 w-96 h-96 bg-white opacity-5 rounded-full blur-3xl float-animation"></div>
+            <div class="absolute bottom-20 right-10 w-64 h-64 bg-blue-300 opacity-10 rounded-full blur-2xl float-animation" style="animation-delay: -3s;"></div>
+            <div class="absolute top-1/2 left-1/4 w-32 h-32 bg-white opacity-5 rounded-full blur-xl float-animation" style="animation-delay: -1.5s;"></div>
+        </div>
+
+        <div class="relative z-10">
+            <!-- Branding -->
+            <a href="/" class="flex items-center gap-3 mb-12 group">
+                <div class="flex gap-1.5">
+                    <div class="w-4 h-4 rounded-full bg-google-red shadow-lg"></div>
+                    <div class="w-4 h-4 rounded-full bg-google-yellow shadow-lg"></div>
+                    <div class="w-4 h-4 rounded-full bg-google-green shadow-lg"></div>
+                </div>
+                <span class="text-2xl font-bold tracking-tight group-hover:opacity-80 transition-opacity">TownRanker</span>
+            </a>
+
+            <!-- Headline & Subheadline -->
+            <h2 class="text-4xl font-bold leading-tight mb-6">
+                Dominate your local market.
+            </h2>
+            <p class="text-blue-100 text-lg mb-12 leading-relaxed opacity-90">
+                Join hundreds of local businesses using TownRanker to climb search results and convert more neighbors into customers.
+            </p>
+
+            <!-- Benefits List -->
+            <div class="space-y-8">
+                <div class="flex items-start gap-4 group">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-white/10 border border-white/10 shrink-0 group-hover:bg-white/20 transition-colors">
+                        <span class="material-symbols-outlined">trending_up</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg">Proven SEO Strategies</h3>
+                        <p class="text-blue-100 text-sm mt-1 leading-relaxed">Data-driven techniques that actually move the needle for local search.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4 group">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-white/10 border border-white/10 shrink-0 group-hover:bg-white/20 transition-colors">
+                        <span class="material-symbols-outlined">smartphone</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg">Mobile-First Development</h3>
+                        <p class="text-blue-100 text-sm mt-1 leading-relaxed">Websites that look beautiful and load instantly on any device.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4 group">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-white/10 border border-white/10 shrink-0 group-hover:bg-white/20 transition-colors">
+                        <span class="material-symbols-outlined">analytics</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg">Transparent Reporting</h3>
+                        <p class="text-blue-100 text-sm mt-1 leading-relaxed">Real-time dashboards. No marketing jargon, just clear results.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Proof / Testimonial -->
+        <div class="relative z-10 mt-auto pt-10">
+            <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-lg">
+                <div class="flex gap-1 text-yellow-300 mb-3">
+                    <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
+                </div>
+                <p class="text-sm font-medium italic">"TownRanker completely transformed our online presence. We've seen a 200% increase in local leads in just 3 months."</p>
+                <div class="mt-4 flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-google-blue font-bold text-sm">SJ</div>
+                    <div>
+                        <div class="text-sm font-semibold">Sarah Jenkins</div>
+                        <div class="text-xs text-blue-200">Jenkins Bakery, Phoenix AZ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Side: Form -->
+    <div class="w-full lg:w-7/12 flex items-center justify-center p-6 lg:p-12 overflow-y-auto">
+        <div class="w-full max-w-md py-8">
+            <!-- Mobile Logo -->
+            <a href="/" class="lg:hidden flex items-center gap-2 mb-8 justify-center">
+                <div class="flex gap-1">
+                    <div class="w-3 h-3 rounded-full bg-google-red"></div>
+                    <div class="w-3 h-3 rounded-full bg-google-yellow"></div>
+                    <div class="w-3 h-3 rounded-full bg-google-green"></div>
+                </div>
+                <span class="text-xl font-bold text-gray-700">TownRanker</span>
+            </a>
+
+            <!-- Header -->
+            <div class="mb-10 text-center lg:text-left">
+                <h1 class="text-3xl font-bold text-gray-900 mb-3">Get Started Free</h1>
+                <p class="text-gray-600">Start growing your business with TownRanker today. Free SEO analysis included.</p>
+            </div>
+
+            <form id="signupForm" class="space-y-5">
+                <!-- Full Name -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5" for="fullName">Full Name *</label>
+                    <input type="text" id="fullName" name="name" placeholder="John Doe" class="input-field w-full px-4 py-3 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:bg-white" required>
+                </div>
+
+                <!-- Email & Phone Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5" for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" placeholder="john@company.com" class="input-field w-full px-4 py-3 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:bg-white" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5" for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567" class="input-field w-full px-4 py-3 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:bg-white" required>
+                    </div>
+                </div>
+
+                <!-- Business Name -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5" for="businessName">Business Name *</label>
+                    <input type="text" id="businessName" name="company" placeholder="Acme Corp" class="input-field w-full px-4 py-3 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:bg-white" required>
+                </div>
+
+                <!-- Website URL (Optional) -->
+                <div>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label class="block text-sm font-medium text-gray-700" for="website">Website URL</label>
+                        <span class="text-xs text-gray-400">Optional</span>
+                    </div>
+                    <input type="url" id="website" name="website" placeholder="https://example.com" class="input-field w-full px-4 py-3 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:bg-white">
+                </div>
+
+                <!-- How did you hear about us -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5" for="source">How did you hear about us?</label>
+                    <div class="relative">
+                        <select id="source" name="source" class="input-field w-full px-4 py-3 rounded-lg bg-gray-50 text-gray-900 focus:bg-white appearance-none cursor-pointer" required>
+                            <option value="" disabled selected>Select an option</option>
+                            <option value="google">Google Search</option>
+                            <option value="social">Social Media</option>
+                            <option value="referral">Referral</option>
+                            <option value="advertisement">Advertisement</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                            <span class="material-symbols-outlined text-xl">expand_more</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message (Optional) -->
+                <div>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label class="block text-sm font-medium text-gray-700" for="message">Tell us about your goals</label>
+                        <span class="text-xs text-gray-400">Optional</span>
+                    </div>
+                    <textarea id="message" name="message" rows="3" placeholder="I want to rank #1 for..." class="input-field w-full px-4 py-3 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:bg-white resize-none"></textarea>
+                </div>
+
+                <!-- Trust & Terms -->
+                <div class="pt-2">
+                    <div class="flex items-start gap-3">
+                        <div class="flex items-center h-5 mt-0.5">
+                            <input id="terms" name="terms" type="checkbox" class="h-4 w-4 text-google-blue focus:ring-blue-500 border-gray-300 rounded cursor-pointer" required>
+                        </div>
+                        <div class="text-sm">
+                            <label for="terms" class="font-medium text-gray-700 cursor-pointer">I agree to the <a href="/pages/terms.html" class="text-google-blue hover:underline">Terms of Service</a> and <a href="/pages/privacy.html" class="text-google-blue hover:underline">Privacy Policy</a>.</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submitBtn" class="btn-submit w-full bg-google-blue hover:bg-blue-600 text-white font-semibold py-4 px-4 rounded-lg shadow-md flex items-center justify-center gap-2 group">
+                    <span>Get My Free Analysis</span>
+                    <span class="material-symbols-outlined text-xl transition-transform group-hover:translate-x-1">arrow_forward</span>
+                </button>
+
+                <!-- Trust Indicators -->
+                <div class="flex items-center justify-center gap-6 pt-4 text-gray-400 text-xs">
+                    <div class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-base">lock</span>
+                        <span>Secure</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-base">block</span>
+                        <span>No Spam</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-base">verified</span>
+                        <span>Free Analysis</span>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Login Link -->
+            <div class="mt-8 text-center">
+                <p class="text-sm text-gray-600">
+                    Already have an account?
+                    <a href="/login.html" class="font-medium text-google-blue hover:text-blue-600 transition-colors">Sign in</a>
+                </p>
+            </div>
+
+            <!-- Success Message (Hidden by default) -->
+            <div id="successMessage" class="hidden mt-8 p-6 bg-green-50 border border-green-200 rounded-xl text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="material-symbols-outlined text-3xl text-green-600" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">You're All Set!</h3>
+                <p class="text-gray-600 mb-4">We've received your information and will be in touch within 24 hours with your free SEO analysis.</p>
+                <a href="/" class="inline-flex items-center gap-2 text-google-blue font-medium hover:underline">
+                    <span class="material-symbols-outlined text-lg">arrow_back</span>
+                    Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const form = this;
+            const btn = document.getElementById('submitBtn');
+            const successMessage = document.getElementById('successMessage');
+            const originalBtnText = btn.innerHTML;
+
+            // Show loading state
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Submitting...';
+            btn.disabled = true;
+
+            const formData = {
+                name: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                company: document.getElementById('businessName').value,
+                website: document.getElementById('website').value,
+                source: document.getElementById('source').value,
+                message: document.getElementById('message').value
+            };
+
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    // Hide form, show success
+                    form.style.display = 'none';
+                    successMessage.classList.remove('hidden');
+
+                    // Scroll to success message
+                    successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    throw new Error('Failed to submit');
+                }
+            } catch (error) {
+                // Show error state
+                btn.innerHTML = '<span class="material-symbols-outlined">error</span> Something went wrong. Try again.';
+                btn.classList.remove('bg-google-blue', 'hover:bg-blue-600');
+                btn.classList.add('bg-red-500', 'hover:bg-red-600');
+
+                setTimeout(() => {
+                    btn.innerHTML = originalBtnText;
+                    btn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                    btn.classList.add('bg-google-blue', 'hover:bg-blue-600');
+                    btn.disabled = false;
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

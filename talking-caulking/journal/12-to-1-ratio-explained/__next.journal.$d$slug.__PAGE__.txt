@@ -1,0 +1,6 @@
+1:"$Sreact.fragment"
+3:I[5751,["/talking-caulking/_next/static/chunks/4681aba30f546505.js","/talking-caulking/_next/static/chunks/4568f7a022d16e5d.js"],"OutletBoundary"]
+4:"$Sreact.suspense"
+0:{"buildId":"Euld37-mqh-OHspOA6x1V","rsc":["$","$1","c",{"children":["$L2",[["$","script","script-0",{"src":"/talking-caulking/_next/static/chunks/4681aba30f546505.js","async":true}],["$","script","script-1",{"src":"/talking-caulking/_next/static/chunks/b141ae7fa0710dcf.js","async":true}]],["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"loading":null,"isPartial":false}
+5:null
+2:E{"digest":"NEXT_HTTP_ERROR_FALLBACK;404"}

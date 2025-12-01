@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reddit Monitors - TownRanker</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d24;
+            --surface-2: #22262f;
+            --border: #2d323c;
+            --text: #f5f5f5;
+            --text-dim: #8b8f98;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --reddit: #ff4500;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .reddit-badge {
+            background: var(--reddit);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        /* Mobile Responsive */
+        @media (max-width: 800px) {
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .container { padding: 0.75rem; }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            .header > div { width: 100%; }
+            .header > div .btn { width: 100%; font-size: 0.8rem; padding: 0.5rem 0.75rem; }
+            .page-title { font-size: 1.1rem; }
+            .reddit-badge { padding: 2px 6px; font-size: 0.6rem; }
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+            .stat-card { padding: 0.75rem; }
+            .stat-value { font-size: 1.25rem; }
+            .stat-label { font-size: 0.6rem; }
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            .section-header h2 { font-size: 1rem; }
+            .section-header .btn { width: 100%; font-size: 0.8rem; }
+            .monitors-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            .monitor-header { padding: 0.75rem; }
+            .monitor-name { font-size: 0.9rem; }
+            .monitor-body { padding: 0.75rem; }
+            .monitor-stats { gap: 0.35rem; }
+            .monitor-stat-value { font-size: 1rem; }
+            .monitor-stat-label { font-size: 0.6rem; }
+            .monitor-footer {
+                padding: 0.625rem 0.75rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .monitor-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .monitor-actions .btn-sm {
+                flex: 1;
+                padding: 0.5rem;
+                font-size: 0.75rem;
+            }
+            .meta-tag { font-size: 0.6rem; padding: 0.15rem 0.4rem; }
+            .create-card { min-height: 150px; }
+            .create-icon { width: 40px; height: 40px; }
+            .create-icon .material-icons-round { font-size: 1.25rem; }
+            .create-text { font-size: 0.85rem; }
+            .modal { margin: 0.75rem; max-height: calc(100vh - 1.5rem); }
+            .modal-header { padding: 0.875rem; }
+            .modal-header h3 { font-size: 1rem; }
+            .modal-body { padding: 0.875rem; }
+            .form-label { font-size: 0.8rem; }
+            .form-input, .form-textarea { font-size: 0.85rem; padding: 0.5rem 0.75rem; }
+            .modal-footer {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 0.875rem;
+            }
+            .modal-footer .btn { width: 100%; font-size: 0.85rem; }
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .stat-value.success { color: var(--success); }
+        .stat-value.warning { color: var(--warning); }
+        .stat-value.danger { color: var(--danger); }
+        .stat-value.accent { color: var(--accent); }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { filter: brightness(1.1); }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .btn-outline:hover { background: var(--surface-2); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { filter: brightness(1.1); }
+        .btn-sm { padding: 0.5rem 0.875rem; font-size: 0.8rem; }
+
+        /* Monitor Grid */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .monitors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .monitor-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .monitor-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        .monitor-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+        .monitor-info {
+            flex: 1;
+        }
+        .monitor-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .monitor-business {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+        .monitor-status {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .monitor-status.active {
+            background: rgba(34,197,94,0.15);
+            color: var(--success);
+        }
+        .monitor-status.paused {
+            background: rgba(245,158,11,0.15);
+            color: var(--warning);
+        }
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        .status-dot.pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .monitor-body {
+            padding: 1.25rem;
+        }
+        .monitor-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .monitor-stat {
+            text-align: center;
+        }
+        .monitor-stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .monitor-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .monitor-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .meta-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.625rem;
+            background: var(--surface-2);
+            border-radius: 6px;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+        .meta-tag .material-icons-round {
+            font-size: 0.875rem;
+        }
+
+        .monitor-footer {
+            padding: 1rem 1.25rem;
+            background: var(--surface-2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .monitor-updated {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+        .monitor-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Create Card */
+        .create-card {
+            background: var(--surface);
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 280px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .create-card:hover {
+            border-color: var(--accent);
+            background: var(--surface-2);
+        }
+        .create-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--surface-2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .create-icon .material-icons-round {
+            font-size: 2rem;
+            color: var(--accent);
+        }
+        .create-text {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .create-subtext {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow: hidden;
+        }
+        .modal-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+        .modal-close:hover { color: var(--text); }
+        .modal-body {
+            padding: 1.25rem;
+        }
+        .modal-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group:last-child { margin-bottom: 0; }
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-input {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text);
+            font-size: 0.875rem;
+            outline: none;
+        }
+        .form-input:focus { border-color: var(--accent); }
+        .form-input::placeholder { color: var(--text-dim); }
+        .form-help {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 0.375rem;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 1001;
+        }
+        .toast {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.875rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .toast.success { border-left: 3px solid var(--success); }
+        .toast.error { border-left: 3px solid var(--danger); }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Loading */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-state {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-dim);
+        }
+        .loading-state .spinner {
+            width: 40px;
+            height: 40px;
+            border-width: 3px;
+            color: var(--accent);
+            margin: 0 auto 1rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-dim);
+        }
+        .empty-state .material-icons-round {
+            font-size: 4rem;
+            opacity: 0.3;
+            margin-bottom: 1rem;
+        }
+
+        /* Mobile Sidebar */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-right: 0.5rem;
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 998;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            z-index: 999;
+            transition: left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar.active {
+            left: 0;
+        }
+        .sidebar-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+        .sidebar-logo-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .sidebar-close {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+        .sidebar-section {
+            padding: 0 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-dim);
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.15s;
+        }
+        .sidebar-link:hover {
+            background: var(--surface-2);
+            color: var(--text);
+        }
+        .sidebar-link.active {
+            background: rgba(99,102,241,0.15);
+            color: var(--accent);
+        }
+        .sidebar-link .material-icons-round {
+            font-size: 1.25rem;
+        }
+        .sidebar-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--border);
+        }
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .sidebar-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--surface-2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-user-info {
+            flex: 1;
+        }
+        .sidebar-user-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .sidebar-user-role {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+        @media (max-width: 600px) {
+            .menu-toggle { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/login" class="sidebar-logo">
+                <div class="sidebar-logo-icon">TR</div>
+                <span class="sidebar-logo-text">TownRanker</span>
+            </a>
+            <button class="sidebar-close" onclick="closeSidebar()">
+                <span class="material-icons-round">close</span>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Main</div>
+                <a href="/login" class="sidebar-link">
+                    <span class="material-icons-round">dashboard</span>
+                    Dashboard
+                </a>
+                <a href="/admin/reddit-dashboard.html" class="sidebar-link active">
+                    <span class="material-icons-round">forum</span>
+                    Reddit Monitors
+                </a>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Tools</div>
+                <a href="/admin/seo-dashboard.html" class="sidebar-link">
+                    <span class="material-icons-round">trending_up</span>
+                    SEO Dashboard
+                </a>
+                <a href="/admin/seo-checklist.html" class="sidebar-link">
+                    <span class="material-icons-round">checklist</span>
+                    SEO Checklist
+                </a>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Account</div>
+                <a href="#" class="sidebar-link" onclick="logout()">
+                    <span class="material-icons-round">logout</span>
+                    Logout
+                </a>
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar">
+                    <span class="material-icons-round">person</span>
+                </div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name">Admin</div>
+                    <div class="sidebar-user-role">Administrator</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle" onclick="openSidebar()">
+                    <span class="material-icons-round">menu</span>
+                </button>
+                <a href="/login" class="logo-link">
+                    <div class="logo-icon">TR</div>
+                </a>
+                <h1 class="page-title">
+                    Reddit Monitors
+                    <span class="reddit-badge">Dashboard</span>
+                </h1>
+            </div>
+            <div>
+                <button class="btn btn-outline" onclick="loadMonitors()">
+                    <span class="material-icons-round">refresh</span>
+                    Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-label">Total Monitors</div>
+                <div class="stat-value accent" id="totalMonitors">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active</div>
+                <div class="stat-value success" id="activeMonitors">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Leads Today</div>
+                <div class="stat-value warning" id="leadsToday">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Leads</div>
+                <div class="stat-value" id="totalLeads">0</div>
+            </div>
+        </div>
+
+        <!-- Monitors Section -->
+        <div class="section-header">
+            <h2 class="section-title">Your Monitors</h2>
+            <button class="btn btn-primary" onclick="openCreateModal()">
+                <span class="material-icons-round">add</span>
+                New Monitor
+            </button>
+        </div>
+
+        <div id="monitorsContainer">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Loading monitors...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Modal -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Create New Monitor</h3>
+                <button class="modal-close" onclick="closeCreateModal()">
+                    <span class="material-icons-round">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Monitor Name *</label>
+                    <input type="text" class="form-input" id="monitorName" placeholder="e.g., Phoenix Windows & Doors">
+                    <p class="form-help">A descriptive name for this monitor</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Business Name</label>
+                    <input type="text" class="form-input" id="businessName" placeholder="e.g., Your Company Name">
+                    <p class="form-help">The business this monitor is for</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" class="form-input" id="location" placeholder="e.g., Phoenix, Arizona">
+                    <p class="form-help">Target geographic area</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-input" id="description" placeholder="e.g., Monitor for window and door leads">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeCreateModal()">Cancel</button>
+                <button class="btn btn-success" id="createBtn" onclick="createMonitor()">
+                    <span class="material-icons-round">add</span>
+                    Create Monitor
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Delete Monitor</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">
+                    <span class="material-icons-round">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete "<strong id="deleteMonitorName"></strong>"?</p>
+                <p style="color: var(--text-dim); font-size: 0.875rem; margin-top: 0.75rem;">This action cannot be undone. All settings will be permanently removed.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn" onclick="confirmDelete()">
+                    <span class="material-icons-round">delete</span>
+                    Delete Monitor
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Run Monitor Modal -->
+    <div class="modal-overlay" id="runModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Run Monitor</h3>
+                <button class="modal-close" onclick="closeRunModal()">
+                    <span class="material-icons-round">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 1rem;">Search Reddit for leads from "<strong id="runMonitorName"></strong>"</p>
+                <div class="form-group">
+                    <label class="form-label">Date Range</label>
+                    <select class="form-input" id="runDays">
+                        <option value="7">Last 7 days</option>
+                        <option value="14">Last 14 days</option>
+                        <option value="20" selected>Last 20 days</option>
+                        <option value="30">Last 30 days</option>
+                        <option value="60">Last 60 days</option>
+                        <option value="90">Last 90 days</option>
+                    </select>
+                    <p class="form-help">How far back to search for Reddit posts</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeRunModal()">Cancel</button>
+                <button class="btn btn-success" id="confirmRunBtn" onclick="confirmRun()">
+                    <span class="material-icons-round">play_circle</span>
+                    Run Monitor
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        let monitors = [];
+        let monitorToDelete = null;
+
+        // Auth
+        function getToken() {
+            return localStorage.getItem('token') || sessionStorage.getItem('token') ||
+                   localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated
+            var token = getToken();
+            if (!token) {
+                showToast('Please log in first', 'error');
+                setTimeout(function() { window.location.href = '/login'; }, 1500);
+                return;
+            }
+            console.log('Auth token found:', token.substring(0, 20) + '...');
+            loadMonitors();
+            loadStats();
+        });
+
+        // Load monitors
+        async function loadMonitors() {
+            var container = document.getElementById('monitorsContainer');
+
+            try {
+                var res = await fetch('/api/reddit-monitors', {
+                    headers: { 'Authorization': 'Bearer ' + getToken() }
+                });
+                var data = await res.json();
+
+                if (data.success && data.monitors) {
+                    monitors = data.monitors;
+                    renderMonitors();
+                } else {
+                    container.innerHTML = '<div class="empty-state"><span class="material-icons-round">search_off</span><p>No monitors found</p></div>';
+                }
+            } catch (e) {
+                container.innerHTML = '<div class="empty-state"><span class="material-icons-round">error</span><p>Failed to load monitors</p></div>';
+            }
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                var res = await fetch('/api/reddit-monitor/leads?limit=1000', {
+                    headers: { 'Authorization': 'Bearer ' + getToken() }
+                });
+                var data = await res.json();
+
+                if (data.leads) {
+                    document.getElementById('totalLeads').textContent = data.total || data.leads.length;
+
+                    // Count today's leads
+                    var today = new Date();
+                    today.setHours(0,0,0,0);
+                    var todayCount = 0;
+                    for (var i = 0; i < data.leads.length; i++) {
+                        var leadDate = new Date(data.leads[i].createdAt);
+                        if (leadDate >= today) todayCount++;
+                    }
+                    document.getElementById('leadsToday').textContent = todayCount;
+                }
+            } catch (e) {
+                console.error('Failed to load stats', e);
+            }
+        }
+
+        // Render monitors
+        function renderMonitors() {
+            var container = document.getElementById('monitorsContainer');
+            var activeCount = 0;
+
+            var html = '<div class="monitors-grid">';
+
+            for (var i = 0; i < monitors.length; i++) {
+                var m = monitors[i];
+                var isActive = m.schedule && m.schedule.enabled;
+                if (isActive) activeCount++;
+
+                var subredditCount = (m.targetSubreddits || []).length;
+                var keywordCount = (m.serviceKeywords || []).length;
+                var interval = (m.schedule && m.schedule.intervalMinutes) || 30;
+
+                var lastUpdated = m.lastUpdated ? formatDate(m.lastUpdated) : 'Never';
+
+                html += '<div class="monitor-card" onclick="openMonitor(\'' + m.id + '\')">' +
+                    '<div class="monitor-header">' +
+                        '<div class="monitor-info">' +
+                            '<div class="monitor-name">' + escapeHtml(m.name || m.id) + '</div>' +
+                            '<div class="monitor-business">' + escapeHtml(m.businessName || 'No business set') + '</div>' +
+                        '</div>' +
+                        '<div class="monitor-status ' + (isActive ? 'active' : 'paused') + '">' +
+                            '<span class="status-dot' + (isActive ? ' pulse' : '') + '"></span>' +
+                            (isActive ? 'Active' : 'Paused') +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="monitor-body">' +
+                        '<div class="monitor-stats">' +
+                            '<div class="monitor-stat">' +
+                                '<div class="monitor-stat-value">' + subredditCount + '</div>' +
+                                '<div class="monitor-stat-label">Subreddits</div>' +
+                            '</div>' +
+                            '<div class="monitor-stat">' +
+                                '<div class="monitor-stat-value">' + keywordCount + '</div>' +
+                                '<div class="monitor-stat-label">Keywords</div>' +
+                            '</div>' +
+                            '<div class="monitor-stat">' +
+                                '<div class="monitor-stat-value">' + interval + 'm</div>' +
+                                '<div class="monitor-stat-label">Interval</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="monitor-meta">' +
+                            '<span class="meta-tag"><span class="material-icons-round">location_on</span>' + escapeHtml(m.location || 'No location') + '</span>' +
+                            '<span class="meta-tag"><span class="material-icons-round">schedule</span>Every ' + interval + ' min</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="monitor-footer">' +
+                        '<span class="monitor-updated">Updated: ' + lastUpdated + '</span>' +
+                        '<div class="monitor-actions">' +
+                            '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); toggleMonitor(\'' + m.id + '\', ' + !isActive + ')">' +
+                                '<span class="material-icons-round">' + (isActive ? 'pause' : 'play_arrow') + '</span>' +
+                            '</button>' +
+                            '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); runMonitor(\'' + m.id + '\')">' +
+                                '<span class="material-icons-round">play_circle</span>' +
+                            '</button>' +
+                            '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); openDeleteModal(\'' + m.id + '\', \'' + escapeHtml(m.name || m.id) + '\')">' +
+                                '<span class="material-icons-round">delete</span>' +
+                            '</button>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            }
+
+            // Add create card
+            html += '<div class="create-card" onclick="openCreateModal()">' +
+                '<div class="create-icon"><span class="material-icons-round">add</span></div>' +
+                '<div class="create-text">Create New Monitor</div>' +
+                '<div class="create-subtext">Set up a new Reddit lead monitor</div>' +
+            '</div>';
+
+            html += '</div>';
+            container.innerHTML = html;
+
+            // Update stats
+            document.getElementById('totalMonitors').textContent = monitors.length;
+            document.getElementById('activeMonitors').textContent = activeCount;
+        }
+
+        // Open monitor settings
+        function openMonitor(id) {
+            window.location.href = '/admin/reddit-monitor.html?id=' + id;
+        }
+
+        // Toggle monitor active state
+        async function toggleMonitor(id, active) {
+            try {
+                var res = await fetch('/api/reddit-monitors/' + id + '/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify({ active: active })
+                });
+                var data = await res.json();
+
+                if (data.success) {
+                    showToast(active ? 'Monitor activated' : 'Monitor paused', 'success');
+                    loadMonitors();
+                } else {
+                    showToast('Toggle failed: ' + data.message, 'error');
+                }
+            } catch (e) {
+                showToast('Error toggling monitor', 'error');
+            }
+        }
+
+        // Run monitor - open modal
+        var monitorToRun = null;
+        function runMonitor(id) {
+            var monitor = monitors.find(function(m) { return m.id === id; });
+            monitorToRun = id;
+            document.getElementById('runMonitorName').textContent = monitor ? monitor.name : id;
+            document.getElementById('runDays').value = '20';
+            document.getElementById('runModal').classList.add('active');
+        }
+
+        function closeRunModal() {
+            document.getElementById('runModal').classList.remove('active');
+            monitorToRun = null;
+        }
+
+        async function confirmRun() {
+            if (!monitorToRun) return;
+
+            var days = document.getElementById('runDays').value;
+            var btn = document.getElementById('confirmRunBtn');
+            btn.innerHTML = '<span class="spinner"></span> Running...';
+            btn.disabled = true;
+
+            try {
+                var token = getToken();
+                if (!token) {
+                    showToast('Please log in again', 'error');
+                    setTimeout(function() { window.location.href = '/login'; }, 1500);
+                    return;
+                }
+
+                var res = await fetch('/api/reddit-monitors/' + monitorToRun + '/run', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ days: parseInt(days) })
+                });
+                var data = await res.json();
+
+                if (data.success) {
+                    showToast(data.message || 'Monitor started! Check leads tab in a moment.', 'success');
+                    closeRunModal();
+                } else {
+                    if (res.status === 401) {
+                        showToast('Session expired. Please log in again.', 'error');
+                        setTimeout(function() { window.location.href = '/login'; }, 1500);
+                    } else {
+                        showToast('Run failed: ' + data.message, 'error');
+                    }
+                }
+            } catch (e) {
+                console.error('Run error:', e);
+                showToast('Error running monitor', 'error');
+            } finally {
+                btn.innerHTML = '<span class="material-icons-round">play_circle</span> Run Monitor';
+                btn.disabled = false;
+            }
+        }
+
+        // Create monitor
+        async function createMonitor() {
+            var name = document.getElementById('monitorName').value.trim();
+            var businessName = document.getElementById('businessName').value.trim();
+            var location = document.getElementById('location').value.trim();
+            var description = document.getElementById('description').value.trim();
+
+            if (!name) {
+                showToast('Please enter a monitor name', 'error');
+                return;
+            }
+
+            var btn = document.getElementById('createBtn');
+            btn.innerHTML = '<span class="spinner"></span> Creating...';
+            btn.disabled = true;
+
+            try {
+                var token = getToken();
+                if (!token) {
+                    showToast('Not authenticated. Please log in again.', 'error');
+                    setTimeout(function() { window.location.href = '/login'; }, 1500);
+                    return;
+                }
+
+                var res = await fetch('/api/reddit-monitors', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        businessName: businessName,
+                        location: location,
+                        description: description
+                    })
+                });
+                var data = await res.json();
+
+                if (data.success) {
+                    showToast('Monitor created!', 'success');
+                    closeCreateModal();
+                    // Open the new monitor settings
+                    window.location.href = '/admin/reddit-monitor.html?id=' + data.monitor.id;
+                } else {
+                    if (res.status === 401) {
+                        showToast('Session expired. Please log in again.', 'error');
+                        setTimeout(function() { window.location.href = '/login'; }, 1500);
+                    } else {
+                        showToast('Create failed: ' + data.message, 'error');
+                    }
+                }
+            } catch (e) {
+                console.error('Create error:', e);
+                showToast('Error creating monitor: ' + e.message, 'error');
+            } finally {
+                btn.innerHTML = '<span class="material-icons-round">add</span> Create Monitor';
+                btn.disabled = false;
+            }
+        }
+
+        // Delete monitor
+        function openDeleteModal(id, name) {
+            monitorToDelete = id;
+            document.getElementById('deleteMonitorName').textContent = name;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            monitorToDelete = null;
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        async function confirmDelete() {
+            if (!monitorToDelete) return;
+
+            var btn = document.getElementById('confirmDeleteBtn');
+            btn.innerHTML = '<span class="spinner"></span> Deleting...';
+            btn.disabled = true;
+
+            try {
+                var res = await fetch('/api/reddit-monitors/' + monitorToDelete, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + getToken() }
+                });
+                var data = await res.json();
+
+                if (data.success) {
+                    showToast('Monitor deleted', 'success');
+                    closeDeleteModal();
+                    loadMonitors();
+                } else {
+                    showToast('Delete failed: ' + data.message, 'error');
+                }
+            } catch (e) {
+                showToast('Error deleting monitor', 'error');
+            } finally {
+                btn.innerHTML = '<span class="material-icons-round">delete</span> Delete Monitor';
+                btn.disabled = false;
+            }
+        }
+
+        // Modal controls
+        function openCreateModal() {
+            document.getElementById('monitorName').value = '';
+            document.getElementById('businessName').value = '';
+            document.getElementById('location').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('createModal').classList.add('active');
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.remove('active');
+        }
+
+        // Utilities
+        function formatDate(dateStr) {
+            var d = new Date(dateStr);
+            var now = new Date();
+            var diff = now - d;
+
+            if (diff < 60000) return 'Just now';
+            if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+            if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+            return d.toLocaleDateString();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function showToast(message, type) {
+            var container = document.getElementById('toastContainer');
+            var toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            var icon = (type === 'success') ? 'check_circle' : 'error';
+            toast.innerHTML = '<span class="material-icons-round">' + icon + '</span>' + message;
+            container.appendChild(toast);
+            setTimeout(function() { toast.remove(); }, 4000);
+        }
+
+        // Sidebar functions
+        function openSidebar() {
+            document.getElementById('sidebar').classList.add('active');
+            document.getElementById('sidebarOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            sessionStorage.removeItem('token');
+            localStorage.removeItem('adminToken');
+            sessionStorage.removeItem('adminToken');
+            window.location.href = '/login';
+        }
+
+        // Close modals on escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSidebar();
+                closeCreateModal();
+                closeDeleteModal();
+            }
+        });
+    </script>
+</body>
+</html>

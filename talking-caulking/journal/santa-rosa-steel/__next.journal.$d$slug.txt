@@ -1,0 +1,4 @@
+1:"$Sreact.fragment"
+2:I[18356,["/talking-caulking/_next/static/chunks/4681aba30f546505.js","/talking-caulking/_next/static/chunks/4568f7a022d16e5d.js"],"default"]
+3:I[87408,["/talking-caulking/_next/static/chunks/4681aba30f546505.js","/talking-caulking/_next/static/chunks/4568f7a022d16e5d.js"],"default"]
+0:{"buildId":"Euld37-mqh-OHspOA6x1V","rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"loading":null,"isPartial":false}

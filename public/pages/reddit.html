@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reddit Lead Monitor - TownRanker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --reddit-orange: #ff4500;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --gray: #6b7280;
+            --light: #f9fafb;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --bg-primary: #f9fafb;
+            --bg-secondary: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --hover-bg: #f3f4f6;
+        }
+        [data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --dark: #f9fafb;
+            --gray: #9ca3af;
+            --light: #374151;
+            --white: #1f2937;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --hover-bg: #334155;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        /* Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--reddit-orange) 0%, #ff6b35 100%);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .page-header h1 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+        }
+        .page-header .reddit-icon {
+            font-size: 32px;
+        }
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px 30px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .stat-icon.orange { background: rgba(255, 69, 0, 0.1); color: var(--reddit-orange); }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .stat-icon.blue { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
+        .stat-icon.yellow { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+        .stat-label { font-size: 13px; color: var(--text-secondary); }
+        /* Main Content */
+        .main-content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 1024px) {
+            .main-content { grid-template-columns: 1fr; }
+        }
+        /* Sidebar - Monitors List */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .section-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--hover-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .section-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .section-body {
+            padding: 15px;
+        }
+        /* Monitor Item */
+        .monitor-item {
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .monitor-item:hover {
+            border-color: var(--primary);
+            background: var(--hover-bg);
+        }
+        .monitor-item.active {
+            border-color: var(--reddit-orange);
+            background: rgba(255, 69, 0, 0.05);
+        }
+        .monitor-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .monitor-status {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+        .monitor-status.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        .monitor-status.paused {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+        .monitor-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        /* Create Button */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        .btn-reddit {
+            background: var(--reddit-orange);
+            color: white;
+        }
+        .btn-reddit:hover {
+            background: #e03d00;
+        }
+        .btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+        /* Lead Feed */
+        .feed-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .feed-filters {
+            display: flex;
+            gap: 10px;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--reddit-orange);
+            color: white;
+            border-color: var(--reddit-orange);
+        }
+        /* Lead Cards */
+        .lead-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            transition: all 0.2s;
+        }
+        .lead-card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+        .lead-card.hot-lead {
+            border-left: 4px solid var(--reddit-orange);
+        }
+        .lead-card.high-priority {
+            border-left: 4px solid var(--warning);
+        }
+        .lead-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .lead-subreddit {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 69, 0, 0.1);
+            color: var(--reddit-orange);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .lead-priority {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .lead-priority.hot { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .lead-priority.high { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .lead-priority.medium { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
+        .lead-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .lead-title a {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .lead-title a:hover {
+            color: var(--reddit-orange);
+        }
+        .lead-content {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        .lead-keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+        .keyword-tag {
+            background: var(--hover-bg);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+        .keyword-tag.high {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        .lead-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+        .lead-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .lead-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .lead-actions {
+            display: flex;
+            gap: 8px;
+        }
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, var(--reddit-orange) 0%, #ff6b35 100%);
+            color: white;
+            border-radius: 16px 16px 0 0;
+        }
+        .modal-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-body {
+            padding: 25px;
+        }
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        .form-group label small {
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--reddit-orange);
+        }
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        /* Tag Input */
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            min-height: 50px;
+            cursor: text;
+        }
+        .tag-input-container:focus-within {
+            border-color: var(--reddit-orange);
+        }
+        .tag-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--reddit-orange);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .tag-item .remove-tag {
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+        }
+        .tag-input {
+            flex: 1;
+            min-width: 100px;
+            border: none;
+            outline: none;
+            padding: 5px;
+            background: transparent;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+        /* Priority Selector */
+        .priority-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .priority-option {
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .priority-option:hover {
+            border-color: var(--primary);
+        }
+        .priority-option.selected {
+            border-color: var(--reddit-orange);
+            background: rgba(255, 69, 0, 0.05);
+        }
+        .priority-option .material-icons {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .priority-option.hot .material-icons { color: var(--danger); }
+        .priority-option.high .material-icons { color: var(--warning); }
+        .priority-option.medium .material-icons { color: var(--primary); }
+        /* Subreddit Suggestions */
+        .subreddit-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .subreddit-suggestion {
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: var(--hover-bg);
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+        .subreddit-suggestion:hover {
+            background: var(--reddit-orange);
+            color: white;
+            border-color: var(--reddit-orange);
+        }
+        /* Checkbox */
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--reddit-orange);
+        }
+        /* Modal Footer */
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 20px 25px;
+            border-top: 1px solid var(--border-color);
+            background: var(--hover-bg);
+            border-radius: 0 0 16px 16px;
+        }
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            z-index: 100;
+        }
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .empty-state .material-icons {
+            font-size: 64px;
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+        .empty-state h3 {
+            margin: 20px 0 10px;
+            color: var(--text-primary);
+        }
+        .empty-state p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        /* Loading */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--reddit-orange);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            display: none;
+            z-index: 2000;
+            box-shadow: var(--shadow-lg);
+        }
+        .toast.show {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <span class="material-icons reddit-icon">forum</span>
+            Reddit Lead Monitor
+        </h1>
+        <a href="../login.html" class="back-btn">
+            <span class="material-icons">arrow_back</span>
+            Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stat-card">
+            <div class="stat-icon orange">
+                <span class="material-icons">visibility</span>
+            </div>
+            <div>
+                <div class="stat-value" id="totalMonitors">0</div>
+                <div class="stat-label">Active Monitors</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <span class="material-icons">local_fire_department</span>
+            </div>
+            <div>
+                <div class="stat-value" id="hotLeads">0</div>
+                <div class="stat-label">Hot Leads Today</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <span class="material-icons">trending_up</span>
+            </div>
+            <div>
+                <div class="stat-value" id="totalLeads">0</div>
+                <div class="stat-label">Total Leads (7 days)</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon yellow">
+                <span class="material-icons">notifications_active</span>
+            </div>
+            <div>
+                <div class="stat-value" id="alertsSent">0</div>
+                <div class="stat-label">Alerts Sent</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Sidebar - Monitors -->
+        <div class="sidebar">
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>
+                        <span class="material-icons">radar</span>
+                        My Monitors
+                    </h3>
+                    <button class="btn btn-reddit btn-sm" onclick="openCreateModal()">
+                        <span class="material-icons">add</span>
+                        New
+                    </button>
+                </div>
+                <div class="section-body" id="monitorsContainer">
+                    <!-- Monitors will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>
+                        <span class="material-icons">bolt</span>
+                        Quick Actions
+                    </h3>
+                </div>
+                <div class="section-body">
+                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;" onclick="refreshFeeds()">
+                        <span class="material-icons">refresh</span>
+                        Refresh All Feeds
+                    </button>
+                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;" onclick="testSlackConnection()">
+                        <span class="material-icons">link</span>
+                        Test Slack Connection
+                    </button>
+                    <button class="btn btn-secondary" style="width: 100%;" onclick="exportLeads()">
+                        <span class="material-icons">download</span>
+                        Export Leads CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feed Section -->
+        <div class="feed-section">
+            <div class="feed-header">
+                <h2 style="display: flex; align-items: center; gap: 10px;">
+                    <span class="material-icons">rss_feed</span>
+                    Recent Leads
+                    <span class="loading-spinner" id="feedLoader" style="display: none;"></span>
+                </h2>
+                <div class="feed-filters">
+                    <button class="filter-btn active" onclick="filterLeads('all')">All</button>
+                    <button class="filter-btn" onclick="filterLeads('hot')">Hot Leads</button>
+                    <button class="filter-btn" onclick="filterLeads('high')">High Priority</button>
+                    <button class="filter-btn" onclick="filterLeads('new')">Last 24h</button>
+                </div>
+            </div>
+
+            <div id="leadsContainer">
+                <!-- Leads will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Monitor Modal -->
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>
+                    <span class="material-icons">add_circle</span>
+                    Create New Monitor
+                </h2>
+                <button class="modal-close" onclick="closeCreateModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="monitorForm">
+                    <div class="form-group">
+                        <label>Monitor Name</label>
+                        <input type="text" class="form-control" id="monitorName" placeholder="e.g., East Mesa Window Leads" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Subreddits to Monitor
+                            <small>(Press Enter to add)</small>
+                        </label>
+                        <div class="tag-input-container" id="subredditContainer" onclick="document.getElementById('subredditInput').focus()">
+                            <input type="text" class="tag-input" id="subredditInput" placeholder="Type subreddit name...">
+                        </div>
+                        <div class="subreddit-suggestions">
+                            <span class="subreddit-suggestion" onclick="addSubreddit('phoenix')">r/phoenix</span>
+                            <span class="subreddit-suggestion" onclick="addSubreddit('arizona')">r/arizona</span>
+                            <span class="subreddit-suggestion" onclick="addSubreddit('Gilbert')">r/Gilbert</span>
+                            <span class="subreddit-suggestion" onclick="addSubreddit('Mesa')">r/Mesa</span>
+                            <span class="subreddit-suggestion" onclick="addSubreddit('Chandler')">r/Chandler</span>
+                            <span class="subreddit-suggestion" onclick="addSubreddit('Tempe')">r/Tempe</span>
+                            <span class="subreddit-suggestion" onclick="addSubreddit('Scottsdale')">r/Scottsdale</span>
+                            <span class="subreddit-suggestion" onclick="addSubreddit('QueenCreek')">r/QueenCreek</span>
+                            <span class="subreddit-suggestion" onclick="addSubreddit('homeimprovement')">r/homeimprovement</span>
+                            <span class="subreddit-suggestion" onclick="addSubreddit('HomeOwners')">r/HomeOwners</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            High Priority Keywords
+                            <small>(Direct matches - Press Enter to add)</small>
+                        </label>
+                        <div class="tag-input-container" id="highKeywordContainer" onclick="document.getElementById('highKeywordInput').focus()">
+                            <input type="text" class="tag-input" id="highKeywordInput" placeholder="e.g., window replacement, broken window...">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Medium Priority Keywords
+                            <small>(Related topics - Press Enter to add)</small>
+                        </label>
+                        <div class="tag-input-container" id="mediumKeywordContainer" onclick="document.getElementById('mediumKeywordInput').focus()">
+                            <input type="text" class="tag-input" id="mediumKeywordInput" placeholder="e.g., energy bill, drafty house...">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Location Keywords <small>(Boost priority when mentioned)</small></label>
+                        <div class="tag-input-container" id="locationContainer" onclick="document.getElementById('locationInput').focus()">
+                            <input type="text" class="tag-input" id="locationInput" placeholder="e.g., mesa, gilbert, queen creek...">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Check Frequency</label>
+                        <select class="form-control" id="frequency">
+                            <option value="5">Every 5 minutes</option>
+                            <option value="10" selected>Every 10 minutes</option>
+                            <option value="15">Every 15 minutes</option>
+                            <option value="30">Every 30 minutes</option>
+                            <option value="60">Every hour</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notifications</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="slackNotify" checked>
+                                Send to Slack
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="emailNotify">
+                                Send Email
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="hotLeadsOnly">
+                                Hot Leads Only
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCreateModal()">Cancel</button>
+                <button class="btn btn-reddit" onclick="saveMonitor()">
+                    <span class="material-icons">save</span>
+                    Create Monitor
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="material-icons" id="toastIcon">check_circle</span>
+        <span id="toastMessage">Success!</span>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="../login.html" class="btn btn-secondary">
+            <span class="material-icons">dashboard</span>
+            Dashboard
+        </a>
+        <button class="btn btn-reddit" onclick="openCreateModal()">
+            <span class="material-icons">add</span>
+            New Monitor
+        </button>
+        <button class="btn btn-secondary" onclick="toggleDarkMode()">
+            <span class="material-icons" id="themeIcon">dark_mode</span>
+        </button>
+    </div>
+
+    <script>
+        // State Management
+        let monitors = [];
+        let leads = [];
+        let subreddits = [];
+        let highKeywords = [];
+        let mediumKeywords = [];
+        let locations = [];
+        let currentFilter = 'all';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadMonitors();
+            loadLeads();
+            setupTagInputs();
+            loadTheme();
+        });
+
+        // Authentication Check
+        function checkAuth() {
+            const adminToken = localStorage.getItem('adminToken');
+            if (!adminToken) {
+                window.location.href = '../login.html';
+            }
+        }
+
+        // Theme Management
+        function loadTheme() {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+            updateThemeIcon(theme);
+        }
+
+        function toggleDarkMode() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            document.getElementById('themeIcon').textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
+        }
+
+        // Tag Input Setup
+        function setupTagInputs() {
+            setupTagInput('subredditInput', 'subredditContainer', subreddits);
+            setupTagInput('highKeywordInput', 'highKeywordContainer', highKeywords);
+            setupTagInput('mediumKeywordInput', 'mediumKeywordContainer', mediumKeywords);
+            setupTagInput('locationInput', 'locationContainer', locations);
+        }
+
+        function setupTagInput(inputId, containerId, array) {
+            const input = document.getElementById(inputId);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && input.value.trim()) {
+                    e.preventDefault();
+                    addTag(input.value.trim(), containerId, array);
+                    input.value = '';
+                }
+            });
+        }
+
+        function addTag(value, containerId, array) {
+            if (!array.includes(value.toLowerCase())) {
+                array.push(value.toLowerCase());
+                renderTags(containerId, array);
+            }
+        }
+
+        function removeTag(value, containerId, array) {
+            const index = array.indexOf(value.toLowerCase());
+            if (index > -1) {
+                array.splice(index, 1);
+                renderTags(containerId, array);
+            }
+        }
+
+        function renderTags(containerId, array) {
+            const container = document.getElementById(containerId);
+            const input = container.querySelector('.tag-input');
+            container.innerHTML = '';
+            array.forEach(tag => {
+                const tagEl = document.createElement('span');
+                tagEl.className = 'tag-item';
+                tagEl.innerHTML = `${tag} <span class="remove-tag" onclick="removeTag('${tag}', '${containerId}', ${containerId === 'subredditContainer' ? 'subreddits' : containerId === 'highKeywordContainer' ? 'highKeywords' : containerId === 'mediumKeywordContainer' ? 'mediumKeywords' : 'locations'})">&times;</span>`;
+                container.appendChild(tagEl);
+            });
+            container.appendChild(input);
+        }
+
+        function addSubreddit(name) {
+            addTag(name, 'subredditContainer', subreddits);
+        }
+
+        // Modal Management
+        function openCreateModal() {
+            document.getElementById('createModal').classList.add('active');
+            // Reset form
+            document.getElementById('monitorForm').reset();
+            subreddits = [];
+            highKeywords = [];
+            mediumKeywords = [];
+            locations = [];
+            renderTags('subredditContainer', subreddits);
+            renderTags('highKeywordContainer', highKeywords);
+            renderTags('mediumKeywordContainer', mediumKeywords);
+            renderTags('locationContainer', locations);
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.remove('active');
+        }
+
+        // Save Monitor
+        function saveMonitor() {
+            const name = document.getElementById('monitorName').value;
+            if (!name) {
+                showToast('Please enter a monitor name', 'error');
+                return;
+            }
+            if (subreddits.length === 0) {
+                showToast('Please add at least one subreddit', 'error');
+                return;
+            }
+            if (highKeywords.length === 0 && mediumKeywords.length === 0) {
+                showToast('Please add at least one keyword', 'error');
+                return;
+            }
+
+            const monitor = {
+                id: Date.now(),
+                name: name,
+                subreddits: [...subreddits],
+                highKeywords: [...highKeywords],
+                mediumKeywords: [...mediumKeywords],
+                locations: [...locations],
+                frequency: parseInt(document.getElementById('frequency').value),
+                notifications: {
+                    slack: document.getElementById('slackNotify').checked,
+                    email: document.getElementById('emailNotify').checked,
+                    hotLeadsOnly: document.getElementById('hotLeadsOnly').checked
+                },
+                active: true,
+                createdAt: new Date().toISOString(),
+                leadsFound: 0
+            };
+
+            monitors.push(monitor);
+            saveMonitorsToStorage();
+            closeCreateModal();
+            renderMonitors();
+            showToast('Monitor created successfully!', 'success');
+
+            // Generate n8n workflow
+            generateN8nWorkflow(monitor);
+        }
+
+        // Generate n8n Workflow JSON
+        function generateN8nWorkflow(monitor) {
+            const rssUrl = `https://www.reddit.com/r/${monitor.subreddits.join('+')}/new/.rss?limit=100`;
+
+            const workflow = {
+                name: `Reddit Monitor - ${monitor.name}`,
+                active: true,
+                nodes: [
+                    {
+                        parameters: {
+                            rule: { interval: [{ field: "minutes", minutesInterval: monitor.frequency }] }
+                        },
+                        id: "schedule",
+                        name: `Every ${monitor.frequency} Minutes`,
+                        type: "n8n-nodes-base.scheduleTrigger",
+                        typeVersion: 1.2,
+                        position: [0, 0]
+                    },
+                    {
+                        parameters: {
+                            method: "GET",
+                            url: rssUrl,
+                            sendHeaders: true,
+                            headerParameters: {
+                                parameters: [{ name: "User-Agent", value: "Mozilla/5.0 (compatible; TownRanker-Reddit-Monitor/1.0)" }]
+                            },
+                            options: { response: { response: { responseFormat: "text" } } }
+                        },
+                        id: "http-fetch",
+                        name: "Fetch Reddit RSS",
+                        type: "n8n-nodes-base.httpRequest",
+                        typeVersion: 4.2,
+                        position: [250, 0]
+                    }
+                ]
+            };
+
+            // Store workflow JSON for export
+            monitor.workflow = workflow;
+            saveMonitorsToStorage();
+
+            console.log('Generated workflow:', JSON.stringify(workflow, null, 2));
+        }
+
+        // Storage
+        function saveMonitorsToStorage() {
+            localStorage.setItem('reddit_monitors', JSON.stringify(monitors));
+            updateStats();
+        }
+
+        function loadMonitors() {
+            const saved = localStorage.getItem('reddit_monitors');
+            if (saved) {
+                monitors = JSON.parse(saved);
+            }
+
+            // Add default East Mesa monitor if none exist
+            if (monitors.length === 0) {
+                const defaultMonitor = {
+                    id: 1732765200000,
+                    name: "East Mesa Windows & Doors",
+                    subreddits: ['phoenix', 'arizona', 'Gilbert', 'GilbertAZ', 'Mesa', 'QueenCreek', 'SanTanValley', 'ApacheJunction', 'Chandler', 'Tempe', 'Scottsdale', 'MaricopaAZ', 'Ahwatukee', 'FountainHillsAZ', 'homeimprovement', 'HomeImprovement', 'homeowners', 'firsttimehomebuyer', 'RealEstate', 'ArizonaRealEstate'],
+                    highKeywords: ['window', 'windows', 'door', 'doors', 'patio door', 'sliding door', 'french door', 'entry door', 'front door', 'sliding glass', 'glass door', 'screen door', 'storm door', 'security door', 'window replacement', 'door replacement', 'replace windows', 'replace door', 'window install', 'door install', 'new windows', 'new door', 'window company', 'window contractor', 'double pane', 'single pane', 'dual pane', 'triple pane', 'vinyl window', 'broken window', 'foggy window', 'window repair', 'door repair', 'milgard', 'pella', 'andersen', 'simonton', 'anlin', 'bay window', 'casement window', 'awning window'],
+                    mediumKeywords: ['home renovation', 'home remodel', 'curb appeal', 'hvac', 'ac bill', 'electric bill', 'energy bill', 'drafty', 'air leak', 'insulation', 'condensation', 'noise', 'soundproof', 'break in', 'security', 'flip house', 'fixer upper', 'just bought', 'new home', 'contractor recommendation', 'who do you use', 'looking for recommendation'],
+                    locations: ['mesa', 'gilbert', 'queen creek', 'san tan', 'apache junction', 'chandler', 'tempe', 'scottsdale', 'phoenix', 'ahwatukee', 'gold canyon', 'fountain hills', 'maricopa', 'east valley', 'power ranch', 'sossaman', 'ellsworth', 'signal butte'],
+                    frequency: 10,
+                    notifications: {
+                        slack: true,
+                        email: false,
+                        hotLeadsOnly: false
+                    },
+                    active: true,
+                    createdAt: new Date().toISOString(),
+                    leadsFound: 4,
+                    n8nWorkflowId: '1tn68GcPGdOPOXJS'
+                };
+                monitors.push(defaultMonitor);
+                saveMonitorsToStorage();
+            }
+
+            renderMonitors();
+            updateStats();
+        }
+
+        function renderMonitors() {
+            const container = document.getElementById('monitorsContainer');
+            if (monitors.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 30px; color: var(--text-secondary);">
+                        <span class="material-icons" style="font-size: 48px; opacity: 0.5;">radar</span>
+                        <p style="margin-top: 10px;">No monitors yet</p>
+                        <button class="btn btn-reddit btn-sm" style="margin-top: 15px;" onclick="openCreateModal()">
+                            <span class="material-icons">add</span>
+                            Create First Monitor
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = monitors.map(m => `
+                <div class="monitor-item ${m.active ? 'active' : ''}" onclick="selectMonitor(${m.id})">
+                    <div class="monitor-name">
+                        ${m.name}
+                        <span class="monitor-status ${m.active ? 'active' : 'paused'}">
+                            ${m.active ? 'Active' : 'Paused'}
+                        </span>
+                    </div>
+                    <div class="monitor-meta">
+                        ${m.subreddits.length} subreddits • ${m.highKeywords.length + m.mediumKeywords.length} keywords
+                    </div>
+                    <div class="monitor-meta" style="margin-top: 5px;">
+                        <span class="material-icons" style="font-size: 14px; vertical-align: middle;">schedule</span>
+                        Every ${m.frequency} min
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectMonitor(id) {
+            console.log('Selected monitor:', id);
+            // Could show details or filter leads by this monitor
+        }
+
+        // Leads Management
+        function loadLeads() {
+            // Demo leads - in production would fetch from API
+            leads = [
+                {
+                    id: 1,
+                    title: "Need window replacement recommendations in Mesa",
+                    subreddit: "Mesa",
+                    author: "homeowner2024",
+                    content: "Just bought a house in East Mesa near Power Ranch and need to replace all the windows. The single pane windows are killing our AC bill. Anyone have recommendations for a good window company?",
+                    link: "https://reddit.com/r/Mesa/comments/example1",
+                    priority: "hot",
+                    score: 12,
+                    keywords: ["window replacement", "window company", "ac bill"],
+                    locations: ["mesa", "power ranch"],
+                    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+                },
+                {
+                    id: 2,
+                    title: "Sliding glass door stuck - need repair or replacement",
+                    subreddit: "Gilbert",
+                    author: "gilbertresident",
+                    content: "My sliding glass door won't open anymore. It's about 15 years old. Should I try to repair it or just get a new one? Any recommendations for door companies in Gilbert?",
+                    link: "https://reddit.com/r/Gilbert/comments/example2",
+                    priority: "high",
+                    score: 9,
+                    keywords: ["sliding glass door", "door replacement", "door repair"],
+                    locations: ["gilbert"],
+                    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
+                },
+                {
+                    id: 3,
+                    title: "High energy bills - considering new windows",
+                    subreddit: "phoenix",
+                    author: "azliving",
+                    content: "Our energy bill hit $400 last month. House was built in 1985 with original windows. Thinking about upgrading to dual pane. Has anyone done this? Worth the investment?",
+                    link: "https://reddit.com/r/phoenix/comments/example3",
+                    priority: "high",
+                    score: 7,
+                    keywords: ["energy bill", "new windows", "dual pane"],
+                    locations: [],
+                    timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString()
+                },
+                {
+                    id: 4,
+                    title: "Foggy windows - condensation between panes",
+                    subreddit: "homeimprovement",
+                    author: "diyenthusiast",
+                    content: "Several of my windows have condensation/fog between the panes. Can these be repaired or do I need full replacements? In Arizona if that matters.",
+                    link: "https://reddit.com/r/homeimprovement/comments/example4",
+                    priority: "medium",
+                    score: 5,
+                    keywords: ["foggy window", "window repair"],
+                    locations: ["arizona"],
+                    timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
+                }
+            ];
+            renderLeads();
+            updateStats();
+        }
+
+        function renderLeads() {
+            const container = document.getElementById('leadsContainer');
+            let filteredLeads = [...leads];
+
+            if (currentFilter === 'hot') {
+                filteredLeads = leads.filter(l => l.priority === 'hot');
+            } else if (currentFilter === 'high') {
+                filteredLeads = leads.filter(l => l.priority === 'hot' || l.priority === 'high');
+            } else if (currentFilter === 'new') {
+                const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
+                filteredLeads = leads.filter(l => new Date(l.timestamp).getTime() > dayAgo);
+            }
+
+            if (filteredLeads.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="material-icons">inbox</span>
+                        <h3>No leads found</h3>
+                        <p>Try adjusting your filters or create a new monitor to find leads.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredLeads.map(lead => `
+                <div class="lead-card ${lead.priority === 'hot' ? 'hot-lead' : lead.priority === 'high' ? 'high-priority' : ''}">
+                    <div class="lead-header">
+                        <span class="lead-subreddit">
+                            <span class="material-icons" style="font-size: 14px;">forum</span>
+                            r/${lead.subreddit}
+                        </span>
+                        <span class="lead-priority ${lead.priority}">
+                            ${lead.priority === 'hot' ? '🔥 HOT LEAD' : lead.priority === 'high' ? '⚡ HIGH' : '📋 MEDIUM'}
+                            (Score: ${lead.score})
+                        </span>
+                    </div>
+                    <div class="lead-title">
+                        <a href="${lead.link}" target="_blank">${lead.title}</a>
+                    </div>
+                    <div class="lead-content">${lead.content.substring(0, 200)}...</div>
+                    <div class="lead-keywords">
+                        ${lead.keywords.map(k => `<span class="keyword-tag high">${k}</span>`).join('')}
+                        ${lead.locations.map(l => `<span class="keyword-tag">📍 ${l}</span>`).join('')}
+                    </div>
+                    <div class="lead-footer">
+                        <div class="lead-meta">
+                            <span>
+                                <span class="material-icons" style="font-size: 14px;">person</span>
+                                u/${lead.author}
+                            </span>
+                            <span>
+                                <span class="material-icons" style="font-size: 14px;">schedule</span>
+                                ${formatTimeAgo(lead.timestamp)}
+                            </span>
+                        </div>
+                        <div class="lead-actions">
+                            <a href="${lead.link}" target="_blank" class="btn btn-reddit btn-sm">
+                                <span class="material-icons">open_in_new</span>
+                                View Post
+                            </a>
+                            <button class="btn btn-secondary btn-sm" onclick="addToLeads(${lead.id})">
+                                <span class="material-icons">person_add</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterLeads(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderLeads();
+        }
+
+        function formatTimeAgo(timestamp) {
+            const seconds = Math.floor((Date.now() - new Date(timestamp).getTime()) / 1000);
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+            return `${Math.floor(seconds / 86400)}d ago`;
+        }
+
+        // Stats
+        function updateStats() {
+            document.getElementById('totalMonitors').textContent = monitors.filter(m => m.active).length;
+            document.getElementById('hotLeads').textContent = leads.filter(l => l.priority === 'hot').length;
+            document.getElementById('totalLeads').textContent = leads.length;
+            document.getElementById('alertsSent').textContent = monitors.reduce((acc, m) => acc + (m.leadsFound || 0), 0);
+        }
+
+        // Actions
+        function refreshFeeds() {
+            document.getElementById('feedLoader').style.display = 'inline-block';
+            showToast('Refreshing feeds...', 'info');
+            setTimeout(() => {
+                document.getElementById('feedLoader').style.display = 'none';
+                showToast('Feeds refreshed!', 'success');
+            }, 2000);
+        }
+
+        function testSlackConnection() {
+            showToast('Testing Slack connection...', 'info');
+            setTimeout(() => {
+                showToast('Slack connection successful!', 'success');
+            }, 1500);
+        }
+
+        function exportLeads() {
+            const csv = [
+                ['Title', 'Subreddit', 'Author', 'Priority', 'Score', 'Keywords', 'Link', 'Timestamp'],
+                ...leads.map(l => [
+                    l.title,
+                    l.subreddit,
+                    l.author,
+                    l.priority,
+                    l.score,
+                    l.keywords.join('; '),
+                    l.link,
+                    l.timestamp
+                ])
+            ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `reddit-leads-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            showToast('Leads exported!', 'success');
+        }
+
+        function addToLeads(leadId) {
+            const lead = leads.find(l => l.id === leadId);
+            if (lead) {
+                showToast(`Added ${lead.author} to your leads!`, 'success');
+            }
+        }
+
+        // Toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const msg = document.getElementById('toastMessage');
+
+            icon.textContent = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
+            icon.style.color = type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--primary)';
+            msg.textContent = message;
+
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

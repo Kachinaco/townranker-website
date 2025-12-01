@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor Settings - TownRanker</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d24;
+            --surface-2: #22262f;
+            --border: #2d323c;
+            --text: #f5f5f5;
+            --text-dim: #8b8f98;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --reddit: #ff4500;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .reddit-badge {
+            background: var(--reddit);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        .status-dot.active { background: var(--success); }
+        .status-dot.inactive { background: var(--danger); animation: none; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .status-info {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+        }
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .toggle {
+            position: relative;
+            width: 52px;
+            height: 28px;
+        }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: var(--surface-2);
+            border-radius: 28px;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+        .toggle-slider:before {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: var(--text-dim);
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .toggle input:checked + .toggle-slider {
+            background: var(--success);
+            border-color: var(--success);
+        }
+        .toggle input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+            background: white;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+        /* Mobile Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 0.75rem; }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            .header-left {
+                flex-direction: column;
+                align-items: flex-start;
+                width: 100%;
+            }
+            .header-left .btn { width: 100%; margin-right: 0 !important; font-size: 0.8rem; padding: 0.5rem 0.75rem; }
+            .header > div {
+                width: 100%;
+                display: flex;
+                gap: 0.5rem;
+            }
+            .header > div .btn { flex: 1; font-size: 0.8rem; }
+            .page-title {
+                font-size: 1rem;
+                flex-wrap: wrap;
+            }
+            .reddit-badge { padding: 2px 6px; font-size: 0.6rem; }
+            .status-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+                padding: 0.75rem;
+            }
+            .status-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+                width: 100%;
+            }
+            .status-indicator { font-size: 0.75rem; padding: 0.35rem 0.625rem; }
+            .last-check { font-size: 0.7rem; }
+            .toggle-container {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .toggle-label { font-size: 0.75rem; }
+            .tabs { flex-direction: column; gap: 0.35rem; }
+            .tab { width: 100%; padding: 0.5rem 0.75rem; font-size: 0.8rem; }
+            .grid { gap: 0.75rem; }
+            .card-header { padding: 0.625rem 0.75rem; }
+            .card-title { font-size: 0.85rem; }
+            .card-body { padding: 0.75rem; }
+            .tags-area {
+                min-height: 50px;
+                max-height: 100px;
+            }
+            .tag {
+                font-size: 0.65rem;
+                padding: 0.25rem 0.5rem;
+            }
+            .input-row { flex-direction: column; gap: 0.5rem; }
+            .input-row input { width: 100%; font-size: 0.85rem; padding: 0.5rem 0.625rem; }
+            .input-row .btn { width: 100%; font-size: 0.8rem; }
+            .config-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            .config-item label { font-size: 0.75rem; }
+            .config-item select,
+            .config-item input {
+                font-size: 16px; /* Prevents iOS zoom */
+                padding: 0.5rem 0.625rem;
+            }
+            .action-bar {
+                flex-direction: column;
+                gap: 0.75rem;
+                padding: 0.75rem;
+            }
+            .action-bar-left { width: 100%; text-align: center; font-size: 0.75rem; }
+            .action-bar-right {
+                width: 100%;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .action-bar-right .btn { width: 100%; font-size: 0.8rem; padding: 0.5rem; }
+            .leads-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            .leads-header h3 { font-size: 0.9rem; }
+            .leads-header .btn { width: 100%; font-size: 0.8rem; }
+            .lead-card { padding: 0.75rem; }
+            .lead-header {
+                flex-direction: column;
+                gap: 0.35rem;
+            }
+            .lead-badges { order: 1; }
+            .lead-time { order: 2; font-size: 0.65rem; }
+            .lead-title { font-size: 0.85rem; }
+            .lead-content { font-size: 0.75rem; }
+            .lead-footer {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .lead-keywords { width: 100%; }
+            .lead-keyword { font-size: 0.6rem; }
+            .btn-reddit { width: 100%; justify-content: center; font-size: 0.75rem; padding: 0.5rem; }
+        }
+        .full-width { grid-column: 1 / -1; }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .card-title .material-icons-round {
+            font-size: 1.25rem;
+            color: var(--accent);
+        }
+        .card-count {
+            background: var(--surface-2);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dim);
+        }
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        /* Tags */
+        .tags-area {
+            min-height: 80px;
+            max-height: 160px;
+            overflow-y: auto;
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 0.75rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-content: flex-start;
+        }
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            background: var(--surface-2);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            cursor: default;
+        }
+        .tag:hover { background: var(--border); }
+        .tag .remove {
+            cursor: pointer;
+            opacity: 0.5;
+            font-size: 1rem;
+        }
+        .tag .remove:hover { opacity: 1; color: var(--danger); }
+        .tag.subreddit { background: rgba(255,69,0,0.15); color: var(--reddit); }
+        .tag.keyword { background: rgba(34,197,94,0.15); color: var(--success); }
+        .tag.context { background: rgba(99,102,241,0.15); color: var(--accent); }
+        .tag.exclude { background: rgba(245,158,11,0.15); color: var(--warning); }
+
+        /* Input Row */
+        .input-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        .input-row input {
+            flex: 1;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.625rem 1rem;
+            color: var(--text);
+            font-size: 0.875rem;
+            outline: none;
+        }
+        .input-row input:focus { border-color: var(--accent); }
+        .input-row input::placeholder { color: var(--text-dim); }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-icon { padding: 0.625rem; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { filter: brightness(1.1); }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .btn-outline:hover { background: var(--surface-2); }
+
+        /* Config Grid */
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+        }
+        .config-item label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .config-item input, .config-item select {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.625rem 1rem;
+            color: var(--text);
+            font-size: 0.875rem;
+            outline: none;
+        }
+        .config-item input:focus, .config-item select:focus {
+            border-color: var(--accent);
+        }
+
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+        }
+        .action-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-dim);
+            font-size: 0.875rem;
+        }
+        .action-bar-right {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+        }
+        .toast {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.875rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .toast.success { border-left: 3px solid var(--success); }
+        .toast.error { border-left: 3px solid var(--danger); }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Leads Section */
+        .leads-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .lead-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.15s;
+        }
+        .lead-card:hover {
+            border-color: var(--accent);
+        }
+        .lead-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        .lead-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .lead-badge {
+            padding: 0.25rem 0.625rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .lead-badge.hot { background: linear-gradient(135deg, var(--danger), var(--warning)); color: white; }
+        .lead-badge.high { background: rgba(239,68,68,0.15); color: var(--danger); }
+        .lead-badge.medium { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .lead-badge.subreddit { background: rgba(255,69,0,0.15); color: var(--reddit); }
+        .lead-time { color: var(--text-dim); font-size: 0.75rem; }
+        .lead-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+        .lead-content {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+        }
+        .lead-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+        }
+        .lead-keywords {
+            display: flex;
+            gap: 0.375rem;
+            flex-wrap: wrap;
+        }
+        .lead-kw {
+            background: rgba(34,197,94,0.15);
+            color: var(--success);
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+        .btn-reddit {
+            background: var(--reddit);
+            color: white;
+            text-decoration: none;
+        }
+        .btn-reddit:hover { filter: brightness(1.1); }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-dim);
+        }
+        .empty-state .material-icons-round {
+            font-size: 3rem;
+            opacity: 0.5;
+            margin-bottom: 1rem;
+        }
+
+        /* Loading */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--surface);
+            padding: 0.25rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+        .tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .tab:hover { color: var(--text); background: var(--surface-2); }
+        .tab.active { background: var(--accent); color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Mobile Sidebar */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-right: 0.5rem;
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 998;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            z-index: 999;
+            transition: left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar.active {
+            left: 0;
+        }
+        .sidebar-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+        .sidebar-logo-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .sidebar-close {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+        .sidebar-section {
+            padding: 0 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-dim);
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.15s;
+        }
+        .sidebar-link:hover {
+            background: var(--surface-2);
+            color: var(--text);
+        }
+        .sidebar-link.active {
+            background: rgba(99,102,241,0.15);
+            color: var(--accent);
+        }
+        .sidebar-link .material-icons-round {
+            font-size: 1.25rem;
+        }
+        .sidebar-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--border);
+        }
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .sidebar-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--surface-2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-user-info {
+            flex: 1;
+        }
+        .sidebar-user-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .sidebar-user-role {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+        @media (max-width: 600px) {
+            .menu-toggle { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/login" class="sidebar-logo">
+                <div class="sidebar-logo-icon">TR</div>
+                <span class="sidebar-logo-text">TownRanker</span>
+            </a>
+            <button class="sidebar-close" onclick="closeSidebar()">
+                <span class="material-icons-round">close</span>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Main</div>
+                <a href="/login" class="sidebar-link">
+                    <span class="material-icons-round">dashboard</span>
+                    Dashboard
+                </a>
+                <a href="/admin/reddit-dashboard.html" class="sidebar-link active">
+                    <span class="material-icons-round">forum</span>
+                    Reddit Monitors
+                </a>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Tools</div>
+                <a href="/admin/seo-dashboard.html" class="sidebar-link">
+                    <span class="material-icons-round">trending_up</span>
+                    SEO Dashboard
+                </a>
+                <a href="/admin/seo-checklist.html" class="sidebar-link">
+                    <span class="material-icons-round">checklist</span>
+                    SEO Checklist
+                </a>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Account</div>
+                <a href="#" class="sidebar-link" onclick="logout()">
+                    <span class="material-icons-round">logout</span>
+                    Logout
+                </a>
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar">
+                    <span class="material-icons-round">person</span>
+                </div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name">Admin</div>
+                    <div class="sidebar-user-role">Administrator</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle" onclick="openSidebar()">
+                    <span class="material-icons-round">menu</span>
+                </button>
+                <a href="/admin/reddit-dashboard.html" class="btn btn-outline" style="margin-right: 0.75rem;">
+                    <span class="material-icons-round">arrow_back</span>
+                    Back
+                </a>
+                <h1 class="page-title">
+                    <span id="monitorTitle">Monitor Settings</span>
+                    <span class="reddit-badge" id="monitorBadge">Loading...</span>
+                </h1>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <button class="btn btn-outline" onclick="runMonitorNow()">
+                    <span class="material-icons-round">play_circle</span>
+                    Run Now
+                </button>
+                <button class="btn btn-outline" onclick="loadConfig()">
+                    <span class="material-icons-round">refresh</span>
+                    Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-left">
+                <div class="status-indicator">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Loading...</span>
+                </div>
+                <div class="status-info">
+                    Monitoring <strong id="subredditCount">0</strong> subreddits every <strong id="intervalDisplay">30</strong> minutes
+                </div>
+            </div>
+            <div class="toggle-container">
+                <span style="font-size: 0.875rem; color: var(--text-dim);">Enable</span>
+                <label class="toggle">
+                    <input type="checkbox" id="activeToggle" onchange="toggleMonitor()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="settings" onclick="switchTab('settings')">
+                <span class="material-icons-round">settings</span>
+                Settings
+            </button>
+            <button class="tab" data-tab="leads" onclick="switchTab('leads')">
+                <span class="material-icons-round">local_fire_department</span>
+                Live Leads
+                <span id="leadsCount" style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px; font-size: 0.75rem;">0</span>
+            </button>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content active" id="settings-tab">
+            <div class="grid">
+                <!-- Subreddits -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span class="material-icons-round">forum</span>
+                            Subreddits
+                        </div>
+                        <span class="card-count" id="subredditCountBadge">0</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="tags-area" id="subredditTags"></div>
+                        <div class="input-row">
+                            <input type="text" id="newSubreddit" placeholder="Add subreddit (e.g., phoenix)" onkeypress="if(event.key==='Enter')addSubreddit()">
+                            <button class="btn btn-primary btn-icon" onclick="addSubreddit()">
+                                <span class="material-icons-round">add</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- High Priority Keywords -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span class="material-icons-round">priority_high</span>
+                            High Priority Keywords
+                        </div>
+                        <span class="card-count" id="keywordCountBadge">0</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="tags-area" id="keywordTags"></div>
+                        <div class="input-row">
+                            <input type="text" id="newKeyword" placeholder="e.g., window replacement" onkeypress="if(event.key==='Enter')addKeyword()">
+                            <button class="btn btn-primary btn-icon" onclick="addKeyword()">
+                                <span class="material-icons-round">add</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Context Keywords -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span class="material-icons-round">label</span>
+                            Context Keywords
+                        </div>
+                        <span class="card-count" id="contextCountBadge">0</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="tags-area" id="contextTags"></div>
+                        <div class="input-row">
+                            <input type="text" id="newContext" placeholder="e.g., recommend, contractor" onkeypress="if(event.key==='Enter')addContext()">
+                            <button class="btn btn-primary btn-icon" onclick="addContext()">
+                                <span class="material-icons-round">add</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exclusion Keywords -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span class="material-icons-round">block</span>
+                            Exclusion Keywords
+                        </div>
+                        <span class="card-count" id="exclusionCountBadge">0</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="tags-area" id="exclusionTags"></div>
+                        <div class="input-row">
+                            <input type="text" id="newExclusion" placeholder="e.g., restaurant, hiring" onkeypress="if(event.key==='Enter')addExclusion()">
+                            <button class="btn btn-primary btn-icon" onclick="addExclusion()">
+                                <span class="material-icons-round">add</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuration -->
+                <div class="card full-width">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span class="material-icons-round">tune</span>
+                            Configuration
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="config-grid">
+                            <div class="config-item">
+                                <label>Scan Interval</label>
+                                <select id="intervalSelect" onchange="updateInterval()">
+                                    <option value="15">Every 15 minutes</option>
+                                    <option value="30" selected>Every 30 minutes</option>
+                                    <option value="60">Every hour</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label>Post Age Limit</label>
+                                <select id="ageSelect">
+                                    <option value="30">Last 30 minutes</option>
+                                    <option value="60" selected>Last hour</option>
+                                    <option value="120">Last 2 hours</option>
+                                    <option value="1440">Last 24 hours</option>
+                                </select>
+                            </div>
+                            <div class="config-item" style="grid-column: 1 / -1;">
+                                <label>Slack Webhook URL</label>
+                                <input type="text" id="slackWebhook" placeholder="https://hooks.slack.com/services/...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <div class="action-bar-left">
+                    <span id="lastSaved">Not saved yet</span>
+                </div>
+                <div class="action-bar-right">
+                    <button class="btn btn-outline" onclick="loadConfig()">
+                        <span class="material-icons-round">undo</span>
+                        Discard
+                    </button>
+                    <button class="btn btn-success" id="saveBtn" onclick="saveConfig()">
+                        <span class="material-icons-round">save</span>
+                        Save Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leads Tab -->
+        <div class="tab-content" id="leads-tab">
+            <div class="leads-header">
+                <h2 style="font-size: 1.25rem; font-weight: 600;">Recent Leads</h2>
+                <button class="btn btn-outline" onclick="loadLeads()">
+                    <span class="material-icons-round">refresh</span>
+                    Refresh
+                </button>
+            </div>
+            <div id="leadsList">
+                <div class="empty-state">
+                    <span class="material-icons-round">hourglass_empty</span>
+                    <p>Loading leads...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Get monitor ID from URL
+        var urlParams = new URLSearchParams(window.location.search);
+        var monitorId = urlParams.get('id') || 'phoenix-windows';
+
+        // State
+        let config = {
+            subreddits: [],
+            highPriorityKeywords: [],
+            contextKeywords: [],
+            exclusionKeywords: [],
+            intervalMinutes: 30,
+            timeWindowMinutes: 60,
+            slackWebhook: '',
+            active: false
+        };
+
+        let monitorData = null;
+
+        // Auth
+        function getToken() {
+            return localStorage.getItem('token') || sessionStorage.getItem('token') ||
+                   localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfig();
+        });
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(function(t) {
+                t.classList.toggle('active', t.dataset.tab === tab);
+            });
+            document.querySelectorAll('.tab-content').forEach(function(c) {
+                c.classList.toggle('active', c.id === tab + '-tab');
+            });
+            if (tab === 'leads') loadLeads();
+        }
+
+        // Load config
+        async function loadConfig() {
+            try {
+                var res = await fetch('/api/reddit-monitors/' + monitorId, {
+                    headers: { 'Authorization': 'Bearer ' + getToken() }
+                });
+                var data = await res.json();
+                if (data.success && data.monitor) {
+                    monitorData = data.monitor;
+                    // Map Node.js monitor format to UI config
+                    config = {
+                        subreddits: monitorData.targetSubreddits || [],
+                        highPriorityKeywords: monitorData.serviceKeywords || [],
+                        contextKeywords: monitorData.highIntentPhrases || [],
+                        exclusionKeywords: monitorData.exclusionKeywords || [],
+                        intervalMinutes: (monitorData.schedule && monitorData.schedule.intervalMinutes) || 30,
+                        timeWindowMinutes: 60,
+                        slackWebhook: (monitorData.notifications && monitorData.notifications.slack && monitorData.notifications.slack.webhookUrl) || '',
+                        active: monitorData.schedule && monitorData.schedule.enabled,
+                        lastUpdated: monitorData.lastUpdated
+                    };
+                    // Update header with monitor name
+                    document.getElementById('monitorTitle').textContent = monitorData.name || monitorId;
+                    document.getElementById('monitorBadge').textContent = config.active ? 'ACTIVE' : 'PAUSED';
+                    document.getElementById('monitorBadge').style.background = config.active ? 'var(--success)' : 'var(--warning)';
+                    renderAll();
+                } else {
+                    showToast('Monitor not found', 'error');
+                    window.location.href = '/admin/reddit-dashboard.html';
+                }
+            } catch (e) {
+                showToast('Failed to load config', 'error');
+                console.error(e);
+            }
+        }
+
+        // Save config
+        async function saveConfig() {
+            var btn = document.getElementById('saveBtn');
+            btn.innerHTML = '<span class="spinner"></span> Saving...';
+            btn.disabled = true;
+
+            config.intervalMinutes = parseInt(document.getElementById('intervalSelect').value);
+            config.timeWindowMinutes = parseInt(document.getElementById('ageSelect').value);
+            config.slackWebhook = document.getElementById('slackWebhook').value;
+
+            // Build update payload in Node.js monitor format
+            var updateData = {
+                targetSubreddits: config.subreddits,
+                serviceKeywords: config.highPriorityKeywords,
+                highIntentPhrases: config.contextKeywords,
+                exclusionKeywords: config.exclusionKeywords,
+                schedule: {
+                    intervalMinutes: config.intervalMinutes,
+                    enabled: config.active
+                },
+                notifications: {
+                    slack: {
+                        enabled: !!config.slackWebhook,
+                        webhookUrl: config.slackWebhook
+                    }
+                }
+            };
+
+            try {
+                var res = await fetch('/api/reddit-monitors/' + monitorId, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify(updateData)
+                });
+                var data = await res.json();
+                if (data.success) {
+                    showToast('Settings saved!', 'success');
+                    document.getElementById('lastSaved').textContent = 'Saved just now';
+                } else {
+                    showToast('Save failed: ' + data.message, 'error');
+                }
+            } catch (e) {
+                showToast('Error saving: ' + e.message, 'error');
+            } finally {
+                btn.innerHTML = '<span class="material-icons-round">save</span> Save Settings';
+                btn.disabled = false;
+            }
+        }
+
+        // Toggle monitor
+        async function toggleMonitor() {
+            var active = document.getElementById('activeToggle').checked;
+            try {
+                var res = await fetch('/api/reddit-monitors/' + monitorId + '/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify({ active: active })
+                });
+                var data = await res.json();
+                if (data.success) {
+                    config.active = active;
+                    updateStatus();
+                    document.getElementById('monitorBadge').textContent = active ? 'ACTIVE' : 'PAUSED';
+                    document.getElementById('monitorBadge').style.background = active ? 'var(--success)' : 'var(--warning)';
+                    showToast(active ? 'Monitor activated' : 'Monitor paused', 'success');
+                }
+            } catch (e) {
+                document.getElementById('activeToggle').checked = !active;
+                showToast('Toggle failed', 'error');
+            }
+        }
+
+        // Run monitor manually
+        async function runMonitorNow() {
+            showToast('Running monitor...', 'success');
+            try {
+                var res = await fetch('/api/reddit-monitors/' + monitorId + '/run', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + getToken() }
+                });
+                var data = await res.json();
+                if (data.success) {
+                    showToast('Monitor run completed! Check the Live Leads tab.', 'success');
+                } else {
+                    showToast('Run failed: ' + data.message, 'error');
+                }
+            } catch (e) {
+                showToast('Error running monitor', 'error');
+            }
+        }
+
+        // Render
+        function renderAll() {
+            renderTags('subredditTags', config.subreddits, 'subreddit', 'removeSubreddit');
+            renderTags('keywordTags', config.highPriorityKeywords, 'keyword', 'removeKeyword');
+            renderTags('contextTags', config.contextKeywords, 'context', 'removeContext');
+            renderTags('exclusionTags', config.exclusionKeywords, 'exclude', 'removeExclusion');
+
+            document.getElementById('subredditCountBadge').textContent = config.subreddits.length;
+            document.getElementById('keywordCountBadge').textContent = config.highPriorityKeywords.length;
+            document.getElementById('contextCountBadge').textContent = config.contextKeywords.length;
+            document.getElementById('exclusionCountBadge').textContent = config.exclusionKeywords.length;
+            document.getElementById('subredditCount').textContent = config.subreddits.length;
+
+            document.getElementById('intervalSelect').value = config.intervalMinutes || 30;
+            document.getElementById('ageSelect').value = config.timeWindowMinutes || 60;
+            document.getElementById('slackWebhook').value = config.slackWebhook || '';
+            document.getElementById('intervalDisplay').textContent = config.intervalMinutes || 30;
+            document.getElementById('activeToggle').checked = config.active;
+
+            updateStatus();
+
+            if (config.lastUpdated) {
+                document.getElementById('lastSaved').textContent = 'Last saved: ' + new Date(config.lastUpdated).toLocaleString();
+            }
+        }
+
+        function renderTags(containerId, items, className, removeFuncName) {
+            var container = document.getElementById(containerId);
+            var html = '';
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i];
+                var prefix = (className === 'subreddit') ? 'r/' : '';
+                html += '<span class="tag ' + className + '">' + prefix + item +
+                    '<span class="material-icons-round remove" onclick="' + removeFuncName + '(' + i + ')">close</span></span>';
+            }
+            container.innerHTML = html;
+        }
+
+        function updateStatus() {
+            var dot = document.getElementById('statusDot');
+            var text = document.getElementById('statusText');
+            if (config.active) {
+                dot.className = 'status-dot active';
+                text.textContent = 'Active';
+            } else {
+                dot.className = 'status-dot inactive';
+                text.textContent = 'Paused';
+            }
+        }
+
+        function updateInterval() {
+            var val = document.getElementById('intervalSelect').value;
+            document.getElementById('intervalDisplay').textContent = val;
+        }
+
+        // Add/Remove functions
+        function addSubreddit() {
+            var input = document.getElementById('newSubreddit');
+            var val = input.value.trim().replace(/^r\//, '');
+            if (val && config.subreddits.indexOf(val) === -1) {
+                config.subreddits.push(val);
+                renderAll();
+                input.value = '';
+            }
+        }
+        function removeSubreddit(i) {
+            config.subreddits.splice(i, 1);
+            renderAll();
+        }
+
+        function addKeyword() {
+            var input = document.getElementById('newKeyword');
+            var val = input.value.trim().toLowerCase();
+            if (val && config.highPriorityKeywords.indexOf(val) === -1) {
+                config.highPriorityKeywords.push(val);
+                renderAll();
+                input.value = '';
+            }
+        }
+        function removeKeyword(i) {
+            config.highPriorityKeywords.splice(i, 1);
+            renderAll();
+        }
+
+        function addContext() {
+            var input = document.getElementById('newContext');
+            var val = input.value.trim().toLowerCase();
+            if (val && config.contextKeywords.indexOf(val) === -1) {
+                config.contextKeywords.push(val);
+                renderAll();
+                input.value = '';
+            }
+        }
+        function removeContext(i) {
+            config.contextKeywords.splice(i, 1);
+            renderAll();
+        }
+
+        function addExclusion() {
+            var input = document.getElementById('newExclusion');
+            var val = input.value.trim().toLowerCase();
+            if (val && config.exclusionKeywords.indexOf(val) === -1) {
+                config.exclusionKeywords.push(val);
+                renderAll();
+                input.value = '';
+            }
+        }
+        function removeExclusion(i) {
+            config.exclusionKeywords.splice(i, 1);
+            renderAll();
+        }
+
+        // Load leads
+        async function loadLeads() {
+            var container = document.getElementById('leadsList');
+            container.innerHTML = '<div class="empty-state"><div class="spinner" style="width:40px;height:40px;border-width:3px;color:var(--accent);margin:0 auto;"></div><p style="margin-top:1rem;">Loading leads...</p></div>';
+
+            try {
+                var res = await fetch('/api/reddit-monitors/' + monitorId + '/leads?limit=20', {
+                    headers: { 'Authorization': 'Bearer ' + getToken() }
+                });
+                var data = await res.json();
+
+                if (data.leads && data.leads.length > 0) {
+                    document.getElementById('leadsCount').textContent = data.total || data.leads.length;
+                    var html = '';
+                    for (var i = 0; i < data.leads.length; i++) {
+                        html += renderLead(data.leads[i]);
+                    }
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<div class="empty-state"><span class="material-icons-round">inbox</span><p>No leads yet. Click "Run Now" to search for leads, or wait for the next scheduled run.</p></div>';
+                }
+            } catch (e) {
+                container.innerHTML = '<div class="empty-state"><span class="material-icons-round">error</span><p>Failed to load leads</p></div>';
+            }
+        }
+
+        function renderLead(lead) {
+            var priority = lead.priority || (lead.score >= 150 ? 'hot' : lead.score >= 100 ? 'high' : 'medium');
+            var priorityClass = priority.toLowerCase().indexOf('hot') >= 0 ? 'hot' : priority.toLowerCase();
+            var time = lead.createdAt ? new Date(lead.createdAt).toLocaleString() : 'Unknown';
+            var subreddit = lead.redditSubreddit || lead.company || lead.subreddit || 'reddit';
+            // Use serviceMatches from new leads, or extract from tags
+            var keywords = lead.serviceMatches || lead.intentMatches || [];
+            if (keywords.length === 0) {
+                var tags = lead.tags || [];
+                for (var i = 0; i < tags.length; i++) {
+                    if (tags[i].indexOf('reddit') === -1 && tags[i].indexOf('score') === -1) {
+                        keywords.push(tags[i]);
+                    }
+                    if (keywords.length >= 5) break;
+                }
+            }
+
+            // Extract URL - check redditLink field first, then message
+            var url = lead.redditLink || '#';
+            if (url === '#') {
+                var urlMatch = (lead.message || '').match(/\*\*URL:\*\* (https?:\/\/[^\s\n]+)/);
+                if (urlMatch) url = urlMatch[1];
+            }
+
+            // Extract title and content - check dedicated fields first
+            var title = lead.redditTitle || lead.name || 'Reddit Lead';
+            var content = lead.message || '';
+            if (!lead.redditTitle) {
+                var titleMatch = (lead.message || '').match(/\*\*Title:\*\* ([^\n]+)/);
+                if (titleMatch) title = titleMatch[1];
+            }
+            if (lead.redditTitle) {
+                // If we have redditTitle, message is the snippet
+                var snippetMatch = (lead.message || '').match(/\*\*Snippet:\*\* ([^\n]+)/);
+                if (snippetMatch) content = snippetMatch[1];
+            }
+
+            var kwHtml = '';
+            for (var j = 0; j < keywords.length; j++) {
+                kwHtml += '<span class="lead-kw">' + keywords[j] + '</span>';
+            }
+
+            return '<div class="lead-card">' +
+                '<div class="lead-header">' +
+                    '<div class="lead-badges">' +
+                        '<span class="lead-badge ' + priorityClass + '">' + priority + '</span>' +
+                        '<span class="lead-badge subreddit">' + subreddit + '</span>' +
+                    '</div>' +
+                    '<span class="lead-time">' + time + '</span>' +
+                '</div>' +
+                '<div class="lead-title">' + title + '</div>' +
+                '<div class="lead-content">' + content + '</div>' +
+                '<div class="lead-footer">' +
+                    '<div class="lead-keywords">' + kwHtml + '</div>' +
+                    '<a href="' + url + '" target="_blank" class="btn btn-reddit">' +
+                        '<span class="material-icons-round" style="font-size:1rem;">open_in_new</span> View Post' +
+                    '</a>' +
+                '</div>' +
+            '</div>';
+        }
+
+        // Toast
+        function showToast(message, type) {
+            var container = document.getElementById('toastContainer');
+            var toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            var icon = (type === 'success') ? 'check_circle' : 'error';
+            toast.innerHTML = '<span class="material-icons-round">' + icon + '</span>' + message;
+            container.appendChild(toast);
+            setTimeout(function() { toast.remove(); }, 4000);
+        }
+
+        // Sidebar functions
+        function openSidebar() {
+            document.getElementById('sidebar').classList.add('active');
+            document.getElementById('sidebarOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            sessionStorage.removeItem('token');
+            localStorage.removeItem('adminToken');
+            sessionStorage.removeItem('adminToken');
+            window.location.href = '/login';
+        }
+
+        // Close sidebar on escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSidebar();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -5,13 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TownRanker - Win the Search Results</title>
     <meta name="description" content="Data-driven web development and SEO for local businesses. Built on Google-grade infrastructure.">
-    
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -55,7 +59,7 @@
     <style>
         body { color: #202124; background-color: #ffffff; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
-        
+
         /* Chart Animation */
         .chart-line { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw 2s ease-out forwards; }
         @keyframes draw { to { stroke-dashoffset: 0; } }
@@ -63,51 +67,81 @@
         /* Scrollbar hidden */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Mobile Menu Transition */
+        #mobile-menu { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
+        #mobile-menu.open { max-height: 400px; opacity: 1; }
+
+        /* Spin animation for loading */
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="overflow-x-hidden">
 
     <!-- Navbar -->
     <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-200 transition-all" id="navbar">
-        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2 group">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 group z-50 relative">
                 <div class="flex gap-1">
-                    <div class="w-3 h-3 rounded-full bg-google-blue"></div>
-                    <div class="w-3 h-3 rounded-full bg-google-red"></div>
-                    <div class="w-3 h-3 rounded-full bg-google-yellow"></div>
-                    <div class="w-3 h-3 rounded-full bg-google-green"></div>
+                    <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-google-red"></div>
+                    <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-google-yellow"></div>
+                    <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-google-green"></div>
                 </div>
-                <span class="text-xl font-bold tracking-tight text-gray-700">TownRanker</span>
+                <span class="text-lg sm:text-xl font-bold tracking-tight text-gray-700">TownRanker</span>
             </a>
-            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
+            
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium text-gray-600">
                 <a href="#demo" class="hover:text-google-blue transition-colors">How It Works</a>
                 <a href="#results" class="hover:text-google-blue transition-colors">Results</a>
                 <a href="#infrastructure" class="hover:text-google-blue transition-colors">Infrastructure</a>
+                <a href="#strategy" class="hover:text-google-blue transition-colors">Strategy</a>
+                <a href="/gilbert-arizona-seo" class="hover:text-google-blue transition-colors">Gilbert SEO</a>
                 <a href="/login.html" class="hover:text-google-blue transition-colors">Sign In</a>
-                <a href="#contact" class="bg-google-blue text-white px-6 py-2.5 rounded-md font-medium hover:bg-blue-600 transition-all shadow-sm hover:shadow-md">Start Now</a>
+                <a href="/signup.html" class="bg-google-blue text-white px-5 py-2 lg:px-6 lg:py-2.5 rounded-md font-medium hover:bg-blue-600 transition-all shadow-sm hover:shadow-md whitespace-nowrap">Start Now</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-gray-600 p-2 focus:outline-none z-50">
+                <span class="material-symbols-outlined text-3xl">menu</span>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="md:hidden bg-white border-b border-gray-200 absolute top-16 left-0 w-full shadow-lg">
+            <div class="flex flex-col px-6 py-4 space-y-4 text-center">
+                <a href="#demo" class="text-gray-600 font-medium py-2" onclick="toggleMobileMenu()">How It Works</a>
+                <a href="#results" class="text-gray-600 font-medium py-2" onclick="toggleMobileMenu()">Results</a>
+                <a href="#infrastructure" class="text-gray-600 font-medium py-2" onclick="toggleMobileMenu()">Infrastructure</a>
+                <a href="#strategy" class="text-gray-600 font-medium py-2" onclick="toggleMobileMenu()">Strategy</a>
+                <a href="/gilbert-arizona-seo" class="text-gray-600 font-medium py-2" onclick="toggleMobileMenu()">Gilbert SEO</a>
+                <a href="/login.html" class="text-gray-600 font-medium py-2" onclick="toggleMobileMenu()">Sign In</a>
+                <a href="/signup.html" class="bg-google-blue text-white px-6 py-3 rounded-md font-medium shadow-md mx-auto w-full max-w-xs" onclick="toggleMobileMenu()">Start Now</a>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="relative pt-32 pb-20 overflow-hidden bg-white">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex flex-col lg:flex-row items-center gap-16">
+    <section class="relative pt-28 pb-16 md:pt-32 md:pb-20 overflow-hidden bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+                <!-- Text Content -->
                 <div class="lg:w-1/2 text-center lg:text-left animate-fade-in-up">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-google-blue text-xs font-bold mb-6 border border-blue-100">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-google-blue text-[10px] sm:text-xs font-bold mb-6 border border-blue-100">
                         <span class="material-symbols-outlined text-sm">verified</span>
                         GOOGLE PARTNER INFRASTRUCTURE
                     </div>
-                    <h1 class="text-5xl md:text-6xl font-bold leading-tight text-gray-900 mb-2">TownRanker Local SEO</h1>
-                    <h2 class="text-3xl md:text-4xl font-bold text-google-blue mb-6">Win the Search Results</h2>
-                    <p class="text-xl text-gray-500 leading-relaxed mb-10 max-w-lg mx-auto lg:mx-0">
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight text-gray-900 mb-3">TownRanker Local SEO</h1>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-google-blue mb-6">Win the Search Results</h2>
+                    <p class="text-lg sm:text-xl text-gray-500 leading-relaxed mb-8 sm:mb-10 max-w-lg mx-auto lg:mx-0">
                         We build high-performance websites and automated lead systems that Google loves. See what happens when you treat your website like software, not a brochure.
                     </p>
-                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                        <a href="#contact" class="px-8 py-4 bg-google-blue text-white font-medium rounded-md hover:bg-blue-600 transition-all shadow-lg hover:shadow-xl flex items-center gap-2">
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 w-full sm:w-auto">
+                        <a href="/signup.html" class="w-full sm:w-auto px-8 py-4 bg-google-blue text-white font-medium rounded-md hover:bg-blue-600 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
                             Get Your Audit <span class="material-symbols-outlined">arrow_forward</span>
                         </a>
-                        <a href="#demo" class="px-8 py-4 bg-white text-google-blue border border-gray-200 font-medium rounded-md hover:bg-gray-50 transition-all flex items-center gap-2">
+                        <a href="#demo" class="w-full sm:w-auto px-8 py-4 bg-white text-google-blue border border-gray-200 font-medium rounded-md hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
                             <span class="material-symbols-outlined">play_circle</span> See How It Works
                         </a>
                     </div>
@@ -116,21 +150,25 @@
                 <!-- Interactive Dashboard Mockup -->
                 <div class="lg:w-1/2 w-full relative animate-fade-in-up" style="animation-delay: 0.2s;">
                     <div class="bg-white rounded-2xl shadow-float border border-gray-100 overflow-hidden relative z-10">
-                        <div class="h-14 border-b border-gray-100 flex items-center justify-between px-6 bg-white">
-                            <div class="flex items-center gap-6">
-                                <div class="text-lg font-medium text-gray-700 flex items-center gap-2">
+                        <!-- Dashboard Header -->
+                        <div class="h-14 border-b border-gray-100 flex items-center justify-between px-4 sm:px-6 bg-white">
+                            <div class="flex items-center gap-4 sm:gap-6 w-full overflow-hidden">
+                                <div class="text-lg font-medium text-gray-700 flex items-center gap-2 flex-shrink-0">
                                     <span class="material-symbols-outlined text-google-blue">analytics</span>
                                     <span class="hidden sm:inline">Analytics</span>
                                 </div>
-                                <div class="flex space-x-1 bg-gray-100 p-1 rounded-lg overflow-x-auto max-w-[200px] sm:max-w-none">
-                                    <button onclick="switchDashTab('keywords')" id="tab-keywords" class="px-3 py-1 rounded-md text-xs font-bold text-gray-600 bg-white shadow-sm transition-all whitespace-nowrap flex items-center gap-1"><span class="material-symbols-outlined text-[10px]">key</span> Keywords</button>
-                                    <button onclick="switchDashTab('leads')" id="tab-leads" class="px-3 py-1 rounded-md text-xs font-bold text-gray-500 hover:bg-white hover:text-gray-700 hover:shadow-sm transition-all whitespace-nowrap">Leads</button>
-                                    <button onclick="switchDashTab('visitors')" id="tab-visitors" class="px-3 py-1 rounded-md text-xs font-bold text-gray-500 hover:bg-white hover:text-gray-700 hover:shadow-sm transition-all whitespace-nowrap">Live</button>
-                                    <button onclick="switchDashTab('revenue')" id="tab-revenue" class="px-3 py-1 rounded-md text-xs font-bold text-gray-500 hover:bg-white hover:text-gray-700 hover:shadow-sm transition-all whitespace-nowrap">Revenue</button>
+                                <!-- Scrollable Tabs -->
+                                <div class="flex space-x-1 bg-gray-100 p-1 rounded-lg overflow-x-auto no-scrollbar flex-1 sm:flex-none">
+                                    <button onclick="switchDashTab('keywords')" id="tab-keywords" class="px-3 py-1 rounded-md text-xs font-bold text-gray-600 bg-white shadow-sm transition-all whitespace-nowrap flex items-center gap-1 flex-shrink-0"><span class="material-symbols-outlined text-[10px]">key</span> <span class="hidden xs:inline">Keywords</span></button>
+                                    <button onclick="switchDashTab('leads')" id="tab-leads" class="px-3 py-1 rounded-md text-xs font-bold text-gray-500 hover:bg-white hover:text-gray-700 hover:shadow-sm transition-all whitespace-nowrap flex-shrink-0">Leads</button>
+                                    <button onclick="switchDashTab('visitors')" id="tab-visitors" class="px-3 py-1 rounded-md text-xs font-bold text-gray-500 hover:bg-white hover:text-gray-700 hover:shadow-sm transition-all whitespace-nowrap flex-shrink-0">Live</button>
+                                    <button onclick="switchDashTab('revenue')" id="tab-revenue" class="px-3 py-1 rounded-md text-xs font-bold text-gray-500 hover:bg-white hover:text-gray-700 hover:shadow-sm transition-all whitespace-nowrap flex-shrink-0">Revenue</button>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-gray-50/50 relative h-[400px]">
+                        
+                        <!-- Dashboard Content -->
+                        <div class="bg-gray-50/50 relative h-[350px] sm:h-[400px]">
                             <!-- KEYWORDS VIEW -->
                             <div id="view-keywords" class="absolute inset-0 p-0 overflow-y-auto no-scrollbar transition-all duration-300 opacity-100 transform translate-y-0 bg-white">
                                 <div class="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-gray-200 px-5 py-3 flex justify-between items-center">
@@ -139,28 +177,28 @@
                                         <span class="px-2 py-0.5 bg-green-50 text-google-green text-[10px] font-bold rounded-full flex items-center gap-0.5 border border-green-100"><span class="material-symbols-outlined text-[10px]">arrow_upward</span> 12%</span>
                                     </div>
                                 </div>
-                                <table class="w-full text-left text-sm">
-                                    <thead class="bg-gray-50 text-gray-500 font-semibold text-[10px] uppercase tracking-wider border-b border-gray-100"><tr><th class="px-5 py-2 w-1/2">Keyword</th><th class="px-2 py-2 w-16 text-center">KD %</th><th class="px-2 py-2 w-20 text-right">Vol</th><th class="px-4 py-2 w-20">Pos</th><th class="px-4 py-2 w-20 text-right">Traffic</th></tr></thead>
-                                    <tbody class="divide-y divide-gray-50">
-                                        <tr class="hover:bg-blue-50/30 transition-colors group cursor-default"><td class="px-5 py-3"><div class="flex items-center gap-2"><span class="text-gray-900 font-medium group-hover:text-google-blue transition-colors">emergency plumber near me</span></div><div class="text-[10px] text-gray-400 font-mono mt-0.5">/services/emergency-plumbing</div></td><td class="px-2 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200">68</span></td><td class="px-2 py-3 text-right text-gray-600 font-mono text-xs">2.4K</td><td class="px-4 py-3"><div class="flex items-center gap-2"><span class="font-bold text-gray-900">1</span><span class="text-[10px] text-green-600 bg-green-50 px-1 rounded font-medium">▲ 2</span></div></td><td class="px-4 py-3 text-right font-mono text-xs text-gray-900">890</td></tr>
-                                        <tr class="hover:bg-blue-50/30 transition-colors group cursor-default"><td class="px-5 py-3"><div class="flex items-center gap-2"><span class="text-gray-900 font-medium group-hover:text-google-blue transition-colors">water heater repair</span></div><div class="text-[10px] text-gray-400 font-mono mt-0.5">/services/water-heater</div></td><td class="px-2 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-5 rounded text-[10px] font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">42</span></td><td class="px-2 py-3 text-right text-gray-600 font-mono text-xs">1.1K</td><td class="px-4 py-3"><div class="flex items-center gap-2"><span class="font-bold text-gray-900">3</span><span class="text-[10px] text-gray-300 font-medium">–</span></div></td><td class="px-4 py-3 text-right font-mono text-xs text-gray-900">340</td></tr>
-                                        <tr class="hover:bg-blue-50/30 transition-colors group cursor-default"><td class="px-5 py-3"><div class="flex items-center gap-2"><span class="text-gray-900 font-medium group-hover:text-google-blue transition-colors">drain cleaning services</span></div><div class="text-[10px] text-gray-400 font-mono mt-0.5">/services/drains</div></td><td class="px-2 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-5 rounded text-[10px] font-bold bg-green-100 text-green-700 border border-green-200">15</span></td><td class="px-2 py-3 text-right text-gray-600 font-mono text-xs">1.8K</td><td class="px-4 py-3"><div class="flex items-center gap-2"><span class="font-bold text-gray-900">1</span><span class="text-[10px] text-green-600 bg-green-50 px-1 rounded font-medium">▲ 3</span></div></td><td class="px-4 py-3 text-right font-mono text-xs text-gray-900">720</td></tr>
-                                        <tr class="hover:bg-blue-50/30 transition-colors group cursor-default"><td class="px-5 py-3"><div class="flex items-center gap-2"><span class="text-gray-900 font-medium group-hover:text-google-blue transition-colors">plumber phoenix</span></div><div class="text-[10px] text-gray-400 font-mono mt-0.5">/service-area/phoenix</div></td><td class="px-2 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200">82</span></td><td class="px-2 py-3 text-right text-gray-600 font-mono text-xs">5.6K</td><td class="px-4 py-3"><div class="flex items-center gap-2"><span class="font-bold text-gray-900">4</span><span class="text-[10px] text-green-600 bg-green-50 px-1 rounded font-medium">▲ 1</span></div></td><td class="px-4 py-3 text-right font-mono text-xs text-gray-900">410</td></tr>
-                                        <tr class="hover:bg-blue-50/30 transition-colors group cursor-default"><td class="px-5 py-3"><div class="flex items-center gap-2"><span class="text-gray-900 font-medium group-hover:text-google-blue transition-colors">tankless water heater</span></div><div class="text-[10px] text-gray-400 font-mono mt-0.5">/products/tankless</div></td><td class="px-2 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-5 rounded text-[10px] font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">38</span></td><td class="px-2 py-3 text-right text-gray-600 font-mono text-xs">900</td><td class="px-4 py-3"><div class="flex items-center gap-2"><span class="font-bold text-gray-900">2</span><span class="text-[10px] text-gray-300 font-medium">–</span></div></td><td class="px-4 py-3 text-right font-mono text-xs text-gray-900">280</td></tr>
-                                        <tr class="hover:bg-blue-50/30 transition-colors group cursor-default"><td class="px-5 py-3"><div class="flex items-center gap-2"><span class="text-gray-900 font-medium group-hover:text-google-blue transition-colors">sewer line repair</span></div><div class="text-[10px] text-gray-400 font-mono mt-0.5">/services/sewer</div></td><td class="px-2 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200">65</span></td><td class="px-2 py-3 text-right text-gray-600 font-mono text-xs">750</td><td class="px-4 py-3"><div class="flex items-center gap-2"><span class="font-bold text-gray-900">1</span><span class="text-[10px] text-green-600 bg-green-50 px-1 rounded font-medium">▲ 2</span></div></td><td class="px-4 py-3 text-right font-mono text-xs text-gray-900">310</td></tr>
-                                        <tr class="hover:bg-blue-50/30 transition-colors group cursor-default"><td class="px-5 py-3"><div class="flex items-center gap-2"><span class="text-gray-900 font-medium group-hover:text-google-blue transition-colors">cheap plumber</span></div><div class="text-[10px] text-gray-400 font-mono mt-0.5">/pricing</div></td><td class="px-2 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-5 rounded text-[10px] font-bold bg-green-100 text-green-700 border border-green-200">22</span></td><td class="px-2 py-3 text-right text-gray-600 font-mono text-xs">1.5K</td><td class="px-4 py-3"><div class="flex items-center gap-2"><span class="font-bold text-gray-900">3</span><span class="text-[10px] text-green-600 bg-green-50 px-1 rounded font-medium">▲ 4</span></div></td><td class="px-4 py-3 text-right font-mono text-xs text-gray-900">150</td></tr>
-                                        <tr class="hover:bg-blue-50/30 transition-colors group cursor-default"><td class="px-5 py-3"><div class="flex items-center gap-2"><span class="text-gray-900 font-medium group-hover:text-google-blue transition-colors">toilet repair</span></div><div class="text-[10px] text-gray-400 font-mono mt-0.5">/services/toilet</div></td><td class="px-2 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-5 rounded text-[10px] font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">30</span></td><td class="px-2 py-3 text-right text-gray-600 font-mono text-xs">2.1K</td><td class="px-4 py-3"><div class="flex items-center gap-2"><span class="font-bold text-gray-900">1</span><span class="text-[10px] text-gray-300 font-medium">–</span></div></td><td class="px-4 py-3 text-right font-mono text-xs text-gray-900">850</td></tr>
-                                    </tbody>
-                                </table>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left text-sm min-w-[350px]">
+                                        <thead class="bg-gray-50 text-gray-500 font-semibold text-[10px] uppercase tracking-wider border-b border-gray-100"><tr><th class="px-5 py-2 w-1/2">Keyword</th><th class="px-2 py-2 w-16 text-center">KD %</th><th class="px-2 py-2 w-20 text-right hidden sm:table-cell">Vol</th><th class="px-4 py-2 w-20 text-center sm:text-left">Pos</th><th class="px-4 py-2 w-20 text-right hidden sm:table-cell">Traffic</th></tr></thead>
+                                        <tbody class="divide-y divide-gray-50">
+                                            <tr class="hover:bg-blue-50/30 transition-colors group cursor-default"><td class="px-5 py-3"><div class="flex items-center gap-2"><span class="text-gray-900 font-medium group-hover:text-google-blue transition-colors line-clamp-1">emergency plumber near me</span></div><div class="text-[10px] text-gray-400 font-mono mt-0.5 truncate max-w-[150px]">/services/emergency-plumbing</div></td><td class="px-2 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200">68</span></td><td class="px-2 py-3 text-right text-gray-600 font-mono text-xs hidden sm:table-cell">2.4K</td><td class="px-4 py-3 text-center sm:text-left"><div class="flex items-center justify-center sm:justify-start gap-2"><span class="font-bold text-gray-900">1</span><span class="text-[10px] text-green-600 bg-green-50 px-1 rounded font-medium">▲ 2</span></div></td><td class="px-4 py-3 text-right font-mono text-xs text-gray-900 hidden sm:table-cell">890</td></tr>
+                                            <tr class="hover:bg-blue-50/30 transition-colors group cursor-default"><td class="px-5 py-3"><div class="flex items-center gap-2"><span class="text-gray-900 font-medium group-hover:text-google-blue transition-colors line-clamp-1">water heater repair</span></div><div class="text-[10px] text-gray-400 font-mono mt-0.5 truncate max-w-[150px]">/services/water-heater</div></td><td class="px-2 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-5 rounded text-[10px] font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">42</span></td><td class="px-2 py-3 text-right text-gray-600 font-mono text-xs hidden sm:table-cell">1.1K</td><td class="px-4 py-3 text-center sm:text-left"><div class="flex items-center justify-center sm:justify-start gap-2"><span class="font-bold text-gray-900">3</span><span class="text-[10px] text-gray-300 font-medium">–</span></div></td><td class="px-4 py-3 text-right font-mono text-xs text-gray-900 hidden sm:table-cell">340</td></tr>
+                                            <tr class="hover:bg-blue-50/30 transition-colors group cursor-default"><td class="px-5 py-3"><div class="flex items-center gap-2"><span class="text-gray-900 font-medium group-hover:text-google-blue transition-colors line-clamp-1">drain cleaning services</span></div><div class="text-[10px] text-gray-400 font-mono mt-0.5 truncate max-w-[150px]">/services/drains</div></td><td class="px-2 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-5 rounded text-[10px] font-bold bg-green-100 text-green-700 border border-green-200">15</span></td><td class="px-2 py-3 text-right text-gray-600 font-mono text-xs hidden sm:table-cell">1.8K</td><td class="px-4 py-3 text-center sm:text-left"><div class="flex items-center justify-center sm:justify-start gap-2"><span class="font-bold text-gray-900">1</span><span class="text-[10px] text-green-600 bg-green-50 px-1 rounded font-medium">▲ 3</span></div></td><td class="px-4 py-3 text-right font-mono text-xs text-gray-900 hidden sm:table-cell">720</td></tr>
+                                            <tr class="hover:bg-blue-50/30 transition-colors group cursor-default"><td class="px-5 py-3"><div class="flex items-center gap-2"><span class="text-gray-900 font-medium group-hover:text-google-blue transition-colors line-clamp-1">plumber phoenix</span></div><div class="text-[10px] text-gray-400 font-mono mt-0.5 truncate max-w-[150px]">/service-area/phoenix</div></td><td class="px-2 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200">82</span></td><td class="px-2 py-3 text-right text-gray-600 font-mono text-xs hidden sm:table-cell">5.6K</td><td class="px-4 py-3 text-center sm:text-left"><div class="flex items-center justify-center sm:justify-start gap-2"><span class="font-bold text-gray-900">4</span><span class="text-[10px] text-green-600 bg-green-50 px-1 rounded font-medium">▲ 1</span></div></td><td class="px-4 py-3 text-right font-mono text-xs text-gray-900 hidden sm:table-cell">410</td></tr>
+                                            <tr class="hover:bg-blue-50/30 transition-colors group cursor-default"><td class="px-5 py-3"><div class="flex items-center gap-2"><span class="text-gray-900 font-medium group-hover:text-google-blue transition-colors line-clamp-1">tankless water heater</span></div><div class="text-[10px] text-gray-400 font-mono mt-0.5 truncate max-w-[150px]">/products/tankless</div></td><td class="px-2 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-5 rounded text-[10px] font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">38</span></td><td class="px-2 py-3 text-right text-gray-600 font-mono text-xs hidden sm:table-cell">900</td><td class="px-4 py-3 text-center sm:text-left"><div class="flex items-center justify-center sm:justify-start gap-2"><span class="font-bold text-gray-900">2</span><span class="text-[10px] text-gray-300 font-medium">–</span></div></td><td class="px-4 py-3 text-right font-mono text-xs text-gray-900 hidden sm:table-cell">280</td></tr>
+                                            <tr class="hover:bg-blue-50/30 transition-colors group cursor-default"><td class="px-5 py-3"><div class="flex items-center gap-2"><span class="text-gray-900 font-medium group-hover:text-google-blue transition-colors line-clamp-1">sewer line repair</span></div><div class="text-[10px] text-gray-400 font-mono mt-0.5 truncate max-w-[150px]">/services/sewer</div></td><td class="px-2 py-3 text-center"><span class="inline-flex items-center justify-center w-8 h-5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200">65</span></td><td class="px-2 py-3 text-right text-gray-600 font-mono text-xs hidden sm:table-cell">750</td><td class="px-4 py-3 text-center sm:text-left"><div class="flex items-center justify-center sm:justify-start gap-2"><span class="font-bold text-gray-900">1</span><span class="text-[10px] text-green-600 bg-green-50 px-1 rounded font-medium">▲ 2</span></div></td><td class="px-4 py-3 text-right font-mono text-xs text-gray-900 hidden sm:table-cell">310</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                             <!-- LEADS VIEW -->
-                            <div id="view-leads" class="absolute inset-0 p-6 overflow-y-auto no-scrollbar transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4">
+                            <div id="view-leads" class="absolute inset-0 p-4 sm:p-6 overflow-y-auto no-scrollbar transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4">
                                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"><div class="px-4 py-3 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center"><h3 class="text-xs font-bold text-gray-500 uppercase">Incoming Stream</h3><div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div></div><div id="leadsList" class="divide-y divide-gray-50"></div></div>
                             </div>
                             <!-- VISITORS VIEW -->
-                            <div id="view-visitors" class="absolute inset-0 p-6 overflow-y-auto no-scrollbar transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4"><div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6 text-center"><div class="text-xs text-gray-500 font-medium uppercase mb-2">Active Users Right Now</div><div class="text-5xl font-bold text-google-blue mb-2" id="live-user-count">42</div><div class="text-xs text-gray-400">Pages being viewed:</div></div></div>
+                            <div id="view-visitors" class="absolute inset-0 p-4 sm:p-6 overflow-y-auto no-scrollbar transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4"><div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6 text-center"><div class="text-xs text-gray-500 font-medium uppercase mb-2">Active Users Right Now</div><div class="text-5xl font-bold text-google-blue mb-2" id="live-user-count">42</div><div class="text-xs text-gray-400">Pages being viewed:</div></div></div>
                             <!-- REVENUE VIEW -->
-                            <div id="view-revenue" class="absolute inset-0 p-6 overflow-y-auto no-scrollbar transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4"><div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6"><div class="flex justify-between items-end mb-4"><div><div class="text-xs text-gray-500 font-medium uppercase">Total Revenue</div><div class="text-3xl font-bold text-gray-800">$124,592</div></div></div></div></div>
+                            <div id="view-revenue" class="absolute inset-0 p-4 sm:p-6 overflow-y-auto no-scrollbar transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4"><div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6"><div class="flex justify-between items-end mb-4"><div><div class="text-xs text-gray-500 font-medium uppercase">Total Revenue</div><div class="text-3xl font-bold text-gray-800">$124,592</div></div></div></div></div>
                         </div>
                     </div>
                 </div>
@@ -169,31 +207,33 @@
     </section>
 
     <!-- Visual Proof / Map Animation -->
-    <section id="demo" class="py-24 bg-white overflow-hidden">
+    <section id="demo" class="py-16 md:py-24 bg-white overflow-hidden">
         <!-- Tailwind Safelist for JS -->
         <div class="hidden bg-google-green bg-red-500 bg-yellow-400 scale-110 scale-100 opacity-100 opacity-0 transition-all duration-700 transform shadow-md text-white flex items-center justify-center aspect-square rounded-full"></div>
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex flex-col lg:flex-row items-center gap-16">
-                <div class="lg:w-1/2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+                <div class="lg:w-1/2 order-2 lg:order-1">
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 text-google-green text-xs font-bold mb-6 border border-green-100"><span class="material-symbols-outlined text-sm">public</span> LIVE CASE STUDY</div>
-                    <h2 class="text-4xl font-bold text-gray-900 mb-6">Watch a Brand Take Over Mesa, AZ</h2>
+                    <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Watch a Brand Take Over Mesa, AZ</h2>
                     <p class="text-lg text-gray-500 mb-8 leading-relaxed">This is what "Domination" looks like. We track your ranking across a geo-grid. Our goal is to turn every red and yellow pin into a #1 ranking green pin.</p>
                     <div class="space-y-4">
                         <div class="flex items-center gap-4"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm"></div><span class="text-sm text-gray-600"><strong>Red (10+):</strong> Invisible to customers</span></div>
                         <div class="flex items-center gap-4"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm"></div><span class="text-sm text-gray-600"><strong>Yellow (4-9):</strong> Getting impressions, no clicks</span></div>
                         <div class="flex items-center gap-4"><div class="w-3 h-3 rounded-full bg-google-green shadow-sm shadow-green-200"></div><span class="text-sm text-gray-600"><strong>Green (1-3):</strong> Maximum Revenue</span></div>
                     </div>
-                    <button onclick="restartMapAnimation()" class="mt-10 flex items-center gap-2 text-google-blue font-bold hover:text-blue-700 transition-colors"><span class="material-symbols-outlined">replay</span> Replay Simulation</button>
+                    <button onclick="restartMapAnimation()" class="mt-10 flex items-center gap-2 text-google-blue font-bold hover:text-blue-700 transition-colors group"><span class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-500">replay</span> Replay Simulation</button>
                 </div>
-                <div class="lg:w-1/2 w-full">
-                    <div class="relative aspect-video bg-gray-50 rounded-2xl shadow-float border border-gray-200 overflow-hidden group">
-                        <!-- Real Map Background (Mesa, AZ) -->
+                <div class="lg:w-1/2 w-full order-1 lg:order-2">
+                    <div class="relative aspect-square sm:aspect-[4/3] bg-gray-50 rounded-2xl shadow-float border border-gray-200 overflow-hidden group" style="min-height: 400px;">
+                        <!-- Real Map Background (Mesa, AZ) - Google Maps Embed -->
                         <div class="absolute inset-0 z-0">
-                            <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=Mesa,AZ&t=&z=13&ie=UTF8&iwloc=&output=embed" class="w-full h-full opacity-60 grayscale" style="pointer-events: none;"></iframe>
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d53307.34332994979!2d-111.86178565!3d33.4151843!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x872ba7e9a99dab35%3A0x6c89faca7f2a6817!2sMesa%2C%20AZ!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus" width="100%" height="100%" style="border:0; pointer-events: none;" allowfullscreen="" loading="lazy" tabindex="-1"></iframe>
                         </div>
-                        <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-md shadow-sm border border-gray-200 z-20 flex items-center gap-2"><span class="material-symbols-outlined text-google-red text-sm">location_on</span><div class="text-xs font-bold text-gray-700">Mesa, AZ</div></div>
                         <div class="absolute bottom-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-md shadow-sm border border-gray-200 z-20"><div class="text-[10px] text-gray-500 uppercase font-bold">Avg Rank</div><div class="text-lg font-bold text-gray-900" id="avg-rank-display">14.2</div></div>
-                        <div class="absolute inset-0 flex items-center justify-center z-10 p-8"><div class="grid grid-cols-5 gap-4 md:gap-8 w-full max-w-md" id="map-grid"></div></div>
+                        <!-- Squared ranking grid overlay -->
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 p-3 sm:p-4">
+                            <div class="w-full h-full grid grid-cols-5 gap-1.5 sm:gap-2" id="map-grid"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -201,59 +241,75 @@
     </section>
 
     <!-- Results / Portfolio -->
-    <section id="results" class="py-24 bg-white border-t border-gray-100">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center max-w-3xl mx-auto mb-16">
+    <section id="results" class="py-16 md:py-24 bg-white border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16">
                 <h2 class="text-3xl font-bold text-gray-900 mb-4">Live Deployments</h2>
                 <p class="text-gray-500 text-lg">Interact with live desktop previews of our high-performance infrastructure.</p>
             </div>
-            <div class="grid md:grid-cols-2 gap-10">
+            <div class="grid md:grid-cols-2 gap-8 md:gap-10">
                 <!-- Item 1: Sedona -->
                 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-card-hover transition-shadow group">
-                    <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div><div class="ml-2 text-xs text-gray-500 font-mono">windowsanddoorsofsedona.com</div></div>
-                    <div class="relative h-[500px] bg-gray-100 overflow-hidden">
+                    <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div><div class="ml-2 text-xs text-gray-500 font-mono truncate">windowsanddoorsofsedona.com</div></div>
+                    <div class="relative h-[400px] sm:h-[500px] bg-gray-100 overflow-hidden">
                         <div style="width: 250%; height: 250%; transform: scale(0.4); transform-origin: top left;"><iframe src="https://www.windowsanddoorsofsedona.com" class="w-full h-full border-0 bg-white"></iframe></div>
                         <div class="absolute bottom-0 left-0 w-full bg-white/90 backdrop-blur-sm border-t border-gray-100 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none"><div class="flex items-center justify-between"><div><h3 class="font-bold text-gray-900">Windows & Doors of Sedona</h3><p class="text-xs text-gray-500">Construction • Lead Gen System</p></div><div class="text-right"><div class="text-google-green font-bold">+300%</div><div class="text-xs text-gray-500">Lead Vol</div></div></div></div>
                     </div>
                 </div>
                 <!-- Item 2: Kachina -->
                 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-card-hover transition-shadow group">
-                    <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div><div class="ml-2 text-xs text-gray-500 font-mono">kachinacontracting.com</div></div>
-                    <div class="relative h-[500px] bg-gray-100 overflow-hidden">
+                    <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div><div class="ml-2 text-xs text-gray-500 font-mono truncate">kachinacontracting.com</div></div>
+                    <div class="relative h-[400px] sm:h-[500px] bg-gray-100 overflow-hidden">
                         <div style="width: 250%; height: 250%; transform: scale(0.4); transform-origin: top left;"><iframe src="https://kachinacontracting.com" class="w-full h-full border-0 bg-white"></iframe></div>
                         <div class="absolute bottom-0 left-0 w-full bg-white/90 backdrop-blur-sm border-t border-gray-100 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none"><div class="flex items-center justify-between"><div><h3 class="font-bold text-gray-900">Kachina Contracting</h3><p class="text-xs text-gray-500">General Contractor • Portfolio</p></div><div class="text-right"><div class="text-google-green font-bold">#1 Rank</div><div class="text-xs text-gray-500">Local SEO</div></div></div></div>
                     </div>
                 </div>
                 <!-- Item 3: Coffee -->
                 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-card-hover transition-shadow group">
-                    <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div><div class="ml-2 text-xs text-gray-500 font-mono">coffeeroastingtimer.com</div></div>
-                    <div class="relative h-[500px] bg-gray-100 overflow-hidden">
+                    <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div><div class="ml-2 text-xs text-gray-500 font-mono truncate">coffeeroastingtimer.com</div></div>
+                    <div class="relative h-[400px] sm:h-[500px] bg-gray-100 overflow-hidden">
                         <div style="width: 250%; height: 250%; transform: scale(0.4); transform-origin: top left;"><iframe src="https://www.coffeeroastingtimer.com" class="w-full h-full border-0 bg-white"></iframe></div>
                         <div class="absolute bottom-0 left-0 w-full bg-white/90 backdrop-blur-sm border-t border-gray-100 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none"><div class="flex items-center justify-between"><div><h3 class="font-bold text-gray-900">Coffee Roasting Timer</h3><p class="text-xs text-gray-500">SaaS Application</p></div><div class="text-right"><div class="text-google-blue font-bold">10k+</div><div class="text-xs text-gray-500">Users</div></div></div></div>
                     </div>
                 </div>
                 <!-- Item 4: Flagstaff -->
                 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-card-hover transition-shadow group">
-                    <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div><div class="ml-2 text-xs text-gray-500 font-mono">flagstaffwindows.com</div></div>
-                    <div class="relative h-[500px] bg-gray-100 overflow-hidden">
+                    <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div><div class="ml-2 text-xs text-gray-500 font-mono truncate">flagstaffwindows.com</div></div>
+                    <div class="relative h-[400px] sm:h-[500px] bg-gray-100 overflow-hidden">
                         <div style="width: 250%; height: 250%; transform: scale(0.4); transform-origin: top left;"><iframe src="https://flagstaffwindows.com" class="w-full h-full border-0 bg-white"></iframe></div>
                         <div class="absolute bottom-0 left-0 w-full bg-white/90 backdrop-blur-sm border-t border-gray-100 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none"><div class="flex items-center justify-between"><div><h3 class="font-bold text-gray-900">Flagstaff Windows</h3><p class="text-xs text-gray-500">Local Business • SEO</p></div><div class="text-right"><div class="text-google-green font-bold">+250%</div><div class="text-xs text-gray-500">Traffic</div></div></div></div>
                     </div>
                 </div>
                 <!-- Item 5: Payson -->
                 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-card-hover transition-shadow group">
-                    <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div><div class="ml-2 text-xs text-gray-500 font-mono">paysonwindowsanddoors.com</div></div>
-                    <div class="relative h-[500px] bg-gray-100 overflow-hidden">
+                    <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div><div class="ml-2 text-xs text-gray-500 font-mono truncate">paysonwindowsanddoors.com</div></div>
+                    <div class="relative h-[400px] sm:h-[500px] bg-gray-100 overflow-hidden">
                         <div style="width: 250%; height: 250%; transform: scale(0.4); transform-origin: top left;"><iframe src="https://paysonwindowsanddoors.com" class="w-full h-full border-0 bg-white"></iframe></div>
                         <div class="absolute bottom-0 left-0 w-full bg-white/90 backdrop-blur-sm border-t border-gray-100 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none"><div class="flex items-center justify-between"><div><h3 class="font-bold text-gray-900">Payson Windows</h3><p class="text-xs text-gray-500">Sales Page • Lead Gen</p></div><div class="text-right"><div class="text-google-green font-bold">+180%</div><div class="text-xs text-gray-500">Revenue</div></div></div></div>
                     </div>
                 </div>
                 <!-- Item 6: WDNM -->
                 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-card-hover transition-shadow group">
-                    <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div><div class="ml-2 text-xs text-gray-500 font-mono">windowsdoorsnearme.com</div></div>
-                    <div class="relative h-[500px] bg-gray-100 overflow-hidden">
+                    <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div><div class="ml-2 text-xs text-gray-500 font-mono truncate">windowsdoorsnearme.com</div></div>
+                    <div class="relative h-[400px] sm:h-[500px] bg-gray-100 overflow-hidden">
                         <div style="width: 250%; height: 250%; transform: scale(0.4); transform-origin: top left;"><iframe src="https://www.windowsdoorsnearme.com" class="w-full h-full border-0 bg-white"></iframe></div>
                         <div class="absolute bottom-0 left-0 w-full bg-white/90 backdrop-blur-sm border-t border-gray-100 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none"><div class="flex items-center justify-between"><div><h3 class="font-bold text-gray-900">Windows Doors Near Me</h3><p class="text-xs text-gray-500">National Directory • SEO</p></div><div class="text-right"><div class="text-google-blue font-bold">National</div><div class="text-xs text-gray-500">Rankings</div></div></div></div>
+                    </div>
+                </div>
+                <!-- Item 7: Mesa Painting -->
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-card-hover transition-shadow group">
+                    <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div><div class="ml-2 text-xs text-gray-500 font-mono truncate">mesapaintingcontractor.com</div></div>
+                    <div class="relative h-[400px] sm:h-[500px] bg-gray-100 overflow-hidden">
+                        <div style="width: 250%; height: 250%; transform: scale(0.4); transform-origin: top left;"><iframe src="https://mesapaintingcontractor.com" class="w-full h-full border-0 bg-white"></iframe></div>
+                        <div class="absolute bottom-0 left-0 w-full bg-white/90 backdrop-blur-sm border-t border-gray-100 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none"><div class="flex items-center justify-between"><div><h3 class="font-bold text-gray-900">Mesa Painting Contractor</h3><p class="text-xs text-gray-500">Painting Services • AI Video</p></div><div class="text-right"><div class="text-google-green font-bold">New</div><div class="text-xs text-gray-500">Launch</div></div></div></div>
+                    </div>
+                </div>
+                <!-- Item 8: PHX Door and Trim -->
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-card-hover transition-shadow group">
+                    <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div><div class="ml-2 text-xs text-gray-500 font-mono truncate">phxdoorandtrim.com</div></div>
+                    <div class="relative h-[400px] sm:h-[500px] bg-gray-100 overflow-hidden">
+                        <div style="width: 250%; height: 250%; transform: scale(0.4); transform-origin: top left;"><iframe src="https://phxdoorandtrim.com" class="w-full h-full border-0 bg-white"></iframe></div>
+                        <div class="absolute bottom-0 left-0 w-full bg-white/90 backdrop-blur-sm border-t border-gray-100 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none"><div class="flex items-center justify-between"><div><h3 class="font-bold text-gray-900">PHX Door and Trim</h3><p class="text-xs text-gray-500">Interior Doors • Trim Work</p></div><div class="text-right"><div class="text-google-green font-bold">+220%</div><div class="text-xs text-gray-500">Leads</div></div></div></div>
                     </div>
                 </div>
             </div>
@@ -261,10 +317,10 @@
     </section>
 
     <!-- Infrastructure (Code) -->
-    <section id="infrastructure" class="py-24 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center max-w-3xl mx-auto mb-16"><h2 class="text-3xl font-bold text-gray-900 mb-4">Built on Google-Grade Code</h2><p class="text-gray-500 text-lg">We don't use drag-and-drop builders. We write semantic, structured code that search engines understand instantly.</p></div>
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
+    <section id="infrastructure" class="py-16 md:py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16"><h2 class="text-3xl font-bold text-gray-900 mb-4">Built on Google-Grade Code</h2><p class="text-gray-500 text-lg">We don't use drag-and-drop builders. We write semantic, structured code that search engines understand instantly.</p></div>
+            <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                 <div class="bg-[#0d1117] rounded-xl shadow-2xl overflow-hidden border border-gray-800 font-mono text-sm leading-relaxed"><div class="bg-[#161b22] px-4 py-2 flex items-center gap-2 border-b border-gray-800"><div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div><div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div><div class="w-3 h-3 rounded-full bg-[#27c93f]"></div></div><div class="ml-4 text-gray-400 text-xs">seo-config.json</div></div><div class="p-6 overflow-x-auto"><pre><code class="text-gray-300">{
   <span class="code-string">"@context"</span>: <span class="code-string">"https://schema.org"</span>,
   <span class="code-string">"@type"</span>: <span class="code-string">"LocalBusiness"</span>,
@@ -280,11 +336,235 @@
         </div>
     </section>
 
+    <!-- Growth Strategy / Plan of Attack - Code Style -->
+    <section id="strategy" class="py-16 md:py-24 bg-white border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Your Plan of Attack</h2>
+                <p class="text-gray-500 text-lg">A proven strategy to dominate local search, written in the language Google understands.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+                <!-- Code Editor - Growth Pipeline -->
+                <div class="bg-[#0d1117] rounded-xl shadow-2xl overflow-hidden border border-gray-800 font-mono text-sm leading-relaxed">
+                    <div class="bg-[#161b22] px-4 py-2 flex items-center gap-2 border-b border-gray-800">
+                        <div class="flex gap-1.5">
+                            <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+                        </div>
+                        <div class="ml-4 text-gray-400 text-xs">growth-pipeline.js</div>
+                    </div>
+                    <div class="p-6 overflow-x-auto text-[13px]">
+<pre><code class="text-gray-300"><span class="text-purple-400">const</span> <span class="text-blue-300">GrowthPipeline</span> = {
+
+  <span class="text-gray-500">// Phase 1: Deep Audit</span>
+  <span class="text-green-400">audit</span>: {
+    <span class="code-string">"competitors"</span>: <span class="text-orange-300">analyzeTop10()</span>,
+    <span class="code-string">"keywords"</span>: <span class="text-orange-300">findOpportunities()</span>,
+    <span class="code-string">"technical"</span>: <span class="text-orange-300">siteHealthCheck()</span>
+  },
+
+  <span class="text-gray-500">// Phase 2: Foundation</span>
+  <span class="text-yellow-400">foundation</span>: {
+    <span class="code-string">"website"</span>: <span class="code-string">"lightning-fast"</span>,
+    <span class="code-string">"schema"</span>: <span class="text-orange-300">injectStructuredData()</span>,
+    <span class="code-string">"mobile"</span>: <span class="text-purple-400">true</span>
+  },
+
+  <span class="text-gray-500">// Phase 3: Local Domination</span>
+  <span class="text-blue-400">local</span>: {
+    <span class="code-string">"gbp"</span>: <span class="text-orange-300">optimizeProfile()</span>,
+    <span class="code-string">"citations"</span>: <span class="text-cyan-300">50</span>,
+    <span class="code-string">"reviews"</span>: <span class="text-orange-300">automate()</span>
+  },
+
+  <span class="text-gray-500">// Phase 4: Content</span>
+  <span class="text-pink-400">content</span>: {
+    <span class="code-string">"servicePages"</span>: <span class="text-orange-300">generate()</span>,
+    <span class="code-string">"locationPages"</span>: <span class="text-orange-300">expand()</span>,
+    <span class="code-string">"blog"</span>: <span class="text-orange-300">schedule()</span>
+  },
+
+  <span class="text-gray-500">// Phase 5: Scale</span>
+  <span class="text-green-400">scale</span>: {
+    <span class="code-string">"tracking"</span>: <span class="text-purple-400">true</span>,
+    <span class="code-string">"reporting"</span>: <span class="code-string">"monthly"</span>,
+    <span class="code-string">"optimize"</span>: <span class="code-string">"continuous"</span>
+  }
+};
+
+<span class="text-purple-400">export default</span> <span class="text-blue-300">GrowthPipeline</span>;</code></pre>
+                    </div>
+                </div>
+
+                <!-- Execution Timeline -->
+                <div class="bg-[#0d1117] rounded-xl shadow-2xl overflow-hidden border border-gray-800 font-mono text-sm leading-relaxed">
+                    <div class="bg-[#161b22] px-4 py-2 flex items-center gap-2 border-b border-gray-800">
+                        <div class="flex gap-1.5">
+                            <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+                        </div>
+                        <div class="ml-4 text-gray-400 text-xs">terminal</div>
+                    </div>
+                    <div class="p-6 overflow-x-auto text-[13px]">
+<pre><code class="text-gray-300"><span class="text-green-400">$</span> townranker execute --client <span class="code-string">"YourBusiness"</span>
+
+<span class="text-gray-500">▸ Initializing growth pipeline...</span>
+
+<span class="text-yellow-400">[Month 1]</span> <span class="text-gray-400">━━━━━━━━━━</span> Foundation
+  <span class="text-green-400">✓</span> Site audit complete
+  <span class="text-green-400">✓</span> Schema deployed
+  <span class="text-green-400">✓</span> GBP optimized
+
+<span class="text-yellow-400">[Month 2-3]</span> <span class="text-gray-400">━━━━━━━━━━</span> Momentum
+  <span class="text-green-400">✓</span> 50 citations built
+  <span class="text-green-400">✓</span> Content published
+  <span class="text-green-400">✓</span> Rankings climbing...
+
+<span class="text-blue-400">[Month 4-6]</span> <span class="text-gray-400">━━━━━━━━━━</span> Growth
+  <span class="text-green-400">✓</span> Page 1 rankings: <span class="text-cyan-300">12 keywords</span>
+  <span class="text-green-400">✓</span> Map pack: <span class="text-cyan-300">Top 3</span>
+  <span class="text-green-400">✓</span> Traffic: <span class="text-cyan-300">+180%</span>
+
+<span class="text-green-400">[Month 6+]</span> <span class="text-gray-400">━━━━━━━━━━</span> Domination
+  <span class="text-green-400">✓</span> Market leader status
+  <span class="text-green-400">✓</span> Leads: <span class="text-cyan-300">5x increase</span>
+  <span class="text-green-400">✓</span> ROI: <span class="text-cyan-300">312%</span>
+
+<span class="text-green-400">$</span> <span class="text-gray-500 animate-pulse">_</span></code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-gray-50 rounded-xl p-6 text-center border border-gray-100">
+                    <div class="text-3xl font-bold text-google-green mb-1">312%</div>
+                    <div class="text-sm text-gray-500">Avg. Traffic Increase</div>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-6 text-center border border-gray-100">
+                    <div class="text-3xl font-bold text-google-blue mb-1">Top 3</div>
+                    <div class="text-sm text-gray-500">Map Pack Rankings</div>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-6 text-center border border-gray-100">
+                    <div class="text-3xl font-bold text-google-yellow mb-1">5x</div>
+                    <div class="text-sm text-gray-500">More Leads</div>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-6 text-center border border-gray-100">
+                    <div class="text-3xl font-bold text-google-red mb-1">90</div>
+                    <div class="text-sm text-gray-500">Days to Results</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 md:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <!-- Left Content -->
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Ready to Rank Higher?</h2>
+                    <p class="text-lg text-gray-600 mb-8">Get a free SEO analysis of your business. We'll show you exactly where you stand and how we can help you dominate local search results.</p>
+
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-google-blue flex-shrink-0">
+                                <span class="material-symbols-outlined">speed</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900 mb-1">Free SEO Audit</h3>
+                                <p class="text-gray-600">Get a comprehensive analysis of your current rankings and opportunities.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-google-green flex-shrink-0">
+                                <span class="material-symbols-outlined">trending_up</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900 mb-1">Custom Strategy</h3>
+                                <p class="text-gray-600">Receive a tailored plan designed specifically for your business goals.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center text-google-yellow flex-shrink-0">
+                                <span class="material-symbols-outlined">schedule</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900 mb-1">Quick Response</h3>
+                                <p class="text-gray-600">We'll get back to you within 24 hours with actionable insights.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="bg-gray-50 rounded-2xl p-8 md:p-10 shadow-card">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Get Your Free Analysis</h3>
+                    <form id="contactForm" class="space-y-5">
+                        <div>
+                            <label for="contact-name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                            <input type="text" id="contact-name" name="name" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-google-blue focus:border-transparent transition-all"
+                                placeholder="John Smith">
+                        </div>
+                        <div>
+                            <label for="contact-email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                            <input type="email" id="contact-email" name="email" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-google-blue focus:border-transparent transition-all"
+                                placeholder="john@example.com">
+                        </div>
+                        <div>
+                            <label for="contact-phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                            <input type="tel" id="contact-phone" name="phone" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-google-blue focus:border-transparent transition-all"
+                                placeholder="(555) 123-4567">
+                        </div>
+                        <div>
+                            <label for="contact-business" class="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
+                            <input type="text" id="contact-business" name="business"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-google-blue focus:border-transparent transition-all"
+                                placeholder="Your Business LLC">
+                        </div>
+                        <div>
+                            <label for="contact-message" class="block text-sm font-medium text-gray-700 mb-2">Tell us about your goals</label>
+                            <textarea id="contact-message" name="message" rows="3"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-google-blue focus:border-transparent transition-all resize-none"
+                                placeholder="I want to rank #1 for..."></textarea>
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-google-blue text-white font-medium py-4 rounded-lg hover:bg-blue-600 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">send</span>
+                            Get My Free Analysis
+                        </button>
+                    </form>
+                    <p class="text-center text-sm text-gray-500 mt-4">No spam, ever. We respect your privacy.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 pt-12 pb-8"><div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6"><div class="flex items-center gap-2"><span class="text-xl font-bold text-gray-600">TownRanker</span><span class="text-sm text-gray-400">© 2025</span></div></div></footer>
+    <footer class="bg-white border-t border-gray-200 pt-12 pb-8"><div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6"><div class="flex items-center gap-3"><div class="flex gap-1"><div class="w-3 h-3 rounded-full bg-google-red"></div><div class="w-3 h-3 rounded-full bg-google-yellow"></div><div class="w-3 h-3 rounded-full bg-google-green"></div></div><span class="text-xl font-bold text-gray-600">TownRanker</span><span class="text-sm text-gray-400">© 2025</span></div></div></footer>
 
     <!-- Scripts -->
     <script>
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const btn = document.getElementById('mobile-menu-btn');
+            if (menu.classList.contains('open')) {
+                menu.classList.remove('open');
+                btn.innerHTML = '<span class="material-symbols-outlined text-3xl">menu</span>';
+            } else {
+                menu.classList.add('open');
+                btn.innerHTML = '<span class="material-symbols-outlined text-3xl">close</span>';
+            }
+        }
+        document.getElementById('mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+
         // Tabs & Animation Logic
         function switchDashTab(tabName) {
             document.querySelectorAll('[id^="tab-"]').forEach(btn => { btn.classList.remove('bg-white', 'text-gray-600', 'shadow-sm'); btn.classList.add('text-gray-500', 'hover:bg-white', 'hover:text-gray-700'); });
@@ -294,7 +574,7 @@
             const activeView = document.getElementById(`view-${tabName}`);
             if (activeView) { activeView.classList.remove('opacity-0', 'pointer-events-none', 'transform', 'translate-y-4'); activeView.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0'); }
         }
-        
+
         // Map Logic
         const mapGrid = document.getElementById('map-grid');
         const avgRankDisplay = document.getElementById('avg-rank-display');
@@ -304,17 +584,71 @@
         function runMapAnimation() { mapGrid.innerHTML = ''; const dots = []; const totalDots = 25; for (let i = 0; i < totalDots; i++) { const startRank = Math.floor(Math.random() * 13) + 8; const dot = createDot(startRank); mapGrid.appendChild(dot); dots.push({ element: dot, currentRank: startRank }); setTimeout(() => { dot.classList.remove('scale-0', 'opacity-0'); dot.classList.add('scale-100', 'opacity-100'); }, i * 30); } let progress = 0; const duration = 50; clearInterval(animationInterval); setTimeout(() => { animationInterval = setInterval(() => { progress++; let totalRank = 0; dots.forEach((dotObj, index) => { if (Math.random() > 0.6 && dotObj.currentRank > 1) { const improvement = Math.floor(Math.random() * 3) + 1; dotObj.currentRank = Math.max(1, dotObj.currentRank - improvement); if (dotObj.currentRank <= 3 && !dotObj.element.classList.contains('bg-google-green')) { dotObj.element.classList.add('scale-110'); setTimeout(() => dotObj.element.classList.remove('scale-110'), 200); } updateDotStyle(dotObj.element, dotObj.currentRank); } totalRank += dotObj.currentRank; }); avgRankDisplay.innerText = (totalRank / totalDots).toFixed(1); if (progress > duration) { clearInterval(animationInterval); dots.forEach(dotObj => { dotObj.currentRank = Math.floor(Math.random() * 2) + 1; updateDotStyle(dotObj.element, dotObj.currentRank); }); avgRankDisplay.innerText = "1.2"; avgRankDisplay.classList.add('text-google-green'); } }, 100); }, 1000); }
         function restartMapAnimation() { avgRankDisplay.classList.remove('text-google-green'); runMapAnimation(); }
         document.addEventListener('DOMContentLoaded', () => { const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { runMapAnimation(); observer.unobserve(entry.target); } }); }); observer.observe(document.querySelector('#map-grid')); });
-        
+
         // Live Visitor Simulation
         function updateLiveVisitors() { const el = document.getElementById('live-user-count'); if (!el) return; let count = parseInt(el.innerText); const change = Math.floor(Math.random() * 5) - 2; count = Math.max(20, count + change); el.innerText = count; }
         setInterval(updateLiveVisitors, 3000);
-        
+
         // Dynamic Leads
         const leadsList = document.getElementById('leadsList');
         const names = ['James', 'Emily', 'Michael', 'Sarah', 'David'];
         const actions = ['New Contact', 'Quote', 'Call'];
         function addLead() { if (!leadsList) return; const name = names[Math.floor(Math.random() * names.length)]; const action = actions[Math.floor(Math.random() * actions.length)]; const leadHTML = `<div class="p-3 flex items-center gap-3 bg-white animate-fade-in-up border-b border-gray-50"><div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">${name[0]}</div><div class="flex-1"><div class="text-sm font-medium text-gray-800">${name}</div><div class="text-xs text-gray-500">${action}</div></div><div class="text-xs text-google-blue font-bold">Just now</div></div>`; leadsList.insertAdjacentHTML('afterbegin', leadHTML); if (leadsList.children.length > 5) leadsList.lastElementChild.remove(); }
         setInterval(addLead, 8000); for(let i=0; i<3; i++) addLead();
+
+        // Contact Form Handler
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const btn = this.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Sending...';
+            btn.disabled = true;
+
+            const formData = {
+                name: document.getElementById('contact-name').value,
+                email: document.getElementById('contact-email').value,
+                phone: document.getElementById('contact-phone').value,
+                company: document.getElementById('contact-business').value,
+                message: document.getElementById('contact-message').value,
+                source: 'website-contact'
+            };
+
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Sent Successfully!';
+                    btn.classList.remove('bg-google-blue', 'hover:bg-blue-600');
+                    btn.classList.add('bg-google-green');
+                    this.reset();
+
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.classList.remove('bg-google-green');
+                        btn.classList.add('bg-google-blue', 'hover:bg-blue-600');
+                        btn.disabled = false;
+                    }, 3000);
+                } else {
+                    throw new Error('Failed to submit');
+                }
+            } catch (error) {
+                btn.innerHTML = '<span class="material-symbols-outlined">error</span> Try Again';
+                btn.classList.remove('bg-google-blue');
+                btn.classList.add('bg-google-red');
+
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('bg-google-red');
+                    btn.classList.add('bg-google-blue', 'hover:bg-blue-600');
+                    btn.disabled = false;
+                }, 2000);
+            }
+        });
     </script>
 </body>
 </html>

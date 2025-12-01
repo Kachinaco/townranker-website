@@ -1,0 +1,29 @@
+# Environment files with secrets
+.env
+.env.local
+.env.production
+.env.secure
+
+# Config files with secrets
+config/reddit-monitor.json
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+error.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build artifacts
+dist/
+build/

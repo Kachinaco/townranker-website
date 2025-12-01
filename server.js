@@ -8,6 +8,8 @@ const { simpleParser } = require('mailparser');
 const http = require('http');
 const socketIo = require('socket.io');
 const openphoneSync = require('./server/services/openphoneSync');
+const { sendSlackVisitorNotification } = require('./server/services/visitor-tracker');
+const redditMonitorService = require('./server/services/redditMonitorService');
 require('dotenv').config();
 
 const app = express();
@@ -326,6 +328,7 @@ const { router: authRoutes, verifyToken: authenticateToken } = require('./server
 
 // Email transporter setup
 const fs = require('fs').promises;
+const { exec } = require('child_process');
 
 // IMAP configuration for receiving emails
 const imapConfig = {
@@ -813,6 +816,73 @@ const messagesRoutes = require('./server/routes/messages');
 app.use('/api/openphone', openphoneRoutes);
 app.use('/api/messages', messagesRoutes);
 
+// Mount Reddit leads routes
+const redditLeadsRoutes = require('./server/routes/reddit-leads');
+app.use('/api/reddit-leads', redditLeadsRoutes);
+
+// Backward-compatible Reddit monitor routes (for dashboard)
+const RedditMonitorConfig = require('./server/models/RedditMonitorConfig');
+const RedditLead = require('./server/models/RedditLead');
+// Note: redditMonitorService already required at top of file
+
+app.get('/api/reddit-monitors', async (req, res) => {
+    try {
+        const configs = await RedditMonitorConfig.find().sort({ createdAt: -1 });
+        // Transform to old format
+        const monitors = configs.map(c => ({
+            id: c.monitorId,
+            name: c.name,
+            businessName: c.businessName,
+            location: c.location,
+            targetSubreddits: c.targetSubreddits,
+            serviceKeywords: c.serviceKeywords,
+            schedule: {
+                enabled: c.isActive,
+                intervalMinutes: c.intervalMinutes
+            },
+            lastUpdated: c.updatedAt
+        }));
+        res.json({ success: true, monitors });
+    } catch (e) {
+        res.status(500).json({ success: false, error: e.message });
+    }
+});
+
+app.get('/api/reddit-monitor/leads', async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 100;
+        const leads = await RedditLead.find().sort({ discoveredAt: -1 }).limit(limit);
+        res.json({ success: true, leads, total: await RedditLead.countDocuments() });
+    } catch (e) {
+        res.status(500).json({ success: false, error: e.message });
+    }
+});
+
+app.post('/api/reddit-monitors/:id/toggle', async (req, res) => {
+    try {
+        const monitor = await RedditMonitorConfig.findOne({ monitorId: req.params.id });
+        if (!monitor) return res.status(404).json({ success: false, error: 'Not found' });
+        monitor.isActive = !monitor.isActive;
+        await monitor.save();
+        if (monitor.isActive) {
+            redditMonitorService.startMonitor(monitor.monitorId, monitor.intervalMinutes);
+        } else {
+            redditMonitorService.stopMonitor(monitor.monitorId);
+        }
+        res.json({ success: true, isActive: monitor.isActive });
+    } catch (e) {
+        res.status(500).json({ success: false, error: e.message });
+    }
+});
+
+app.post('/api/reddit-monitors/:id/run', async (req, res) => {
+    try {
+        const stats = await redditMonitorService.runMonitor(req.params.id);
+        res.json({ success: true, stats });
+    } catch (e) {
+        res.status(500).json({ success: false, error: e.message });
+    }
+});
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -905,6 +975,63 @@ app.get('/api/check-emails', (req, res) => {
         res.json({ success: true, message: 'Email check triggered' });
     } else {
         res.json({ success: false, message: 'Email receiver not connected' });
+    }
+});
+
+// Visitor tracking endpoint
+app.post('/api/track-visitor', async (req, res) => {
+    try {
+        const visitorData = req.body;
+
+        // Get IP address from request
+        const ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress || '').split(',')[0].trim();
+        visitorData.ip = ip;
+
+        // Fetch geolocation data for IP (non-blocking)
+        if (ip && ip !== 'unknown' && !ip.startsWith('127.') && !ip.startsWith('::1')) {
+            fetch(`http://ip-api.com/json/${ip}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`)
+                .then(response => response.json())
+                .then(location => {
+                    if (location && location.status === 'success') {
+                        visitorData.location = {
+                            city: location.city,
+                            region: location.regionName,
+                            country: location.country,
+                            countryCode: location.countryCode,
+                            zip: location.zip,
+                            lat: location.lat,
+                            lon: location.lon,
+                            timezone: location.timezone,
+                            isp: location.isp,
+                            org: location.org
+                        };
+                    }
+
+                    // Send to Slack after geolocation lookup
+                    sendSlackVisitorNotification(visitorData).catch(err => {
+                        console.error('Failed to send visitor notification:', err);
+                    });
+                })
+                .catch(err => {
+                    console.error('Geolocation lookup failed:', err);
+                    // Send to Slack even if geolocation fails
+                    sendSlackVisitorNotification(visitorData).catch(err => {
+                        console.error('Failed to send visitor notification:', err);
+                    });
+                });
+        } else {
+            // Send to Slack without geolocation
+            sendSlackVisitorNotification(visitorData).catch(err => {
+                console.error('Failed to send visitor notification:', err);
+            });
+        }
+
+        // Return success immediately (non-blocking)
+        res.json({ success: true });
+
+    } catch (error) {
+        console.error('Error tracking visitor:', error);
+        res.status(500).json({ error: 'Failed to track visitor' });
     }
 });
 
@@ -1032,12 +1159,13 @@ app.post('/api/contact', async (req, res) => {
                         </div>
                     </div>
                     
+                    ${lead.projectType || lead.budget || lead.timeline ? `
                     <div style="background: #ede9fe; padding: 20px; border-radius: 8px;">
                         <h3 style="color: #5b21b6; margin-top: 0;">Your Project Summary:</h3>
-                        <p><strong>Project Type:</strong> ${lead.projectType.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</p>
-                        <p><strong>Budget Range:</strong> ${formatBudget(lead.budget)}</p>
-                        <p><strong>Timeline:</strong> ${lead.timeline === 'asap' ? 'ASAP' : lead.timeline.replace('-', ' to ')}</p>
-                    </div>
+                        ${lead.projectType ? `<p><strong>Project Type:</strong> ${lead.projectType.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</p>` : ''}
+                        ${lead.budget ? `<p><strong>Budget Range:</strong> ${formatBudget(lead.budget)}</p>` : ''}
+                        ${lead.timeline ? `<p><strong>Timeline:</strong> ${lead.timeline === 'asap' ? 'ASAP' : lead.timeline.replace('-', ' to ')}</p>` : ''}
+                    </div>` : ''}
                     
                     <p style="color: #4b5563; line-height: 1.6; margin-top: 20px;">
                         While you wait, feel free to check out our portfolio at <a href="https://townranker.com" style="color: #6366f1;">townranker.com</a>
@@ -2468,6 +2596,916 @@ app.post('/api/send-customer-email', async (req, res) => {
     }
 });
 
+// Send Email API (for admin dashboard)
+app.post('/api/send-email', authenticateAdmin, async (req, res) => {
+    try {
+        const { to, subject, body, leadId } = req.body;
+
+        if (!to || !subject || !body) {
+            return res.status(400).json({
+                success: false,
+                message: 'To, subject, and body are required'
+            });
+        }
+
+        // Create HTML email
+        const emailHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); padding: 20px; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 24px;">${subject}</h1>
+                </div>
+                <div style="padding: 30px; background: #f9fafb; line-height: 1.6; color: #1f2937;">
+                    ${body.replace(/\n/g, '<br>')}
+                </div>
+                <div style="background: #1f2937; padding: 20px; text-align: center;">
+                    <p style="color: white; margin: 0; font-weight: bold;">TownRanker</p>
+                    <p style="color: #9ca3af; margin: 5px 0; font-size: 14px;">Professional Digital Solutions</p>
+                </div>
+            </div>
+        `;
+
+        const result = await transporter.sendMail({
+            from: process.env.EMAIL_FROM || '"TownRanker" <rank@townranker.com>',
+            to: to,
+            subject: subject,
+            html: emailHtml
+        });
+
+        // Update lead if leadId provided
+        if (leadId) {
+            await Lead.findByIdAndUpdate(leadId, {
+                lastContacted: new Date(),
+                $inc: { emailCount: 1 },
+                $push: {
+                    emailHistory: {
+                        subject: subject,
+                        body: body,
+                        sentAt: new Date(),
+                        messageId: result.messageId,
+                        status: 'sent'
+                    },
+                    interactions: {
+                        type: 'email',
+                        title: 'Email Sent',
+                        description: subject,
+                        timestamp: new Date()
+                    }
+                }
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Email sent successfully',
+            messageId: result.messageId
+        });
+    } catch (error) {
+        console.error('Send email error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to send email',
+            error: error.message
+        });
+    }
+});
+
+// Send SMS API (for admin dashboard) - uses OpenPhone
+app.post('/api/send-sms', authenticateAdmin, async (req, res) => {
+    try {
+        const { to, message, leadId } = req.body;
+
+        if (!to || !message) {
+            return res.status(400).json({
+                success: false,
+                message: 'Phone number and message are required'
+            });
+        }
+
+        // Clean phone number
+        let phoneNumber = to.replace(/[^0-9+]/g, '');
+        if (!phoneNumber.startsWith('+')) {
+            phoneNumber = '+1' + phoneNumber.replace(/^1/, '');
+        }
+
+        const OPENPHONE_API_URL = 'https://api.openphone.com/v1';
+        const API_KEY = process.env.OPENPHONE_API_KEY;
+        const PHONE_NUMBER = process.env.OPENPHONE_PHONE_NUMBER;
+
+        if (!API_KEY) {
+            return res.status(500).json({
+                success: false,
+                message: 'OpenPhone API key not configured'
+            });
+        }
+
+        // Send via OpenPhone
+        const axios = require('axios');
+        const response = await axios.post(`${OPENPHONE_API_URL}/messages`, {
+            to: [phoneNumber],
+            from: PHONE_NUMBER,
+            content: message
+        }, {
+            headers: {
+                'Authorization': API_KEY,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // Update lead if leadId provided
+        if (leadId) {
+            await Lead.findByIdAndUpdate(leadId, {
+                lastContacted: new Date(),
+                $push: {
+                    interactions: {
+                        type: 'sms',
+                        title: 'SMS Sent',
+                        description: message,
+                        body: message,
+                        timestamp: new Date()
+                    }
+                }
+            });
+        }
+
+        // Emit real-time notification
+        if (io) {
+            io.emit('sms_notification', {
+                type: 'sms_sent',
+                leadId: leadId,
+                message: message,
+                phone: phoneNumber
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'SMS sent successfully',
+            messageId: response.data.id
+        });
+    } catch (error) {
+        console.error('Send SMS error:', error.response?.data || error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to send SMS',
+            error: error.response?.data?.message || error.message
+        });
+    }
+});
+
+// ============================================
+// Reddit Monitor API Endpoints
+// ============================================
+
+const REDDIT_MONITOR_CONFIG_PATH = path.join(__dirname, 'config', 'reddit-monitor.json');
+const REDDIT_MONITORS_DIR = '/root/scripts/phoenix-lead-system/monitors';
+
+// Helper to run shell commands
+const execPromise = (cmd) => {
+    return new Promise((resolve, reject) => {
+        exec(cmd, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve({ stdout, stderr });
+            }
+        });
+    });
+};
+
+// GET /api/reddit-monitor/config - Fetch current config
+app.get('/api/reddit-monitor/config', authenticateAdmin, async (req, res) => {
+    try {
+        const configData = await fs.readFile(REDDIT_MONITOR_CONFIG_PATH, 'utf8');
+        const config = JSON.parse(configData);
+        res.json({ success: true, config });
+    } catch (error) {
+        console.error('Error reading Reddit monitor config:', error);
+        res.status(500).json({ success: false, message: 'Failed to read config', error: error.message });
+    }
+});
+
+// Path to Node.js monitor config
+const NODEJS_MONITOR_CONFIG_PATH = '/root/scripts/phoenix-lead-system/monitors/phoenix-windows.json';
+
+// Helper function to sync TownRanker config to Node.js monitor
+async function syncToNodejsMonitor(townrankerConfig) {
+    try {
+        // Read existing Node.js monitor config
+        let nodejsConfig = {};
+        try {
+            const existingConfig = await fs.readFile(NODEJS_MONITOR_CONFIG_PATH, 'utf8');
+            nodejsConfig = JSON.parse(existingConfig);
+        } catch (e) {
+            // Create new config if doesn't exist
+            nodejsConfig = {
+                version: '2.0',
+                createdAt: new Date().toISOString(),
+                id: 'phoenix-windows',
+                name: 'Phoenix Windows & Doors Monitor',
+                businessName: 'Windows & Doors Near Me'
+            };
+        }
+
+        // Convert TownRanker config format to Node.js monitor format
+        nodejsConfig.lastUpdated = new Date().toISOString();
+
+        // Map subreddits to target subreddits
+        nodejsConfig.targetSubreddits = townrankerConfig.subreddits || [];
+
+        // Map high priority keywords to service keywords AND high intent phrases
+        nodejsConfig.serviceKeywords = townrankerConfig.highPriorityKeywords || [];
+
+        // Map context keywords to high intent phrases
+        nodejsConfig.highIntentPhrases = townrankerConfig.contextKeywords || [];
+
+        // Map exclusion keywords
+        nodejsConfig.exclusionKeywords = townrankerConfig.exclusionKeywords || [];
+
+        // Build search queries from subreddits and keywords
+        const topSubreddits = (townrankerConfig.subreddits || []).slice(0, 3);
+        const topKeywords = (townrankerConfig.highPriorityKeywords || []).slice(0, 5);
+        nodejsConfig.searchQueries = [
+            ...topSubreddits.map(sub => `site:reddit.com/r/${sub} window OR door replacement recommend`),
+            ...topKeywords.slice(0, 3).map(kw => `site:reddit.com phoenix ${kw}`)
+        ];
+
+        // Map schedule
+        nodejsConfig.schedule = {
+            intervalMinutes: townrankerConfig.intervalMinutes || 15,
+            enabled: townrankerConfig.active !== false
+        };
+
+        // Map notifications
+        nodejsConfig.notifications = {
+            slack: {
+                enabled: !!townrankerConfig.slackWebhook,
+                webhookUrl: townrankerConfig.slackWebhook || ''
+            }
+        };
+
+        // Keep database settings
+        nodejsConfig.database = nodejsConfig.database || {
+            enabled: true,
+            mongoUri: 'mongodb://localhost:27017/townranker',
+            dbName: 'townranker',
+            collection: 'leads'
+        };
+
+        // Keep other settings
+        nodejsConfig.serpApiKey = nodejsConfig.serpApiKey || '***REMOVED***';
+        nodejsConfig.location = nodejsConfig.location || 'Phoenix, Arizona, United States';
+        nodejsConfig.timezone = nodejsConfig.timezone || 'America/Phoenix';
+        nodejsConfig.timezoneAbbr = nodejsConfig.timezoneAbbr || 'MST';
+        nodejsConfig.cacheExpiryDays = nodejsConfig.cacheExpiryDays || 7;
+        nodejsConfig.dataDir = nodejsConfig.dataDir || '/root/scripts/phoenix-lead-system/data';
+
+        // Keep location keywords
+        nodejsConfig.locationKeywords = nodejsConfig.locationKeywords || [
+            'phoenix', 'gilbert', 'mesa', 'chandler', 'scottsdale', 'tempe', 'glendale', 'arizona', 'az'
+        ];
+
+        // Keep scoring
+        nodejsConfig.scoring = nodejsConfig.scoring || {
+            highIntentWeight: 30,
+            serviceWeight: 15,
+            locationWeight: 10,
+            minScore: 30,
+            thresholds: { high: 60, medium: 40 }
+        };
+
+        // Write the synced config
+        await fs.writeFile(NODEJS_MONITOR_CONFIG_PATH, JSON.stringify(nodejsConfig, null, 2));
+        console.log('✅ Synced config to Node.js monitor');
+        return true;
+    } catch (error) {
+        console.error('Error syncing to Node.js monitor:', error);
+        return false;
+    }
+}
+
+// POST /api/reddit-monitor/config - Save config
+app.post('/api/reddit-monitor/config', authenticateAdmin, async (req, res) => {
+    try {
+        const newConfig = req.body;
+        newConfig.lastUpdated = new Date().toISOString();
+
+        // Save to TownRanker config
+        await fs.writeFile(REDDIT_MONITOR_CONFIG_PATH, JSON.stringify(newConfig, null, 2));
+
+        // Also sync to Node.js monitor
+        const syncSuccess = await syncToNodejsMonitor(newConfig);
+
+        res.json({
+            success: true,
+            message: syncSuccess
+                ? 'Config saved and synced to Node.js monitor'
+                : 'Config saved (Node.js sync failed)',
+            config: newConfig,
+            nodejsSynced: syncSuccess
+        });
+    } catch (error) {
+        console.error('Error saving Reddit monitor config:', error);
+        res.status(500).json({ success: false, message: 'Failed to save config', error: error.message });
+    }
+});
+
+// GET /api/reddit-monitor/status - Get n8n workflow status
+app.get('/api/reddit-monitor/status', authenticateAdmin, async (req, res) => {
+    try {
+        const configData = await fs.readFile(REDDIT_MONITOR_CONFIG_PATH, 'utf8');
+        const config = JSON.parse(configData);
+        const workflowId = config.workflowId;
+
+        // Get workflow status from n8n
+        const { stdout } = await execPromise(`docker exec n8n n8n export:workflow --id=${workflowId} 2>/dev/null | grep -v "Permissions"`);
+        const workflow = JSON.parse(stdout);
+
+        res.json({
+            success: true,
+            status: {
+                workflowId: workflowId,
+                name: workflow[0]?.name || 'Unknown',
+                active: workflow[0]?.active || false,
+                lastUpdated: config.lastUpdated
+            }
+        });
+    } catch (error) {
+        console.error('Error getting Reddit monitor status:', error);
+        res.status(500).json({ success: false, message: 'Failed to get status', error: error.message });
+    }
+});
+
+// POST /api/reddit-monitor/toggle - Enable/disable workflow
+app.post('/api/reddit-monitor/toggle', authenticateAdmin, async (req, res) => {
+    try {
+        const { active } = req.body;
+        const configData = await fs.readFile(REDDIT_MONITOR_CONFIG_PATH, 'utf8');
+        const config = JSON.parse(configData);
+        const workflowId = config.workflowId;
+
+        // Toggle workflow in n8n (if workflow exists)
+        try {
+            const activeFlag = active ? 'true' : 'false';
+            await execPromise(`docker exec n8n n8n update:workflow --id=${workflowId} --active=${activeFlag} 2>/dev/null | grep -v "Permissions"`);
+        } catch (n8nError) {
+            console.log('n8n toggle skipped (workflow may not exist):', n8nError.message);
+        }
+
+        // Update TownRanker config file
+        config.active = active;
+        config.lastUpdated = new Date().toISOString();
+        await fs.writeFile(REDDIT_MONITOR_CONFIG_PATH, JSON.stringify(config, null, 2));
+
+        // Also sync to Node.js monitor
+        await syncToNodejsMonitor(config);
+
+        res.json({ success: true, message: `Monitor ${active ? 'activated' : 'deactivated'}`, active });
+    } catch (error) {
+        console.error('Error toggling Reddit monitor:', error);
+        res.status(500).json({ success: false, message: 'Failed to toggle workflow', error: error.message });
+    }
+});
+
+// POST /api/reddit-monitor/sync - Push config to n8n workflow AND Node.js monitor
+app.post('/api/reddit-monitor/sync', authenticateAdmin, async (req, res) => {
+    try {
+        const configData = await fs.readFile(REDDIT_MONITOR_CONFIG_PATH, 'utf8');
+        const config = JSON.parse(configData);
+        const workflowId = config.workflowId;
+
+        let n8nSynced = false;
+        let nodejsSynced = false;
+
+        // Try to sync to n8n workflow (optional - may not exist)
+        try {
+            // Export current workflow
+            const { stdout } = await execPromise(`docker exec n8n n8n export:workflow --id=${workflowId} 2>/dev/null | grep -v "Permissions"`);
+            const workflows = JSON.parse(stdout);
+            const workflow = workflows[0];
+
+            // Build subreddit URL
+            const subredditUrl = `https://www.reddit.com/r/${config.subreddits.join('+')}/new/.rss?limit=100`;
+
+            // Update the HTTP Request node URL
+            const httpNode = workflow.nodes.find(n => n.id === 'http-fetch');
+            if (httpNode) {
+                httpNode.parameters.url = subredditUrl;
+            }
+
+            // Update the Schedule trigger interval
+            const scheduleNode = workflow.nodes.find(n => n.id === 'schedule');
+            if (scheduleNode) {
+                scheduleNode.parameters.rule.interval[0].minutesInterval = config.intervalMinutes;
+            }
+
+            // Update the Slack webhook URL
+            const slackNode = workflow.nodes.find(n => n.id === 'slack-notify');
+            if (slackNode) {
+                slackNode.parameters.url = config.slackWebhook;
+            }
+
+            // Update the filter code with new keywords
+            const filterNode = workflow.nodes.find(n => n.id === 'filter-keywords');
+            if (filterNode) {
+                const jsCode = buildFilterCode(config);
+                filterNode.parameters.jsCode = jsCode;
+            }
+
+            // Write workflow to temp file
+            const tempFile = '/tmp/reddit-workflow-updated.json';
+            await fs.writeFile(tempFile, JSON.stringify([workflow], null, 2));
+
+            // Copy to container and import
+            await execPromise(`docker cp ${tempFile} n8n:/tmp/workflow.json`);
+            await execPromise(`docker exec n8n n8n import:workflow --input=/tmp/workflow.json --separate 2>/dev/null | grep -v "Permissions"`);
+
+            n8nSynced = true;
+        } catch (n8nError) {
+            console.log('n8n sync skipped:', n8nError.message);
+        }
+
+        // Sync to Node.js monitor (primary monitor system)
+        nodejsSynced = await syncToNodejsMonitor(config);
+
+        // Update config timestamp
+        config.lastUpdated = new Date().toISOString();
+        await fs.writeFile(REDDIT_MONITOR_CONFIG_PATH, JSON.stringify(config, null, 2));
+
+        // Build success message
+        let message = 'Config synced: ';
+        const systems = [];
+        if (nodejsSynced) systems.push('Node.js monitor');
+        if (n8nSynced) systems.push('n8n workflow');
+        message += systems.length > 0 ? systems.join(' + ') : 'No systems updated';
+
+        res.json({
+            success: nodejsSynced || n8nSynced,
+            message,
+            nodejsSynced,
+            n8nSynced
+        });
+    } catch (error) {
+        console.error('Error syncing Reddit monitor:', error);
+        res.status(500).json({ success: false, message: 'Failed to sync workflow', error: error.message });
+    }
+});
+
+// Helper function to build the filter code
+function buildFilterCode(config) {
+    // Build the code as an array of strings and join to avoid template literal issues
+    const lines = [
+        'const items = $input.all();',
+        '',
+        '// HIGH PRIORITY - Direct window/door keywords',
+        'const highPriorityKeywords = ' + JSON.stringify(config.highPriorityKeywords) + ';',
+        '',
+        '// CONTEXT keywords',
+        'const contextKeywords = ' + JSON.stringify(config.contextKeywords) + ';',
+        '',
+        '// EXCLUSION keywords',
+        'const exclusionKeywords = ' + JSON.stringify(config.exclusionKeywords) + ';',
+        '',
+        '// Arizona location signals',
+        "const azLocations = ['mesa', 'gilbert', 'queen creek', 'san tan', 'apache junction', 'chandler', 'tempe', 'scottsdale', 'phoenix', 'ahwatukee', 'gold canyon', 'fountain hills', 'maricopa', 'east valley', 'superstition', 'power ranch', 'glendale', 'peoria', 'surprise', 'goodyear', 'avondale', 'buckeye', 'tucson', 'flagstaff'];",
+        '',
+        'const timeWindow = ' + (config.timeWindowMinutes || 35) + ' * 60 * 1000;',
+        'const now = Date.now();',
+        'const results = [];',
+        '',
+        '// Word boundary matching helper',
+        'const wordMatch = (text, keyword) => {',
+        '  const escaped = keyword.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&");',
+        '  return new RegExp("\\\\b" + escaped + "\\\\b", "i").test(text);',
+        '};',
+        '',
+        'for (const item of items) {',
+        '  const post = item.json;',
+        '  const pubDate = new Date(post.published).getTime();',
+        '  const postAge = now - pubDate;',
+        '  if (postAge > timeWindow) continue;',
+        '  const title = (post.title || "").toLowerCase();',
+        '  const content = (post.content || "").toLowerCase();',
+        '  const text = title + " " + content;',
+        '  const hasExclusion = exclusionKeywords.some(kw => wordMatch(text, kw));',
+        '  if (hasExclusion) continue;',
+        '  const highMatches = highPriorityKeywords.filter(kw => wordMatch(text, kw));',
+        '  const contextMatches = contextKeywords.filter(kw => wordMatch(text, kw));',
+        '  const locationMatches = azLocations.filter(loc => wordMatch(text, loc));',
+        '  const hasMultiWordMatch = highMatches.some(kw => kw.includes(" "));',
+        '  const hasSingleWordMatch = highMatches.some(kw => !kw.includes(" "));',
+        '  const hasContext = contextMatches.length >= 1;',
+        '  const isValidLead = hasMultiWordMatch || (hasSingleWordMatch && hasContext);',
+        '  if (isValidLead && highMatches.length >= 1) {',
+        '    const linkMatch = (post.link || "").match(/\\/r\\/([^\\/]+)/);',
+        '    const subreddit = linkMatch ? linkMatch[1] : (post.category || "unknown").replace("r/", "");',
+        '    const cleanContent = (post.content || "").replace(/<[^>]*>/g, " ").replace(/&[^;]+;/g, " ").replace(/\\\\s+/g, " ").trim();',
+        '    const score = (highMatches.length * 3) + (contextMatches.length * 2) + (locationMatches.length > 0 ? 2 : 0);',
+        '    let priority = "Medium";',
+        '    if (score >= 10 || (hasMultiWordMatch && locationMatches.length > 0)) priority = "HIGH";',
+        '    if (score >= 15 || highMatches.length >= 3) priority = "🔥 HOT LEAD";',
+        '    results.push({',
+        '      title: post.title,',
+        '      subreddit: subreddit,',
+        '      author: (post.author || "unknown").replace("/u/", ""),',
+        '      link: post.link,',
+        '      content: cleanContent.substring(0, 400),',
+        '      pubDate: new Date(post.published).toLocaleString("en-US", {timeZone: "America/Phoenix"}),',
+        '      priority: priority,',
+        '      score: score,',
+        '      highKeywords: highMatches.slice(0, 5).join(", ") || "none",',
+        '      contextKeywords: contextMatches.slice(0, 3).join(", ") || "none",',
+        '      locations: locationMatches.join(", ") || "none"',
+        '    });',
+        '  }',
+        '}',
+        'results.sort((a, b) => b.score - a.score);',
+        'if (results.length === 0) return [{ json: { noResults: true } }];',
+        'return results.map(r => ({ json: r }));'
+    ];
+    return lines.join('\n');
+}
+
+// GET /api/reddit-monitor/leads - Fetch leads from n8n execution history
+app.get('/api/reddit-monitor/leads', authenticateAdmin, async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const offset = parseInt(req.query.offset) || 0;
+
+        // Run Python script to extract leads from n8n SQLite database
+        const scriptPath = path.join(__dirname, 'scripts', 'get-reddit-leads.py');
+        const { stdout, stderr } = await execPromise(`python3 "${scriptPath}" --limit ${limit} --offset ${offset}`);
+
+        if (stderr && !stderr.includes('Permissions')) {
+            console.error('Python script error:', stderr);
+        }
+
+        const result = JSON.parse(stdout);
+        res.json(result);
+    } catch (error) {
+        console.error('Error fetching Reddit leads:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch leads',
+            error: error.message,
+            leads: [],
+            total: 0
+        });
+    }
+});
+
+// ============================================
+// Reddit Monitor WORKFLOWS API (Multiple Monitors)
+// ============================================
+
+// GET /api/reddit-monitors - List all monitors
+app.get('/api/reddit-monitors', authenticateAdmin, async (req, res) => {
+    try {
+        const monitors = [];
+
+        // Read all monitor configs from the monitors directory
+        if (require('fs').existsSync(REDDIT_MONITORS_DIR)) {
+            const files = require('fs').readdirSync(REDDIT_MONITORS_DIR).filter(f => f.endsWith('.json'));
+
+            for (const file of files) {
+                try {
+                    const configPath = require('path').join(REDDIT_MONITORS_DIR, file);
+                    const configData = require('fs').readFileSync(configPath, 'utf8');
+                    const config = JSON.parse(configData);
+
+                    monitors.push({
+                        id: config.id || file.replace('.json', ''),
+                        name: config.name || config.businessName || 'Unnamed Monitor',
+                        businessName: config.businessName || '',
+                        active: config.schedule?.enabled !== false,
+                        subredditCount: (config.targetSubreddits || []).length,
+                        keywordCount: (config.serviceKeywords || []).length,
+                        lastUpdated: config.lastUpdated || null,
+                        createdAt: config.createdAt || null
+                    });
+                } catch (e) {
+                    console.error('Error reading monitor config:', file, e.message);
+                }
+            }
+        }
+
+        res.json({ success: true, monitors });
+    } catch (error) {
+        console.error('Error listing monitors:', error);
+        res.status(500).json({ success: false, message: error.message, monitors: [] });
+    }
+});
+
+// GET /api/reddit-monitors/:id - Get a specific monitor
+app.get('/api/reddit-monitors/:id', authenticateAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const configPath = require('path').join(REDDIT_MONITORS_DIR, `${id}.json`);
+
+        if (!require('fs').existsSync(configPath)) {
+            return res.status(404).json({ success: false, message: 'Monitor not found' });
+        }
+
+        const configData = require('fs').readFileSync(configPath, 'utf8');
+        const config = JSON.parse(configData);
+
+        res.json({ success: true, monitor: config });
+    } catch (error) {
+        console.error('Error getting monitor:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// POST /api/reddit-monitors - Create a new monitor
+app.post('/api/reddit-monitors', authenticateAdmin, async (req, res) => {
+    try {
+        const { name, businessName } = req.body;
+
+        if (!name) {
+            return res.status(400).json({ success: false, message: 'Name is required' });
+        }
+
+        // Generate ID from name
+        const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const configPath = require('path').join(REDDIT_MONITORS_DIR, `${id}.json`);
+
+        if (require('fs').existsSync(configPath)) {
+            return res.status(400).json({ success: false, message: 'A monitor with this name already exists' });
+        }
+
+        // Create new monitor config
+        const newConfig = {
+            version: '2.0',
+            id: id,
+            name: name,
+            businessName: businessName || name,
+            createdAt: new Date().toISOString(),
+            lastUpdated: new Date().toISOString(),
+            serpApiKey: '***REMOVED***',
+            location: 'Phoenix, Arizona, United States',
+            timezone: 'America/Phoenix',
+            timezoneAbbr: 'MST',
+            targetSubreddits: ['phoenix', 'arizona'],
+            serviceKeywords: [],
+            highIntentPhrases: ['recommend', 'looking for', 'need', 'who do you use'],
+            exclusionKeywords: ['restaurant', 'hiring', 'job'],
+            locationKeywords: ['phoenix', 'arizona', 'az'],
+            searchQueries: [],
+            schedule: {
+                intervalMinutes: 30,
+                enabled: false
+            },
+            notifications: {
+                slack: {
+                    enabled: false,
+                    webhookUrl: ''
+                }
+            },
+            database: {
+                enabled: true,
+                mongoUri: 'mongodb://localhost:27017/townranker',
+                dbName: 'townranker',
+                collection: 'leads'
+            },
+            scoring: {
+                highIntentWeight: 30,
+                serviceWeight: 15,
+                locationWeight: 10,
+                minScore: 30,
+                thresholds: { high: 60, medium: 40 }
+            }
+        };
+
+        // Save config
+        require('fs').writeFileSync(configPath, JSON.stringify(newConfig, null, 2));
+
+        res.json({ success: true, message: 'Monitor created', monitor: newConfig });
+    } catch (error) {
+        console.error('Error creating monitor:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// PUT /api/reddit-monitors/:id - Update a monitor
+app.put('/api/reddit-monitors/:id', authenticateAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const configPath = require('path').join(REDDIT_MONITORS_DIR, `${id}.json`);
+
+        if (!require('fs').existsSync(configPath)) {
+            return res.status(404).json({ success: false, message: 'Monitor not found' });
+        }
+
+        const updates = req.body;
+        updates.lastUpdated = new Date().toISOString();
+        updates.id = id; // Ensure ID doesn't change
+
+        // Save updated config
+        require('fs').writeFileSync(configPath, JSON.stringify(updates, null, 2));
+
+        res.json({ success: true, message: 'Monitor updated', monitor: updates });
+    } catch (error) {
+        console.error('Error updating monitor:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// DELETE /api/reddit-monitors/:id - Delete a monitor
+app.delete('/api/reddit-monitors/:id', authenticateAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const configPath = require('path').join(REDDIT_MONITORS_DIR, `${id}.json`);
+
+        if (!require('fs').existsSync(configPath)) {
+            return res.status(404).json({ success: false, message: 'Monitor not found' });
+        }
+
+        require('fs').unlinkSync(configPath);
+
+        res.json({ success: true, message: 'Monitor deleted' });
+    } catch (error) {
+        console.error('Error deleting monitor:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// POST /api/reddit-monitors/:id/toggle - Toggle monitor active state
+app.post('/api/reddit-monitors/:id/toggle', authenticateAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { active } = req.body;
+        const configPath = require('path').join(REDDIT_MONITORS_DIR, `${id}.json`);
+
+        if (!require('fs').existsSync(configPath)) {
+            return res.status(404).json({ success: false, message: 'Monitor not found' });
+        }
+
+        const configData = require('fs').readFileSync(configPath, 'utf8');
+        const config = JSON.parse(configData);
+
+        config.schedule = config.schedule || {};
+        config.schedule.enabled = active;
+        config.lastUpdated = new Date().toISOString();
+
+        require('fs').writeFileSync(configPath, JSON.stringify(config, null, 2));
+
+        res.json({ success: true, message: `Monitor ${active ? 'enabled' : 'disabled'}`, active });
+    } catch (error) {
+        console.error('Error toggling monitor:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// GET /api/reddit-monitors/:id/leads - Get leads for a specific monitor
+app.get('/api/reddit-monitors/:id/leads', authenticateAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const limit = parseInt(req.query.limit) || 20;
+
+        // Query MongoDB for leads from this monitor
+        const leads = await Lead.find({
+            source: { $regex: new RegExp(id, 'i') }
+        })
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .lean();
+
+        res.json({ success: true, leads, total: leads.length });
+    } catch (error) {
+        console.error('Error fetching monitor leads:', error);
+        res.status(500).json({ success: false, message: error.message, leads: [] });
+    }
+});
+
+// POST /api/reddit-monitors/:id/run - Manually run a monitor
+app.post('/api/reddit-monitors/:id/run', authenticateAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { days = 30 } = req.body; // Default to 30 days
+        const configPath = require('path').join(REDDIT_MONITORS_DIR, `${id}.json`);
+
+        if (!require('fs').existsSync(configPath)) {
+            return res.status(404).json({ success: false, message: 'Monitor not found' });
+        }
+
+        // Validate days parameter
+        const daysNum = Math.min(Math.max(parseInt(days) || 30, 1), 365);
+
+        // Run the monitor in the background
+        const { exec } = require('child_process');
+        exec(`cd /root/scripts/phoenix-lead-system && node run-monitor.js ${id} ${daysNum}`, (error, stdout, stderr) => {
+            if (error) {
+                console.error('Monitor run error:', error);
+            }
+            console.log('Monitor output:', stdout);
+        });
+
+        res.json({ success: true, message: `Monitor started (searching last ${daysNum} days)` });
+    } catch (error) {
+        console.error('Error running monitor:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// ============================================
+// End Reddit Monitor API Endpoints
+// ============================================
+
+// ============================================
+// n8n Workflow Management API Endpoints
+// ============================================
+
+// GET /api/n8n/workflows - List all workflows
+app.get('/api/n8n/workflows', authenticateAdmin, async (req, res) => {
+    try {
+        // Query n8n SQLite database directly for workflow info
+        const dbPath = '/var/lib/docker/volumes/n8n_data/_data/database.sqlite';
+        const { stdout } = await execPromise(`sqlite3 "${dbPath}" "SELECT id, name, active, createdAt, updatedAt FROM workflow_entity ORDER BY updatedAt DESC;"`);
+
+        const workflows = [];
+        const lines = stdout.trim().split('\n').filter(line => line);
+
+        for (const line of lines) {
+            const parts = line.split('|');
+            if (parts.length >= 5) {
+                workflows.push({
+                    id: parts[0],
+                    name: parts[1],
+                    active: parts[2] === '1',
+                    createdAt: parts[3],
+                    updatedAt: parts[4]
+                });
+            }
+        }
+
+        res.json({
+            success: true,
+            workflows,
+            total: workflows.length
+        });
+    } catch (error) {
+        console.error('Error fetching n8n workflows:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch workflows',
+            error: error.message,
+            workflows: []
+        });
+    }
+});
+
+// POST /api/n8n/workflows/:id/toggle - Toggle workflow active state
+app.post('/api/n8n/workflows/:id/toggle', authenticateAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { active } = req.body;
+
+        // Update workflow active state
+        const activeFlag = active ? 'true' : 'false';
+        await execPromise(`docker exec n8n n8n update:workflow --id=${id} --active=${activeFlag} 2>/dev/null | grep -v "Permissions"`);
+
+        res.json({
+            success: true,
+            message: `Workflow ${active ? 'activated' : 'deactivated'} successfully`,
+            id,
+            active
+        });
+    } catch (error) {
+        console.error('Error toggling n8n workflow:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to toggle workflow',
+            error: error.message
+        });
+    }
+});
+
+// DELETE /api/n8n/workflows/:id - Delete a workflow
+app.delete('/api/n8n/workflows/:id', authenticateAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Delete the workflow
+        await execPromise(`docker exec n8n n8n delete:workflow --id=${id} 2>/dev/null | grep -v "Permissions"`);
+
+        res.json({
+            success: true,
+            message: 'Workflow deleted successfully',
+            id
+        });
+    } catch (error) {
+        console.error('Error deleting n8n workflow:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete workflow',
+            error: error.message
+        });
+    }
+});
+
+// ============================================
+// End n8n Workflow Management API Endpoints
+// ============================================
+
 // Serve index.html for all other routes (SPA support)
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -2493,6 +3531,16 @@ server.listen(PORT, () => {
         openphoneSync.setSocketIO(io);
         // openphoneSync.startPeriodicSync(2); // Disabled - using webhooks only
     }, 7000); // Wait 7 seconds to start after email monitoring
+
+    // Reddit Lead Monitor Service
+    setTimeout(() => {
+        console.log('🔍 Initializing Reddit Monitor Service...');
+        const initialized = redditMonitorService.init();
+        if (initialized) {
+            redditMonitorService.setSocketIO(io);
+            redditMonitorService.startAllMonitors();
+        }
+    }, 10000); // Wait 10 seconds to start after other services
 });
 
 // Graceful shutdown
@@ -2508,7 +3556,11 @@ process.on('SIGINT', async () => {
     // Stop OpenPhone sync (if it was running)
     // console.log('📱 Stopping OpenPhone sync...');
     // openphoneSync.stopPeriodicSync();
-    
+
+    // Stop Reddit monitors
+    console.log('🔍 Stopping Reddit monitors...');
+    redditMonitorService.stopAllMonitors();
+
     await mongoose.connection.close();
     process.exit(0);
 });

@@ -334,15 +334,275 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
+            .dashboard-header {
+                padding: 0.75rem;
+            }
+            .dashboard-header h1 {
+                font-size: 1.1rem;
+            }
+            .dashboard-header p {
+                font-size: 0.75rem;
+            }
+            .container {
+                padding: 0.75rem;
+            }
+            .stat-card {
+                padding: 0.875rem;
+            }
+            .stat-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+            .stat-value {
+                font-size: 1.25rem;
+            }
+            .stat-label {
+                font-size: 0.7rem;
+            }
+            .stat-change {
+                font-size: 0.65rem;
+            }
+            .card {
+                padding: 0.875rem;
+            }
+            .card h3 {
+                font-size: 0.9rem;
+            }
+            .keyword-item, .page-item {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+            .btn {
+                padding: 0.5rem 0.875rem;
+                font-size: 0.8rem;
+            }
+            .alert {
+                padding: 0.75rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Mobile Sidebar */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--gray-700);
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-right: 0.5rem;
+            font-size: 1.5rem;
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            border-right: 1px solid var(--gray-200);
+            z-index: 999;
+            transition: left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .mobile-sidebar.active {
+            left: 0;
+        }
+        .sidebar-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--gray-900);
+        }
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+        }
+        .sidebar-logo-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .sidebar-close {
+            background: none;
+            border: none;
+            color: var(--gray-600);
+            cursor: pointer;
+            padding: 0.25rem;
+            font-size: 1.5rem;
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+        .sidebar-section {
+            padding: 0 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray-600);
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.15s;
+        }
+        .sidebar-link:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+        .sidebar-link.active {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+        }
+        .sidebar-link i {
+            width: 20px;
+            text-align: center;
+        }
+        .sidebar-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .sidebar-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--gray-200);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-600);
+        }
+        .sidebar-user-info {
+            flex: 1;
+        }
+        .sidebar-user-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+        .sidebar-user-role {
+            font-size: 0.7rem;
+            color: var(--gray-600);
+        }
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
         }
     </style>
 </head>
 <body>
+    <!-- Mobile Sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <aside class="mobile-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/login" class="sidebar-logo">
+                <div class="sidebar-logo-icon">TR</div>
+                <span class="sidebar-logo-text">TownRanker</span>
+            </a>
+            <button class="sidebar-close" onclick="closeSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Main</div>
+                <a href="/login" class="sidebar-link">
+                    <i class="fas fa-th-large"></i>
+                    Dashboard
+                </a>
+                <a href="/admin/reddit-dashboard.html" class="sidebar-link">
+                    <i class="fab fa-reddit"></i>
+                    Reddit Monitors
+                </a>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Tools</div>
+                <a href="/admin/seo-dashboard.html" class="sidebar-link active">
+                    <i class="fas fa-chart-line"></i>
+                    SEO Dashboard
+                </a>
+                <a href="/admin/seo-checklist.html" class="sidebar-link">
+                    <i class="fas fa-tasks"></i>
+                    SEO Checklist
+                </a>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Account</div>
+                <a href="#" class="sidebar-link" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name">Admin</div>
+                    <div class="sidebar-user-role">Administrator</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
     <header class="dashboard-header">
-        <a href="/" class="logo">
-            <img src="/images/logo.png" alt="TownRanker">
-            <h1>SEO Dashboard</h1>
-        </a>
+        <div style="display: flex; align-items: center;">
+            <button class="menu-toggle" onclick="openSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a href="/" class="logo">
+                <img src="/images/logo.png" alt="TownRanker">
+                <h1>SEO Dashboard</h1>
+            </a>
+        </div>
         <div>
             <button class="btn btn-secondary" onclick="refreshData()">
                 <i class="fas fa-sync-alt"></i> Refresh
@@ -717,6 +977,34 @@
         
         // Initialize on load
         window.addEventListener('DOMContentLoaded', initDashboard);
+
+        // Sidebar functions
+        function openSidebar() {
+            document.getElementById('sidebar').classList.add('active');
+            document.getElementById('sidebarOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            sessionStorage.removeItem('token');
+            localStorage.removeItem('adminToken');
+            sessionStorage.removeItem('adminToken');
+            window.location.href = '/login';
+        }
+
+        // Close sidebar on escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSidebar();
+            }
+        });
     </script>
 </body>
 </html>

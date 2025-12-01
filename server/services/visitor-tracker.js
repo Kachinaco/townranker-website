@@ -67,6 +67,45 @@ function formatMs(ms) {
 }
 
 /**
+ * Get traffic source from referrer URL
+ */
+function getTrafficSource(referrer) {
+  if (!referrer) return '🔗 Direct Traffic';
+
+  try {
+    const url = new URL(referrer);
+    const hostname = url.hostname.toLowerCase();
+
+    // Search engines
+    if (hostname.includes('google')) return '🔍 Google Search';
+    if (hostname.includes('bing')) return '🔍 Bing Search';
+    if (hostname.includes('yahoo')) return '🔍 Yahoo Search';
+    if (hostname.includes('duckduckgo')) return '🔍 DuckDuckGo';
+    if (hostname.includes('baidu')) return '🔍 Baidu';
+    if (hostname.includes('yandex')) return '🔍 Yandex';
+
+    // Social media
+    if (hostname.includes('facebook') || hostname.includes('fb.com')) return '📘 Facebook';
+    if (hostname.includes('twitter') || hostname.includes('t.co')) return '🐦 Twitter/X';
+    if (hostname.includes('linkedin')) return '💼 LinkedIn';
+    if (hostname.includes('instagram')) return '📷 Instagram';
+    if (hostname.includes('pinterest')) return '📌 Pinterest';
+    if (hostname.includes('reddit')) return '🤖 Reddit';
+    if (hostname.includes('tiktok')) return '🎵 TikTok';
+    if (hostname.includes('youtube')) return '📺 YouTube';
+
+    // Other platforms
+    if (hostname.includes('gmail')) return '✉️ Gmail';
+    if (hostname.includes('outlook')) return '✉️ Outlook';
+
+    // Generic referral
+    return `🔗 ${hostname}`;
+  } catch (e) {
+    return '🔗 Unknown Referrer';
+  }
+}
+
+/**
  * Send visitor notification to Slack
  */
 async function sendSlackVisitorNotification(visitor) {
@@ -125,12 +164,35 @@ async function sendSlackVisitorNotification(visitor) {
       if (visitor.referrer) {
         navFields.push({
           type: 'mrkdwn',
-          text: `*Referrer:*\n${visitor.referrer || 'Direct'}`
+          text: `*Traffic Source:*\n${getTrafficSource(visitor.referrer)}`
         });
       }
       blocks.push({
         type: 'section',
         fields: navFields
+      });
+    }
+
+    // Add full referrer URL - What link brought them to the site
+    if (visitor.referrer) {
+      blocks.push({
+        type: 'section',
+        fields: [
+          {
+            type: 'mrkdwn',
+            text: `*🌐 Incoming Link (Referrer):*\n<${visitor.referrer}|${visitor.referrer.length > 80 ? visitor.referrer.substring(0, 77) + '...' : visitor.referrer}>`
+          }
+        ]
+      });
+    } else {
+      blocks.push({
+        type: 'section',
+        fields: [
+          {
+            type: 'mrkdwn',
+            text: `*🌐 Incoming Link (Referrer):*\nNone (Direct Traffic)`
+          }
+        ]
       });
     }
 

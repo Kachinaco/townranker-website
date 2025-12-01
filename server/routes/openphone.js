@@ -121,7 +121,7 @@ router.post('/send', async (req, res) => {
         const response = await axios.post(`${OPENPHONE_API_URL}/messages`, {
             to: [phoneNumber],
             from: PHONE_NUMBER,
-            text: message
+            content: message
         }, {
             headers: {
                 'Authorization': API_KEY,

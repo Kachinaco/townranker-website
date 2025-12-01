@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html lang="en-US" dir="ltr">
+<html lang="en-US" dir="ltr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
 
     <!-- Primary Meta Tags -->
     <title>Gilbert Arizona SEO & Web Design Services | TownRanker Digital Marketing</title>
@@ -33,913 +37,904 @@
     <meta name="twitter:description" content="Professional SEO and web design for Gilbert, AZ businesses.">
     <meta name="twitter:image" content="https://townranker.com/images/gilbert-seo-services.jpg">
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Font Awesome for icons -->
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#4285F4',
+                            red: '#EA4335',
+                            yellow: '#FBBC05',
+                            green: '#34A853',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --primary-light: #3b82f6;
-            --secondary: #10b981;
-            --secondary-dark: #059669;
-            --accent: #f59e0b;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
-            --white: #ffffff;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            line-height: 1.6;
-            color: var(--gray-900);
-            background: var(--white);
-            overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        /* Header */
-        header {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--gray-100);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            transition: all 0.3s ease;
-        }
-
-        header.scrolled {
-            box-shadow: var(--shadow-md);
-        }
-
-        nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 0;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            transition: transform 0.3s ease;
-        }
-
-        .logo:hover {
-            transform: scale(1.05);
-        }
-
-        .logo img {
-            height: 48px;
-            width: auto;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 32px;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: var(--gray-700);
-            text-decoration: none;
-            font-weight: 500;
-            position: relative;
-            transition: color 0.3s;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .cta-button {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--white) !important;
-            padding: 12px 28px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
-            display: inline-block;
-        }
-
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 12px rgba(37, 99, 235, 0.3);
-            color: var(--white) !important;
-        }
-
-        .cta-button::after {
-            display: none !important;
-        }
-
-        /* Mobile Menu */
-        .mobile-menu {
-            display: none;
-            cursor: pointer;
-            z-index: 1001;
-        }
-
-        .mobile-menu span {
-            display: block;
-            width: 25px;
-            height: 3px;
-            background: var(--gray-700);
-            margin: 5px 0;
-            transition: all 0.3s;
-        }
-
-        .mobile-menu.active span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .mobile-menu.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .mobile-menu.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -6px);
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-                position: fixed;
-                top: 70px;
-                left: 0;
-                right: 0;
-                background: white;
-                flex-direction: column;
-                padding: 20px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                z-index: 1000;
-            }
-
-            .nav-links.active {
-                display: flex;
-            }
-
-            .nav-links a {
-                padding: 12px 0;
-                border-bottom: 1px solid var(--gray-200);
-            }
-
-            .mobile-menu {
-                display: block;
-            }
-        }
-
-        /* Hero Section */
-        .hero-gilbert {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 100px 0 120px;
-            position: relative;
-            overflow: hidden;
-            color: white;
-            text-align: center;
-        }
-
-        .hero-gilbert::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-        }
-
-        .hero-gilbert h1 {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 3.5rem;
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero-gilbert p {
-            font-size: 1.25rem;
-            max-width: 800px;
-            margin: 0 auto 32px;
-            opacity: 0.95;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Services Grid */
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            padding: 60px 0;
-        }
-
-        .service-card {
-            background: white;
-            padding: 32px;
-            border-radius: 16px;
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s ease;
-            border: 1px solid var(--gray-100);
-        }
-
-        .service-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-xl);
-            border-color: var(--primary-light);
-        }
-
-        .service-card i {
-            color: var(--primary);
-            font-size: 2.5rem;
-            margin-bottom: 16px;
-        }
-
-        .service-card h3 {
-            color: var(--gray-900);
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .service-card p {
-            color: var(--gray-600);
-            line-height: 1.7;
-        }
-
-        /* Benefits Section */
-        .benefits-section {
-            background: var(--gray-50);
-            padding: 80px 0;
-        }
-
-        .benefits-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-
-        .benefit-item {
-            background: white;
-            padding: 28px;
-            border-radius: 12px;
-            border-left: 4px solid var(--primary);
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s ease;
-        }
-
-        .benefit-item:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateX(4px);
-        }
-
-        .benefit-item h4 {
-            color: var(--gray-900);
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .benefit-item p {
-            color: var(--gray-600);
-            font-size: 0.95rem;
-        }
-
-        /* Section Headings */
-        .local-seo-section,
-        .benefits-section,
-        .faq-section {
-            margin-top: 0;
-        }
-
-        .local-seo-section h2,
-        .benefits-section h2,
-        .faq-section h2 {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--gray-900);
-            text-align: center;
-            margin-bottom: 48px;
-        }
-
-        /* Process Steps */
-        .process-steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 24px;
-            margin-top: 48px;
-        }
-
-        .step {
-            text-align: center;
-            padding: 24px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .step-number {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.75rem;
-            font-weight: 800;
-            margin: 0 auto 16px;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-
-        .step h4 {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--gray-900);
-        }
-
-        /* FAQ Section */
-        .faq-section {
-            background: var(--gray-50);
-            padding: 80px 0;
-        }
-
-        .faq-container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .faq-item {
-            background: white;
-            margin-bottom: 20px;
-            padding: 28px;
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s ease;
-        }
-
-        .faq-item:hover {
-            box-shadow: var(--shadow-md);
-        }
-
-        .faq-item h3 {
-            color: var(--primary);
-            font-weight: 600;
-            margin-bottom: 12px;
-            font-size: 1.15rem;
-        }
-
-        .faq-item p {
-            color: var(--gray-700);
-            line-height: 1.7;
-        }
-
-        /* Contact Section */
-        .contact-section {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 80px 0;
-            text-align: center;
-        }
-
-        .contact-section h2 {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 24px;
-        }
-
-        .contact-section p {
-            font-size: 1.2rem;
-            margin-bottom: 32px;
-            opacity: 0.95;
-        }
-
-        /* Footer */
-        footer {
-            background: var(--gray-900);
-            color: white;
-            padding: 60px 0 20px;
-            margin-top: 0;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .footer-about h3,
-        .footer-links h4 {
-            color: white;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .footer-about p {
-            color: var(--gray-300);
-            margin-bottom: 20px;
-            line-height: 1.7;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 12px;
-        }
-
-        .social-links a {
-            color: white;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            transition: all 0.3s;
-        }
-
-        .social-links a:hover {
-            background: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .footer-links ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .footer-links li {
-            margin-bottom: 12px;
-        }
-
-        .footer-links a {
-            color: var(--gray-300);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: var(--primary-light);
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            color: var(--gray-400);
-        }
-
-        .footer-bottom a {
-            color: var(--gray-400);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-bottom a:hover {
-            color: var(--primary-light);
-        }
-
-        /* Responsive Typography */
-        @media (max-width: 768px) {
-            .hero-gilbert h1 {
-                font-size: 2.5rem;
-            }
-
-            .hero-gilbert p {
-                font-size: 1.1rem;
-            }
-
-            .local-seo-section h2,
-            .benefits-section h2,
-            .faq-section h2,
-            .contact-section h2 {
-                font-size: 2rem;
-            }
-        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 4s ease-in-out infinite; }
     </style>
 </head>
-<body>
-    <!-- Header -->
-    <header id="header">
-        <nav class="container">
-            <a href="/" class="logo" aria-label="TownRanker Web Development Agency Homepage">
-                <img src="images/townranker-logo.png" alt="TownRanker - Web Development Agency Logo" width="150" height="48">
+<body class="font-sans text-slate-800 antialiased bg-white selection:bg-brand-blue selection:text-white">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 top-0 start-0 border-b border-gray-100 bg-white/95 backdrop-blur-md transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between px-4 py-4">
+            <a href="/" class="flex items-center gap-3 group">
+                <div class="flex gap-1.5 items-center transition-transform group-hover:scale-105 duration-300">
+                    <div class="w-3.5 h-3.5 rounded-full bg-brand-red shadow-sm"></div>
+                    <div class="w-3.5 h-3.5 rounded-full bg-brand-yellow shadow-sm"></div>
+                    <div class="w-3.5 h-3.5 rounded-full bg-brand-green shadow-sm"></div>
+                </div>
+                <span class="self-center text-xl font-display font-bold tracking-tight text-slate-900">TownRanker</span>
             </a>
-            <div class="nav-links" id="navLinks">
-                <a href="/#features">Features</a>
-                <a href="/services.html">Services</a>
-                <a href="/portfolio.html">Portfolio</a>
-                <a href="/pricing.html">Pricing</a>
-                <a href="/gilbert-arizona-seo.html">Gilbert SEO</a>
-                <a href="/about.html">About</a>
-                <a href="/blog.html">Blog</a>
-                <a href="#contact" class="cta-button">Get Started</a>
+
+            <div class="flex md:order-2 space-x-3">
+                <a href="#contact" class="text-white bg-brand-blue hover:bg-blue-600 font-medium rounded-full text-sm px-6 py-2.5 transition-all shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30">
+                    Get Free Quote
+                </a>
+                <button type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-gray-500 rounded-lg md:hidden hover:bg-gray-100" id="menu-toggle">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 17 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+                    </svg>
+                </button>
             </div>
-            <div class="mobile-menu" id="mobileMenu">
-                <span></span>
-                <span></span>
-                <span></span>
+
+            <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-menu">
+                <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium md:space-x-8 md:flex-row md:mt-0">
+                    <li><a href="/" class="block py-2 px-3 text-slate-600 hover:text-brand-blue transition-colors md:p-0">Home</a></li>
+                    <li><a href="#services" class="block py-2 px-3 text-slate-600 hover:text-brand-blue transition-colors md:p-0">Services</a></li>
+                    <li><a href="#results" class="block py-2 px-3 text-slate-600 hover:text-brand-blue transition-colors md:p-0">Results</a></li>
+                    <li><a href="#contact" class="block py-2 px-3 text-slate-600 hover:text-brand-blue transition-colors md:p-0">Contact</a></li>
+                </ul>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
 
     <!-- Hero Section -->
-    <section class="hero-gilbert">
-        <h1>Gilbert Arizona SEO & Web Design Services</h1>
-        <p>Professional Digital Marketing Solutions for Growing Gilbert, AZ Businesses</p>
-        <p>Dominate Local Search Results • Drive More Traffic • Increase Revenue</p>
-        <a href="#contact" class="cta-button">Get Your Free SEO Audit</a>
-    </section>
-
-    <!-- Services Section -->
-    <section class="services-grid">
-        <div class="service-card">
-            <h3>🎯 Local SEO for Gilbert Businesses</h3>
-            <p>Optimize your Gilbert, Arizona business for local search results. We help you rank higher on Google Maps and local searches, bringing customers right to your door.</p>
-            <ul style="text-align: left; margin-top: 15px;">
-                <li>Google Business Profile optimization</li>
-                <li>Local citation building</li>
-                <li>Gilbert-specific keyword targeting</li>
-                <li>Review generation & management</li>
-            </ul>
+    <section class="pt-32 pb-20 lg:pt-40 lg:pb-28 bg-gradient-to-b from-blue-50/50 to-white relative overflow-hidden">
+        <div class="absolute top-20 right-0 -z-10 opacity-30">
+            <svg width="400" height="400" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#4285F4" d="M44.7,-76.4C58.9,-69.2,71.8,-59.1,81.6,-46.6C91.4,-34.1,98.1,-19.2,95.8,-4.9C93.5,9.3,82.2,22.9,70.6,33.8C59,44.7,47,52.9,34.8,60.3C22.6,67.7,10.2,74.3,-1.8,77.4C-13.8,80.5,-25.4,80.1,-36.5,74.6C-47.6,69.1,-58.2,58.5,-66.9,46.3C-75.6,34.1,-82.4,20.3,-83.2,6.1C-84,-8.1,-78.8,-22.7,-70.3,-35.6C-61.8,-48.5,-50,-59.7,-37.1,-67.6C-24.2,-75.5,-10.1,-80.1,2.6,-84.6C15.3,-89.1,28,-93.5,40.7,-97.9" transform="translate(100 100) scale(1.1)" />
+            </svg>
         </div>
 
-        <div class="service-card">
-            <h3>🌐 Web Design & Development</h3>
-            <p>Custom website design and development services for Gilbert, AZ businesses. We build fast, mobile-responsive websites that convert visitors into customers.</p>
-            <ul style="text-align: left; margin-top: 15px;">
-                <li>Mobile-responsive design</li>
-                <li>Fast-loading websites</li>
-                <li>Conversion optimization</li>
-                <li>E-commerce solutions</li>
-            </ul>
-        </div>
-
-        <div class="service-card">
-            <h3>📈 Search Engine Optimization</h3>
-            <p>Comprehensive SEO services to help your Gilbert business rank higher on Google. We use proven strategies to increase your online visibility and organic traffic.</p>
-            <ul style="text-align: left; margin-top: 15px;">
-                <li>On-page SEO optimization</li>
-                <li>Technical SEO audits</li>
-                <li>Content strategy & creation</li>
-                <li>Link building campaigns</li>
-            </ul>
-        </div>
-
-        <div class="service-card">
-            <h3>💼 Digital Marketing Strategy</h3>
-            <p>Complete digital marketing solutions tailored for Gilbert, Arizona businesses. From social media to paid advertising, we help you reach your target audience.</p>
-            <ul style="text-align: left; margin-top: 15px;">
-                <li>Social media marketing</li>
-                <li>Pay-per-click advertising</li>
-                <li>Content marketing</li>
-                <li>Email marketing campaigns</li>
-            </ul>
-        </div>
-    </section>
-
-    <!-- Benefits Section -->
-    <section class="benefits-section">
-        <div class="benefits-grid">
-            <div class="benefit-item">
-                <h3>📍 Local Gilbert Expertise</h3>
-                <p>We understand the Gilbert, AZ market and what local customers are searching for. Our strategies are tailored specifically for Gilbert businesses.</p>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-brand-blue text-sm font-semibold mb-8">
+                <span class="flex h-2 w-2 rounded-full bg-brand-blue animate-pulse"></span>
+                #1 Rated SEO Agency in Gilbert, AZ
             </div>
-            <div class="benefit-item">
-                <h3>📊 Proven Results</h3>
-                <p>Our SEO and web design services have helped Gilbert businesses increase their online visibility by an average of 300% in just 6 months.</p>
+
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-display font-extrabold tracking-tight text-slate-900 mb-6 leading-tight">
+                Gilbert Arizona <br class="hidden md:block" />
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue via-blue-600 to-blue-800">SEO & Web Design</span>
+            </h1>
+
+            <p class="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+                Dominate local search results and turn traffic into revenue. We help Gilbert businesses outrank the competition with data-driven strategies.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                <a href="#contact" class="w-full sm:w-auto px-8 py-4 bg-brand-blue text-white rounded-lg font-semibold text-lg shadow-lg shadow-blue-500/25 hover:bg-blue-600 hover:-translate-y-0.5 transition-all duration-300">
+                    Get Free Analysis
+                </a>
+                <a href="/" class="w-full sm:w-auto px-8 py-4 bg-white text-slate-700 border border-gray-200 rounded-lg font-semibold text-lg hover:border-brand-blue hover:text-brand-blue hover:bg-blue-50 transition-all duration-300">
+                    View Our Work
+                </a>
             </div>
-            <div class="benefit-item">
-                <h3>💰 ROI-Focused Approach</h3>
-                <p>We focus on strategies that drive real business results - more leads, more customers, and increased revenue for your Gilbert business.</p>
-            </div>
-            <div class="benefit-item">
-                <h3>🚀 Fast Implementation</h3>
-                <p>Start seeing results quickly with our proven SEO strategies. Most Gilbert clients see improvement in rankings within 30-60 days.</p>
+
+            <!-- Trust Badges -->
+            <div class="flex flex-wrap justify-center items-center gap-8 opacity-70 hover:opacity-100 transition-all duration-500">
+                <div class="flex items-center gap-2">
+                    <i class="fab fa-google text-2xl"></i>
+                    <span class="font-bold text-slate-700">Partner</span>
+                </div>
+                <div class="h-6 w-px bg-gray-300"></div>
+                <div class="flex items-center gap-2">
+                    <div class="flex text-brand-yellow text-sm">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <span class="font-semibold text-slate-700">5.0 Rating</span>
+                </div>
+                <div class="h-6 w-px bg-gray-300"></div>
+                <div class="font-bold text-slate-700">Top Rated SEO</div>
             </div>
         </div>
     </section>
 
-    <!-- Local SEO Section -->
-    <section class="local-seo-section">
-        <h2 style="text-align: center; color: #1e3a8a; font-size: 2.5rem; margin-bottom: 30px;">
-            Why Gilbert, Arizona Businesses Need Local SEO
-        </h2>
-        <p style="font-size: 1.125rem; line-height: 1.8; margin-bottom: 20px;">
-            Gilbert, Arizona is one of the fastest-growing cities in the United States, with a thriving local economy and competitive business landscape. To succeed in Gilbert's digital marketplace, your business needs a strong online presence and effective search engine optimization strategy.
-        </p>
-        <p style="font-size: 1.125rem; line-height: 1.8; margin-bottom: 20px;">
-            Local SEO for Gilbert businesses focuses on optimizing your online presence to appear in local search results when potential customers search for products or services in Gilbert, AZ. This includes optimizing for searches like "restaurants near me in Gilbert," "plumbers in Gilbert Arizona," or "best dentist Gilbert AZ."
-        </p>
-        <p style="font-size: 1.125rem; line-height: 1.8;">
-            With professional SEO services from TownRanker, your Gilbert business can dominate local search results, attract more qualified leads, and significantly increase your customer base. We specialize in helping Gilbert, Arizona businesses improve their Google rankings, online visibility, and digital marketing ROI.
-        </p>
+    <!-- Services Grid -->
+    <section id="services" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-4">Comprehensive Digital Growth</h2>
+                <p class="text-lg text-slate-600 max-w-2xl mx-auto">Everything you need to scale your Gilbert business online, all in one place.</p>
+            </div>
 
-        <div class="process-steps">
-            <div class="step">
-                <div class="step-number">1</div>
-                <h3>SEO Audit</h3>
-                <p>Comprehensive analysis of your current online presence and Gilbert market position</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="group p-8 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-brand-blue text-xl mb-6 group-hover:bg-brand-blue group-hover:text-white transition-colors">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Local SEO</h3>
+                    <p class="text-slate-600 leading-relaxed">Dominate "Near Me" searches. We optimize your presence to capture high-intent local traffic in Gilbert.</p>
+                </div>
+
+                <div class="group p-8 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <div class="w-12 h-12 rounded-lg bg-red-50 flex items-center justify-center text-brand-red text-xl mb-6 group-hover:bg-brand-red group-hover:text-white transition-colors">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Web Design</h3>
+                    <p class="text-slate-600 leading-relaxed">Lightning-fast, mobile-responsive websites designed to convert visitors into paying customers.</p>
+                </div>
+
+                <div class="group p-8 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <div class="w-12 h-12 rounded-lg bg-yellow-50 flex items-center justify-center text-brand-yellow text-xl mb-6 group-hover:bg-brand-yellow group-hover:text-white transition-colors">
+                        <i class="fab fa-google"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Google Business Profile</h3>
+                    <p class="text-slate-600 leading-relaxed">Full optimization of your GMB listing to increase visibility on Google Maps and drive calls.</p>
+                </div>
+
+                <div class="group p-8 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <div class="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center text-brand-green text-xl mb-6 group-hover:bg-brand-green group-hover:text-white transition-colors">
+                        <i class="fas fa-pen-fancy"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Content Marketing</h3>
+                    <p class="text-slate-600 leading-relaxed">Authority-building content that engages users and signals expertise to search engines.</p>
+                </div>
+
+                <div class="group p-8 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <div class="w-12 h-12 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600 text-xl mb-6 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Link Building</h3>
+                    <p class="text-slate-600 leading-relaxed">High-quality backlink acquisition to boost your domain authority and search rankings.</p>
+                </div>
+
+                <div class="group p-8 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <div class="w-12 h-12 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 text-xl mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Analytics & Reporting</h3>
+                    <p class="text-slate-600 leading-relaxed">Transparent monthly reporting. See exactly how your traffic, leads, and ROI are growing.</p>
+                </div>
             </div>
-            <div class="step">
-                <div class="step-number">2</div>
-                <h3>Strategy Development</h3>
-                <p>Custom SEO and marketing strategy tailored for your Gilbert business</p>
+        </div>
+    </section>
+
+    <!-- Why Gilbert Businesses Need SEO -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-6">Why Gilbert, Arizona Businesses Need Professional SEO in 2025</h2>
+
+                    <p class="text-lg text-slate-600 mb-6 leading-relaxed">
+                        Gilbert, Arizona has transformed from a small agricultural town into one of the fastest-growing cities in the United States. With a population exceeding 275,000 residents and a median household income well above the national average, Gilbert represents one of the most lucrative markets in the Phoenix metropolitan area for local businesses.
+                    </p>
+
+                    <p class="text-slate-600 mb-6 leading-relaxed">
+                        The competition for local customers has never been more intense. Every day, thousands of Gilbert residents search Google for services ranging from home improvement contractors and healthcare providers to restaurants and professional services. The businesses that appear at the top of these search results capture the lion's share of this high-intent traffic.
+                    </p>
+
+                    <p class="text-slate-600 mb-6 leading-relaxed">
+                        Consider this: <strong>92% of consumers</strong> choose a business from the first page of Google search results. If your Gilbert business isn't ranking on page one for your target keywords, you're essentially invisible to the vast majority of potential customers actively searching for your services right now.
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-4 mt-8">
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 text-center">
+                            <div class="text-3xl font-bold text-brand-blue mb-1">275K+</div>
+                            <div class="text-sm text-slate-500">Gilbert Population</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 text-center">
+                            <div class="text-3xl font-bold text-brand-green mb-1">$96K</div>
+                            <div class="text-sm text-slate-500">Median Income</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 text-center">
+                            <div class="text-3xl font-bold text-brand-yellow mb-1">92%</div>
+                            <div class="text-sm text-slate-500">Choose Page 1</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 text-center">
+                            <div class="text-3xl font-bold text-brand-red mb-1">46%</div>
+                            <div class="text-sm text-slate-500">Local Searches</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <video autoplay muted loop playsinline class="rounded-2xl shadow-xl w-full object-cover" style="aspect-ratio: 16/9;">
+                        <source src="/videos/gilbert-hero.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="absolute -bottom-6 -left-6 bg-white p-6 rounded-xl shadow-lg border border-gray-100 max-w-xs">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-brand-green rounded-full flex items-center justify-center text-white">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="font-bold text-slate-900">Local Search Growth</div>
+                        </div>
+                        <p class="text-sm text-slate-600">"Near me" searches have increased 500% in the past 5 years, making local SEO essential for Gilbert businesses.</p>
+                    </div>
+                </div>
             </div>
-            <div class="step">
-                <div class="step-number">3</div>
-                <h3>Implementation</h3>
-                <p>Execute proven SEO tactics and optimization techniques</p>
+        </div>
+    </section>
+
+    <!-- The Gilbert Digital Landscape -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="max-w-3xl mx-auto text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-4">Understanding Gilbert's Digital Landscape</h2>
+                <p class="text-lg text-slate-600">Gilbert's unique demographics and economic factors create specific opportunities and challenges for local SEO.</p>
             </div>
-            <div class="step">
-                <div class="step-number">4</div>
-                <h3>Monitoring & Growth</h3>
-                <p>Track results and continuously optimize for better Gilbert market performance</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                <div class="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl border border-blue-100">
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                        <span class="w-10 h-10 bg-brand-blue rounded-lg flex items-center justify-center text-white"><i class="fas fa-users"></i></span>
+                        Affluent, Tech-Savvy Population
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Gilbert residents are among the most educated and tech-savvy in Arizona. With a high concentration of professionals working in technology, healthcare, and finance, Gilbert consumers conduct extensive online research before making purchasing decisions. They read reviews, compare options, and expect businesses to have a strong digital presence. A business without professional SEO is at a significant disadvantage when competing for these discerning customers.
+                    </p>
+                </div>
+
+                <div class="bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border border-green-100">
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                        <span class="w-10 h-10 bg-brand-green rounded-lg flex items-center justify-center text-white"><i class="fas fa-home"></i></span>
+                        Rapid Growth & New Residents
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Gilbert continues to attract thousands of new residents annually from across the country. These newcomers don't have established relationships with local service providers—they turn to Google to find everything from dentists and mechanics to landscapers and restaurants. Businesses with strong SEO capture these new residents first, building customer relationships that can last for years or even decades.
+                    </p>
+                </div>
+
+                <div class="bg-gradient-to-br from-yellow-50 to-white p-8 rounded-2xl border border-yellow-100">
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                        <span class="w-10 h-10 bg-brand-yellow rounded-lg flex items-center justify-center text-white"><i class="fas fa-store"></i></span>
+                        Competitive Business Environment
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Gilbert's prosperity has attracted businesses of all sizes, creating intense competition across virtually every industry. Whether you're a restaurant competing with dozens of others in the Heritage District, a contractor competing for home improvement projects, or a healthcare provider building your patient base, you're facing competitors who are actively investing in their online visibility. Standing out requires a strategic, professional approach to SEO.
+                    </p>
+                </div>
+
+                <div class="bg-gradient-to-br from-red-50 to-white p-8 rounded-2xl border border-red-100">
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                        <span class="w-10 h-10 bg-brand-red rounded-lg flex items-center justify-center text-white"><i class="fas fa-mobile-alt"></i></span>
+                        Mobile-First Search Behavior
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Over 60% of local searches in Gilbert now occur on mobile devices. People search while driving, while at work, and while comparing options in real-time. This mobile-first behavior means your website must load instantly, display perfectly on any device, and provide clear calls-to-action. Our SEO strategy prioritizes mobile optimization to capture these on-the-go searchers.
+                    </p>
+                </div>
+            </div>
+
+            <div class="relative rounded-2xl overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=400&fit=crop" alt="Modern office workspace representing digital business" class="w-full h-64 object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-slate-900/90 to-slate-900/50 flex items-center">
+                    <div class="px-8 md:px-12 max-w-2xl">
+                        <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">The Cost of Inaction</h3>
+                        <p class="text-slate-200">Every day your competitors outrank you is another day they're capturing customers who should be yours. In Gilbert's competitive market, waiting to invest in SEO means falling further behind while your competitors strengthen their positions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our SEO Process -->
+    <section class="py-20 bg-slate-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="max-w-3xl mx-auto text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-display font-bold mb-4">Our Proven Gilbert SEO Process</h2>
+                <p class="text-lg text-slate-300">A systematic, data-driven approach that delivers consistent results for Gilbert businesses.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 hover:border-brand-blue transition-colors">
+                    <div class="w-12 h-12 bg-brand-red rounded-xl flex items-center justify-center text-white text-xl font-bold mb-6">1</div>
+                    <h3 class="text-xl font-bold mb-4">Discovery & Audit</h3>
+                    <p class="text-slate-400 leading-relaxed mb-4">We begin with a comprehensive analysis of your current online presence, examining your website's technical health, content quality, backlink profile, and competitive positioning. This audit reveals exactly where you stand and identifies the highest-impact opportunities for improvement.</p>
+                    <ul class="text-sm text-slate-500 space-y-2">
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Technical SEO audit</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Competitor analysis</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Keyword opportunity research</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 hover:border-brand-yellow transition-colors">
+                    <div class="w-12 h-12 bg-brand-yellow rounded-xl flex items-center justify-center text-white text-xl font-bold mb-6">2</div>
+                    <h3 class="text-xl font-bold mb-4">Strategy Development</h3>
+                    <p class="text-slate-400 leading-relaxed mb-4">Based on our audit findings and your business goals, we develop a customized SEO strategy targeting the keywords and search terms most likely to drive qualified traffic and conversions. Every recommendation is tied to measurable business outcomes.</p>
+                    <ul class="text-sm text-slate-500 space-y-2">
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Keyword targeting strategy</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Content roadmap</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Link building plan</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 hover:border-brand-blue transition-colors">
+                    <div class="w-12 h-12 bg-brand-blue rounded-xl flex items-center justify-center text-white text-xl font-bold mb-6">3</div>
+                    <h3 class="text-xl font-bold mb-4">Technical Optimization</h3>
+                    <p class="text-slate-400 leading-relaxed mb-4">We address all technical factors that affect your search visibility, from site speed and mobile responsiveness to structured data markup and crawlability. These foundational improvements ensure search engines can properly index and rank your content.</p>
+                    <ul class="text-sm text-slate-500 space-y-2">
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Site speed optimization</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Schema markup implementation</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Mobile optimization</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 hover:border-brand-green transition-colors">
+                    <div class="w-12 h-12 bg-brand-green rounded-xl flex items-center justify-center text-white text-xl font-bold mb-6">4</div>
+                    <h3 class="text-xl font-bold mb-4">Content Creation</h3>
+                    <p class="text-slate-400 leading-relaxed mb-4">Content is the foundation of SEO success. We create high-quality, locally-relevant content that addresses your target customers' questions and establishes your business as an authority in your field. Every piece is optimized for both search engines and human readers.</p>
+                    <ul class="text-sm text-slate-500 space-y-2">
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Service page optimization</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Location-specific content</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Blog content strategy</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 hover:border-purple-500 transition-colors">
+                    <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center text-white text-xl font-bold mb-6">5</div>
+                    <h3 class="text-xl font-bold mb-4">Local SEO & Citations</h3>
+                    <p class="text-slate-400 leading-relaxed mb-4">For Gilbert businesses, local SEO is critical. We optimize your Google Business Profile, build consistent citations across 50+ directories, and implement local schema markup to maximize your visibility in map pack results and local searches.</p>
+                    <ul class="text-sm text-slate-500 space-y-2">
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Google Business Profile optimization</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Citation building & cleanup</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Review generation strategy</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 hover:border-indigo-500 transition-colors">
+                    <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-xl font-bold mb-6">6</div>
+                    <h3 class="text-xl font-bold mb-4">Monitoring & Refinement</h3>
+                    <p class="text-slate-400 leading-relaxed mb-4">SEO is an ongoing process, not a one-time project. We continuously monitor your rankings, traffic, and conversions, making data-driven adjustments to capitalize on new opportunities and respond to algorithm changes or competitive shifts.</p>
+                    <ul class="text-sm text-slate-500 space-y-2">
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Monthly performance reports</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Ranking tracking</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Strategy optimization</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center divide-y md:divide-y-0 md:divide-x divide-slate-800">
+                <div class="p-4">
+                    <div class="text-4xl md:text-5xl font-bold text-brand-blue mb-2">10+</div>
+                    <div class="text-slate-400 font-medium uppercase tracking-wider text-sm">Years Experience</div>
+                </div>
+                <div class="p-4">
+                    <div class="text-4xl md:text-5xl font-bold text-brand-green mb-2">300%</div>
+                    <div class="text-slate-400 font-medium uppercase tracking-wider text-sm">Avg. Traffic Growth</div>
+                </div>
+                <div class="p-4">
+                    <div class="text-4xl md:text-5xl font-bold text-brand-yellow mb-2">500+</div>
+                    <div class="text-slate-400 font-medium uppercase tracking-wider text-sm">Happy Clients</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-6">Real Results for Gilbert Businesses</h2>
+                    <p class="text-lg text-slate-600 mb-8">We don't just promise rankings; we deliver measurable growth. Here is how we helped a local service business dominate their market in just 6 months.</p>
+
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative">
+                        <i class="fas fa-quote-left text-4xl text-blue-100 absolute top-6 left-6"></i>
+                        <p class="text-slate-700 italic mb-6 relative z-10">"TownRanker completely transformed our business. We went from Page 5 to #1 for our main keywords. Our phone hasn't stopped ringing since!"</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-brand-blue rounded-full flex items-center justify-center font-bold text-white">JD</div>
+                            <div>
+                                <div class="font-bold text-slate-900">John D.</div>
+                                <div class="text-sm text-slate-500">Owner, Gilbert HVAC Pros</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+                    <h3 class="font-bold text-slate-900 mb-6 border-b pb-4">Keyword Ranking Improvements</h3>
+
+                    <div class="mb-6">
+                        <div class="flex justify-between text-sm font-medium mb-2">
+                            <span>"HVAC Gilbert AZ"</span>
+                            <span class="text-brand-green">+45 Positions</span>
+                        </div>
+                        <div class="h-4 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-brand-green w-[85%]"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-400 mt-1">
+                            <span>Before: #48</span>
+                            <span>Now: #3</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex justify-between text-sm font-medium mb-2">
+                            <span>"AC Repair Gilbert"</span>
+                            <span class="text-brand-green">+30 Positions</span>
+                        </div>
+                        <div class="h-4 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-brand-green w-[80%]"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-400 mt-1">
+                            <span>Before: #32</span>
+                            <span>Now: #2</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-2">
+                            <span>"Heating Repair Near Me"</span>
+                            <span class="text-brand-green">+52 Positions</span>
+                        </div>
+                        <div class="h-4 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-brand-green w-[90%]"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-400 mt-1">
+                            <span>Before: #55</span>
+                            <span>Now: #3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Industries We Serve -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="max-w-3xl mx-auto text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-4">Industries We Serve in Gilbert</h2>
+                <p class="text-lg text-slate-600">We've helped businesses across virtually every industry dominate Gilbert's local search results. Our strategies are customized to the unique challenges and opportunities of each sector.</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-brand-blue hover:text-white transition-all duration-300 group cursor-pointer">
+                    <i class="fas fa-home text-3xl mb-3 text-brand-blue group-hover:text-white transition-colors"></i>
+                    <h3 class="font-bold">Home Services</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-blue-100 mt-1">HVAC, Plumbing, Electrical</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-brand-green hover:text-white transition-all duration-300 group cursor-pointer">
+                    <i class="fas fa-tooth text-3xl mb-3 text-brand-green group-hover:text-white transition-colors"></i>
+                    <h3 class="font-bold">Dental</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-green-100 mt-1">Dentists, Orthodontists</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-brand-yellow hover:text-white transition-all duration-300 group cursor-pointer">
+                    <i class="fas fa-briefcase-medical text-3xl mb-3 text-brand-yellow group-hover:text-white transition-colors"></i>
+                    <h3 class="font-bold">Healthcare</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-yellow-100 mt-1">Doctors, Clinics, Specialists</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-brand-red hover:text-white transition-all duration-300 group cursor-pointer">
+                    <i class="fas fa-balance-scale text-3xl mb-3 text-brand-red group-hover:text-white transition-colors"></i>
+                    <h3 class="font-bold">Legal</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-red-100 mt-1">Attorneys, Law Firms</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-purple-600 hover:text-white transition-all duration-300 group cursor-pointer">
+                    <i class="fas fa-car text-3xl mb-3 text-purple-600 group-hover:text-white transition-colors"></i>
+                    <h3 class="font-bold">Automotive</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-purple-100 mt-1">Repair, Dealers, Detailing</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-indigo-600 hover:text-white transition-all duration-300 group cursor-pointer">
+                    <i class="fas fa-utensils text-3xl mb-3 text-indigo-600 group-hover:text-white transition-colors"></i>
+                    <h3 class="font-bold">Restaurants</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-indigo-100 mt-1">Dining, Catering, Cafes</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-pink-600 hover:text-white transition-all duration-300 group cursor-pointer">
+                    <i class="fas fa-spa text-3xl mb-3 text-pink-600 group-hover:text-white transition-colors"></i>
+                    <h3 class="font-bold">Beauty & Wellness</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-pink-100 mt-1">Salons, Spas, Fitness</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-teal-600 hover:text-white transition-all duration-300 group cursor-pointer">
+                    <i class="fas fa-building text-3xl mb-3 text-teal-600 group-hover:text-white transition-colors"></i>
+                    <h3 class="font-bold">Real Estate</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-teal-100 mt-1">Agents, Brokers, Property</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-orange-600 hover:text-white transition-all duration-300 group cursor-pointer">
+                    <i class="fas fa-hammer text-3xl mb-3 text-orange-600 group-hover:text-white transition-colors"></i>
+                    <h3 class="font-bold">Construction</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-orange-100 mt-1">Contractors, Remodeling</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-cyan-600 hover:text-white transition-all duration-300 group cursor-pointer">
+                    <i class="fas fa-graduation-cap text-3xl mb-3 text-cyan-600 group-hover:text-white transition-colors"></i>
+                    <h3 class="font-bold">Education</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-cyan-100 mt-1">Tutoring, Schools, Training</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-lime-600 hover:text-white transition-all duration-300 group cursor-pointer">
+                    <i class="fas fa-leaf text-3xl mb-3 text-lime-600 group-hover:text-white transition-colors"></i>
+                    <h3 class="font-bold">Landscaping</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-lime-100 mt-1">Lawn Care, Design, Pools</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-slate-700 hover:text-white transition-all duration-300 group cursor-pointer">
+                    <i class="fas fa-cogs text-3xl mb-3 text-slate-600 group-hover:text-white transition-colors"></i>
+                    <h3 class="font-bold">Professional Services</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-slate-300 mt-1">Accounting, Consulting</p>
+                </div>
+            </div>
+
+            <div class="mt-12 bg-gradient-to-r from-brand-blue to-blue-700 rounded-2xl p-8 md:p-12 text-white text-center">
+                <h3 class="text-2xl font-bold mb-4">Don't See Your Industry?</h3>
+                <p class="text-blue-100 mb-6 max-w-2xl mx-auto">We've successfully ranked businesses in dozens of industries. Our proven methodology adapts to any local business looking to dominate Gilbert search results.</p>
+                <a href="#contact" class="inline-block bg-white text-brand-blue font-bold px-8 py-3 rounded-lg hover:bg-blue-50 transition-colors">Get Custom Strategy</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Areas We Serve -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-6">Gilbert Neighborhoods & Surrounding Areas</h2>
+
+                    <p class="text-lg text-slate-600 mb-6 leading-relaxed">
+                        Our local SEO expertise extends throughout Gilbert and the surrounding Phoenix metropolitan area. We understand the unique characteristics of each neighborhood and community, allowing us to create hyper-targeted strategies that resonate with local customers.
+                    </p>
+
+                    <p class="text-slate-600 mb-8 leading-relaxed">
+                        Whether your customers are in the established neighborhoods near the Heritage District, the growing communities of Agritopia and Morrison Ranch, or the newer developments in South Gilbert, we ensure your business appears prominently when they search for your services.
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="font-bold text-slate-900 mb-3 flex items-center gap-2">
+                                <span class="w-2 h-2 bg-brand-blue rounded-full"></span>
+                                Gilbert Neighborhoods
+                            </h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li>• Downtown Gilbert / Heritage District</li>
+                                <li>• Val Vista Lakes</li>
+                                <li>• Power Ranch</li>
+                                <li>• Seville</li>
+                                <li>• Agritopia</li>
+                                <li>• Morrison Ranch</li>
+                                <li>• Spectrum</li>
+                                <li>• Cooley Station</li>
+                                <li>• Lyons Gate</li>
+                                <li>• Finley Farms</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 mb-3 flex items-center gap-2">
+                                <span class="w-2 h-2 bg-brand-green rounded-full"></span>
+                                Nearby Cities
+                            </h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li>• Mesa</li>
+                                <li>• Chandler</li>
+                                <li>• Queen Creek</li>
+                                <li>• Tempe</li>
+                                <li>• Scottsdale</li>
+                                <li>• Phoenix</li>
+                                <li>• Apache Junction</li>
+                                <li>• San Tan Valley</li>
+                                <li>• Ahwatukee</li>
+                                <li>• Paradise Valley</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600&h=500&fit=crop" alt="Arizona cityscape" class="rounded-2xl shadow-xl w-full">
+                    <div class="absolute -bottom-6 -right-6 bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                        <div class="text-4xl font-bold text-brand-blue mb-1">50+</div>
+                        <div class="text-sm text-slate-500">Miles Coverage Radius</div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- FAQ Section -->
-    <section class="faq-section">
-        <div class="faq-container">
-            <h2 style="text-align: center; color: #1e3a8a; font-size: 2.5rem; margin-bottom: 40px;">
-                Gilbert Arizona SEO FAQs
-            </h2>
-
-            <div class="faq-item">
-                <h3>How much does SEO cost for Gilbert, AZ businesses?</h3>
-                <p>SEO pricing for Gilbert businesses typically ranges from $1,000 to $5,000+ per month depending on your industry competitiveness, current website status, and goals. We offer custom packages tailored to Gilbert businesses of all sizes. Contact us for a free consultation and personalized quote.</p>
+    <section class="py-20 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
+                <p class="text-lg text-slate-600">Everything you need to know about SEO services for Gilbert businesses.</p>
             </div>
 
-            <div class="faq-item">
-                <h3>How long does it take to see SEO results in Gilbert, Arizona?</h3>
-                <p>Most Gilbert businesses start seeing improvement in local search rankings within 30-60 days. Significant results typically appear within 3-6 months. SEO is a long-term investment, but the results compound over time, leading to sustained growth for your Gilbert business.</p>
-            </div>
+            <div class="space-y-4">
+                <details class="group bg-gray-50 rounded-xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer">
+                        <h3 class="font-bold text-slate-900 pr-4">How long does it take to see results from SEO in Gilbert?</h3>
+                        <span class="text-brand-blue group-open:rotate-180 transition-transform"><i class="fas fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="px-6 pb-6 text-slate-600 leading-relaxed">
+                        <p>SEO is a long-term investment that typically shows meaningful results within 3-6 months. However, the timeline varies based on several factors including your current website's authority, the competitiveness of your target keywords, and your industry. For Gilbert businesses in moderately competitive industries, we often see significant ranking improvements within 90 days, with continued growth over the following months. Unlike paid advertising, SEO results compound over time—the work we do today continues to deliver value for years to come.</p>
+                    </div>
+                </details>
 
-            <div class="faq-item">
-                <h3>Why is local SEO important for Gilbert businesses?</h3>
-                <p>Local SEO is crucial for Gilbert, AZ businesses because 76% of people who search for something nearby visit a business within a day. With Gilbert's growing population and competitive market, appearing in local search results means more customers find your business before they find your competitors.</p>
-            </div>
+                <details class="group bg-gray-50 rounded-xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer">
+                        <h3 class="font-bold text-slate-900 pr-4">What makes Gilbert SEO different from general SEO?</h3>
+                        <span class="text-brand-blue group-open:rotate-180 transition-transform"><i class="fas fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="px-6 pb-6 text-slate-600 leading-relaxed">
+                        <p>Local SEO for Gilbert requires a specialized approach that focuses on geographic relevance and local search signals. This includes optimizing your Google Business Profile, building citations in local directories, earning reviews from Gilbert customers, and creating content that addresses the specific needs of the Gilbert community. We also target location-specific keywords like "near me" searches and neighborhood-specific terms. Our deep understanding of Gilbert's unique demographics, neighborhoods, and competitive landscape allows us to craft strategies that resonate with local searchers.</p>
+                    </div>
+                </details>
 
-            <div class="faq-item">
-                <h3>What makes your Gilbert SEO services different?</h3>
-                <p>We specialize in Gilbert, Arizona market dynamics and understand the local business landscape. Our SEO strategies are data-driven, transparent, and focused on ROI. We provide detailed reporting, regular communication, and proven results for Gilbert businesses across all industries.</p>
-            </div>
+                <details class="group bg-gray-50 rounded-xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer">
+                        <h3 class="font-bold text-slate-900 pr-4">How much does SEO cost for a Gilbert business?</h3>
+                        <span class="text-brand-blue group-open:rotate-180 transition-transform"><i class="fas fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="px-6 pb-6 text-slate-600 leading-relaxed">
+                        <p>SEO investment varies based on your business goals, competitive landscape, and the scope of work required. For Gilbert local businesses, our monthly retainers typically range from $1,500 to $5,000+ depending on the intensity of competition in your industry and the aggressiveness of your growth goals. We provide customized proposals after analyzing your specific situation. Remember, SEO delivers one of the highest ROIs of any marketing channel because you're capturing customers who are actively searching for your services—these are high-intent leads that convert at significantly higher rates than other channels.</p>
+                    </div>
+                </details>
 
-            <div class="faq-item">
-                <h3>Do you serve businesses outside of Gilbert, Arizona?</h3>
-                <p>Yes! While we specialize in Gilbert SEO and digital marketing, we serve businesses throughout the Phoenix metro area including Mesa, Chandler, Tempe, Scottsdale, and beyond. We also work with businesses nationwide who want to improve their online presence.</p>
+                <details class="group bg-gray-50 rounded-xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer">
+                        <h3 class="font-bold text-slate-900 pr-4">Do you guarantee first page rankings?</h3>
+                        <span class="text-brand-blue group-open:rotate-180 transition-transform"><i class="fas fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="px-6 pb-6 text-slate-600 leading-relaxed">
+                        <p>We don't make specific ranking guarantees because no legitimate SEO company can—Google's algorithm considers hundreds of factors and changes constantly. What we do guarantee is a systematic, proven methodology that has consistently delivered results for Gilbert businesses. We set realistic expectations, provide transparent reporting, and focus on metrics that matter: traffic growth, lead generation, and revenue impact. Our track record speaks for itself, with the majority of our clients achieving first-page rankings for their primary keywords within 6 months.</p>
+                    </div>
+                </details>
+
+                <details class="group bg-gray-50 rounded-xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer">
+                        <h3 class="font-bold text-slate-900 pr-4">What's included in your Gilbert SEO services?</h3>
+                        <span class="text-brand-blue group-open:rotate-180 transition-transform"><i class="fas fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="px-6 pb-6 text-slate-600 leading-relaxed">
+                        <p>Our comprehensive SEO services include: technical website optimization (site speed, mobile responsiveness, structured data), on-page optimization (title tags, meta descriptions, content optimization), local SEO (Google Business Profile management, citation building, review strategy), content creation (blog posts, service pages, location pages), link building (earning high-quality backlinks from relevant websites), and monthly reporting with strategy calls. We handle everything needed to improve your search visibility, allowing you to focus on running your business.</p>
+                    </div>
+                </details>
+
+                <details class="group bg-gray-50 rounded-xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer">
+                        <h3 class="font-bold text-slate-900 pr-4">Can you help with Google Business Profile optimization?</h3>
+                        <span class="text-brand-blue group-open:rotate-180 transition-transform"><i class="fas fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="px-6 pb-6 text-slate-600 leading-relaxed">
+                        <p>Absolutely—Google Business Profile (formerly Google My Business) optimization is a core component of our local SEO strategy. We optimize every aspect of your profile including business categories, service descriptions, photos, posts, Q&A, and review responses. For Gilbert businesses, appearing in the local map pack can drive significant foot traffic and phone calls. We also implement strategies to encourage satisfied customers to leave reviews, which are critical for local ranking success.</p>
+                    </div>
+                </details>
+
+                <details class="group bg-gray-50 rounded-xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer">
+                        <h3 class="font-bold text-slate-900 pr-4">Do you work with businesses outside of Gilbert?</h3>
+                        <span class="text-brand-blue group-open:rotate-180 transition-transform"><i class="fas fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="px-6 pb-6 text-slate-600 leading-relaxed">
+                        <p>Yes! While we specialize in Gilbert SEO, we serve businesses throughout the Phoenix metropolitan area including Mesa, Chandler, Tempe, Scottsdale, Queen Creek, and beyond. Our local SEO expertise translates across the East Valley and greater Phoenix region. We understand the nuances of each market and can create multi-location strategies for businesses serving multiple cities.</p>
+                    </div>
+                </details>
+
+                <details class="group bg-gray-50 rounded-xl">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer">
+                        <h3 class="font-bold text-slate-900 pr-4">How do you measure SEO success?</h3>
+                        <span class="text-brand-blue group-open:rotate-180 transition-transform"><i class="fas fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="px-6 pb-6 text-slate-600 leading-relaxed">
+                        <p>We track multiple KPIs to measure the success of your SEO campaign: keyword rankings (how you rank for target search terms), organic traffic (visitors from search engines), local visibility (map pack appearances, Google Business Profile metrics), conversions (leads, calls, form submissions generated), and ultimately revenue impact. Our monthly reports clearly show progress across all these metrics, and we hold regular strategy calls to discuss results and adjust tactics as needed.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="py-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+            <h2 class="text-3xl md:text-4xl font-display font-bold text-white mb-6">Ready to Dominate Gilbert Search Results?</h2>
+            <p class="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">Join the hundreds of Gilbert businesses that have transformed their online presence with TownRanker. Your competitors are already investing in SEO—can you afford to wait?</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#contact" class="px-8 py-4 bg-brand-blue text-white rounded-lg font-bold text-lg shadow-lg shadow-blue-500/25 hover:bg-blue-600 hover:-translate-y-1 transition-all duration-300">
+                    Get Your Free Analysis
+                </a>
+                <a href="tel:+19288325856" class="px-8 py-4 bg-white/10 text-white border border-white/20 rounded-lg font-bold text-lg hover:bg-white/20 transition-all duration-300">
+                    <i class="fas fa-phone mr-2"></i> (928) 832-5856
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Contact Section -->
-    <section class="contact-section" id="contact">
-        <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Ready to Grow Your Gilbert Business?</h2>
-        <p style="font-size: 1.25rem; margin-bottom: 30px; max-width: 800px; margin-left: auto; margin-right: auto;">
-            Get a free SEO audit and digital marketing consultation for your Gilbert, Arizona business.
-            Let's discuss how we can help you dominate local search results and attract more customers.
-        </p>
-        <a href="mailto:rank@townranker.com" class="cta-button" style="background: white; color: #1e3a8a;">
-            📧 Contact Us Today
-        </a>
-        <p style="margin-top: 20px;">
-            📞 <a href="tel:+19288325856" style="color: white; text-decoration: none;">(928) 832-5856</a>
-        </p>
-        <p style="margin-top: 10px; opacity: 0.9;">
-            Serving Gilbert, Mesa, Chandler, and the Greater Phoenix Area
-        </p>
-    </section>
+    <section id="contact" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-4">Let's Scale Your Business</h2>
+                    <p class="text-lg text-slate-600 mb-8">Ready to dominate the Gilbert market? Fill out the form for a free comprehensive SEO analysis and strategy session.</p>
 
-    <!-- Footer -->
-    <footer role="contentinfo">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-about">
-                    <h3>TownRanker</h3>
-                    <p>Building revenue-generating websites for ambitious businesses. Your success is our mission.</p>
-                    <div class="social-links">
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-brand-blue shrink-0">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-900">Call Us</div>
+                                <a href="tel:+19288325856" class="text-slate-600 hover:text-brand-blue transition-colors">(928) 832-5856</a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-brand-blue shrink-0">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-900">Email Us</div>
+                                <a href="mailto:rank@townranker.com" class="text-slate-600 hover:text-brand-blue transition-colors">rank@townranker.com</a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-brand-blue shrink-0">
+                                <i class="fas fa-map-pin"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-900">Serving</div>
+                                <p class="text-slate-600">Gilbert, Chandler, Mesa & Phoenix Metro</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 h-64 rounded-xl overflow-hidden border border-gray-200">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d106734.16960647489!2d-111.8684993270601!3d33.31087448635685!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x872ba9048617782f%3A0xb2d0b3494d888806!2sGilbert%2C%20AZ!5e0!3m2!1sen!2sus!4v1629834567890!5m2!1sen!2sus" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                     </div>
                 </div>
 
-                <div class="footer-links">
-                    <h4>Services</h4>
-                    <ul>
-                        <li><a href="/services.html">All Services</a></li>
-                        <li><a href="/services.html#web-development">Web Development</a></li>
-                        <li><a href="/services.html#ecommerce">E-Commerce</a></li>
-                        <li><a href="/services.html#seo">SEO & Marketing</a></li>
-                        <li><a href="/gilbert-arizona-seo.html">Gilbert AZ SEO</a></li>
+                <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+                    <form id="contactForm" class="space-y-5">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                            <input type="text" id="name" name="name" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-brand-blue focus:ring-2 focus:ring-blue-100 outline-none transition-all" placeholder="John Doe" required>
+                        </div>
+
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                            <input type="email" id="email" name="email" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-brand-blue focus:ring-2 focus:ring-blue-100 outline-none transition-all" placeholder="john@company.com" required>
+                        </div>
+
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-slate-700 mb-1">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-brand-blue focus:ring-2 focus:ring-blue-100 outline-none transition-all" placeholder="(480) 555-0123">
+                        </div>
+
+                        <div>
+                            <label for="business" class="block text-sm font-medium text-slate-700 mb-1">Business Name</label>
+                            <input type="text" id="business" name="business" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-brand-blue focus:ring-2 focus:ring-blue-100 outline-none transition-all" placeholder="Your Business">
+                        </div>
+
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-slate-700 mb-1">How can we help?</label>
+                            <textarea id="message" name="message" rows="4" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-brand-blue focus:ring-2 focus:ring-blue-100 outline-none transition-all" placeholder="Tell us about your business goals..."></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full py-4 px-6 bg-brand-blue text-white font-bold rounded-lg shadow-lg shadow-blue-500/25 hover:bg-blue-600 hover:-translate-y-0.5 transition-all duration-200">
+                            Get My Free Analysis
+                        </button>
+                        <p class="text-xs text-center text-slate-400 mt-4">No spam. Secure & confidential.</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="flex gap-1.5">
+                            <div class="w-3 h-3 rounded-full bg-brand-red"></div>
+                            <div class="w-3 h-3 rounded-full bg-brand-yellow"></div>
+                            <div class="w-3 h-3 rounded-full bg-brand-green"></div>
+                        </div>
+                        <span class="text-xl font-display font-bold text-white">TownRanker</span>
+                    </div>
+                    <p class="text-slate-400 mb-6 max-w-md">Professional SEO and web design services for Gilbert, Arizona businesses. We help local companies dominate search results and grow revenue.</p>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="/" class="hover:text-brand-blue transition-colors">Home</a></li>
+                        <li><a href="#services" class="hover:text-brand-blue transition-colors">Services</a></li>
+                        <li><a href="#results" class="hover:text-brand-blue transition-colors">Results</a></li>
+                        <li><a href="#contact" class="hover:text-brand-blue transition-colors">Contact</a></li>
                     </ul>
                 </div>
 
-                <div class="footer-links">
-                    <h4>Company</h4>
-                    <ul>
-                        <li><a href="/about.html">About Us</a></li>
-                        <li><a href="/portfolio.html">Portfolio</a></li>
-                        <li><a href="/pricing.html">Pricing</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-links">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="/blog.html">Blog</a></li>
-                        <li><a href="/portfolio.html">Case Studies</a></li>
-                        <li><a href="/#faq">FAQ</a></li>
-                        <li><a href="#contact">Support</a></li>
+                <div>
+                    <h4 class="text-white font-bold mb-4">Contact</h4>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="tel:+19288325856" class="hover:text-brand-blue transition-colors">(928) 832-5856</a></li>
+                        <li><a href="mailto:rank@townranker.com" class="hover:text-brand-blue transition-colors">rank@townranker.com</a></li>
+                        <li>Gilbert, AZ</li>
                     </ul>
                 </div>
             </div>
 
-            <div class="footer-bottom">
-                <p>&copy; 2024 TownRanker. All rights reserved. | <a href="/privacy.html">Privacy Policy</a> | <a href="/terms.html">Terms of Service</a></p>
+            <div class="border-t border-slate-800 pt-8 text-center text-slate-500 text-sm">
+                <p>&copy; 2025 TownRanker. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Schema.org Structured Data -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        "name": "TownRanker - Gilbert Arizona SEO Services",
-        "image": "https://townranker.com/images/gilbert-seo-services.jpg",
-        "description": "Professional SEO and web design services for Gilbert, Arizona businesses. Local digital marketing agency specializing in search engine optimization.",
-        "address": {
-            "@type": "PostalAddress",
-            "addressLocality": "Gilbert",
-            "addressRegion": "AZ",
-            "postalCode": "85295",
-            "addressCountry": "US"
-        },
-        "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": "33.3528",
-            "longitude": "-111.7890"
-        },
-        "url": "https://townranker.com/gilbert-arizona-seo.html",
-        "telephone": "+1-928-832-5856",
-        "email": "rank@townranker.com",
-        "priceRange": "$$",
-        "areaServed": {
-            "@type": "City",
-            "name": "Gilbert",
-            "containedInPlace": {
-                "@type": "State",
-                "name": "Arizona"
-            }
-        },
-        "hasOfferCatalog": {
-            "@type": "OfferCatalog",
-            "name": "SEO and Web Design Services",
-            "itemListElement": [
-                {
-                    "@type": "Offer",
-                    "itemOffered": {
-                        "@type": "Service",
-                        "name": "Local SEO Services Gilbert AZ",
-                        "description": "Local search engine optimization for Gilbert, Arizona businesses"
-                    }
-                },
-                {
-                    "@type": "Offer",
-                    "itemOffered": {
-                        "@type": "Service",
-                        "name": "Web Design Gilbert Arizona",
-                        "description": "Custom website design and development for Gilbert businesses"
-                    }
-                },
-                {
-                    "@type": "Offer",
-                    "itemOffered": {
-                        "@type": "Service",
-                        "name": "Digital Marketing Gilbert AZ",
-                        "description": "Comprehensive digital marketing services for Gilbert area businesses"
-                    }
-                }
-            ]
-        }
-    }
-    </script>
-
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-            {
-                "@type": "Question",
-                "name": "How much does SEO cost for Gilbert, AZ businesses?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "SEO pricing for Gilbert businesses typically ranges from $1,000 to $5,000+ per month depending on your industry competitiveness, current website status, and goals. We offer custom packages tailored to Gilbert businesses of all sizes."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "How long does it take to see SEO results in Gilbert, Arizona?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Most Gilbert businesses start seeing improvement in local search rankings within 30-60 days. Significant results typically appear within 3-6 months."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Why is local SEO important for Gilbert businesses?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Local SEO is crucial for Gilbert, AZ businesses because 76% of people who search for something nearby visit a business within a day. With Gilbert's growing population and competitive market, appearing in local search results means more customers find your business before they find your competitors."
-                }
-            }
-        ]
-    }
-    </script>
-
-    <!-- Visitor Tracking -->
-    <script src="/js/visitor-tracker.js"></script>
-
-    <!-- Mobile Menu Toggle -->
+    <!-- Mobile Menu Script -->
     <script>
-        document.getElementById('mobileMenu')?.addEventListener('click', function() {
-            document.getElementById('navLinks')?.classList.toggle('active');
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const menu = document.getElementById('navbar-menu');
+            menu.classList.toggle('hidden');
         });
 
-        // Close mobile menu when clicking a link
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('navLinks')?.classList.remove('active');
-            });
-        });
-    </script>
+        // Form submission
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                company: document.getElementById('business').value,
+                message: document.getElementById('message').value,
+                source: 'Gilbert SEO Page'
+            };
 
-    <!-- Scroll to top on page load -->
-    <script>
-        // Ensure page starts at the top
-        window.addEventListener('load', function() {
-            window.scrollTo(0, 0);
-        });
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
 
-        // Also reset scroll position immediately
-        if ('scrollRestoration' in history) {
-            history.scrollRestoration = 'manual';
-        }
-        window.scrollTo(0, 0);
+                if (response.ok) {
+                    alert('Thank you! We will contact you shortly.');
+                    this.reset();
+                } else {
+                    alert('Something went wrong. Please call us directly.');
+                }
+            } catch (error) {
+                alert('Something went wrong. Please call us directly.');
+            }
+        });
     </script>
 </body>
 </html>
